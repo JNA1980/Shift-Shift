@@ -191,10 +191,17 @@ namespace ShiftShift.EditorTools
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
             var json = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelJsonPath);
-            LevelData level = json != null ? JsonUtility.FromJson<LevelData>(json.text) : null;
-            if (level == null || level.Validate().Count > 0)
+            if (json == null)
             {
-                Debug.LogError($"[LevelTest] {LevelJsonPath} is missing or invalid.");
+                Debug.LogError($"[LevelTest] {LevelJsonPath} not found as a text asset " +
+                               $"(file on disk: {(File.Exists(LevelJsonPath) ? "yes, not imported yet: try Assets > Refresh" : "no")}).");
+                return;
+            }
+            LevelData level = JsonUtility.FromJson<LevelData>(json.text);
+            var errors = level != null ? level.Validate() : new List<string> { "could not parse JSON" };
+            if (errors.Count > 0)
+            {
+                Debug.LogError($"[LevelTest] {LevelJsonPath} is invalid:\n- " + string.Join("\n- ", errors));
                 return;
             }
 
