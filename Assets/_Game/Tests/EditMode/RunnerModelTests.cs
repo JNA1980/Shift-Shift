@@ -58,6 +58,48 @@ namespace ShiftShift.Tests
             Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Block, 1.0, lane: 0)));
         }
 
+        // ---------- lane change in progress (key-down to key-up): either lane is safe ----------
+
+        [Test]
+        public void MovingBackEarly_ReleasedAfterBlock_Passes()
+        {
+            // John's day-11 run: right at 2.24, back left pressed 2.88 / recognised 3.051, block in the middle at 3.0.
+            _m.OnGestureFired(GestureType.TapRight, 2.240, 1, 2.304);
+            _m.OnGestureFired(GestureType.TapLeft, 2.880, 1, 3.051);
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Block, 3.0, lane: 0)));
+        }
+
+        [Test]
+        public void MovingBackEarly_ReleasedBeforeBlock_Hits()
+        {
+            _m.OnGestureFired(GestureType.TapRight, 2.240, 1, 2.304);
+            _m.OnGestureFired(GestureType.TapLeft, 2.880, 1, 2.950);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Block, 3.0, lane: 0)));
+        }
+
+        [Test]
+        public void DodgingOutLate_PressedBeforeBlock_Passes()
+        {
+            _m.OnGestureFired(GestureType.TapRight, 2.950, 1, 3.100);
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Block, 3.0, lane: 0)));
+        }
+
+        [Test]
+        public void DodgingOut_PressedAfterBlock_Hits()
+        {
+            _m.OnGestureFired(GestureType.TapRight, 3.050, 1, 3.150);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Block, 3.0, lane: 0)));
+        }
+
+        [Test]
+        public void RecognizedLane_LagsKeyDownLane()
+        {
+            _m.OnGestureFired(GestureType.TapLeft, 1.0, 1, 1.1);
+            Assert.AreEqual(-1, _m.LaneAt(1.05));
+            Assert.AreEqual(0, _m.RecognizedLaneAt(1.05));
+            Assert.AreEqual(-1, _m.RecognizedLaneAt(1.1));
+        }
+
         // ---------- decision A: holds count from key-down ----------
 
         [Test]

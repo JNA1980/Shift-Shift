@@ -128,10 +128,10 @@ namespace ShiftShift
 
         private void OnGestureFired(GestureType type, double time)
         {
-            _model.OnGestureFired(type, time, input.AlternateStreak);
+            double now = Now;
+            _model.OnGestureFired(type, time, input.AlternateStreak, now);
             if (State != RunState.Running) return;
 
-            double now = Now;
             if (type == GestureType.TapLeft || type == GestureType.TapRight)
             {
                 _easeFromX = _visualX;

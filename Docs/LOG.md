@@ -148,3 +148,18 @@
 **Open bug (not yet diagnosed)**
 - "Sometimes after an obstacle is passed I have to wait before changing lane, or it fails."
   Hypotheses: (1) blocks judged at their centre while they look passed ~80 ms earlier, so a tap back counts as inside the lane (decision A uses key-down); (2) phase lockout ignores taps (would not cause a fail); (3) ordering bug. Waiting on the `[Run] Failed` line plus the preceding `[Gesture]` taps to compare times.
+
+## 2026-11-09 — D11: fix "fails after passing a block"
+
+**Diagnosis (from John's run)**
+- TapLeft key-down 2.880 s, recognised 3.051 s; Block @30m (middle) at 3.000 s. Rules (decision A, key-down) put the runner back in the middle before the block, while the screen only moves the capsule after key-up (3.05 s + 120 ms ease). The fail was then shown at 30.5 m because judging waited for the tap to resolve, so it looked like a fail after passing.
+
+**Fix (John: go)**
+- A lane change is "in between" from key-down to key-up: a one-lane obstacle passes if either lane is clear. RunnerModel records each tap's recognition time; Runner passes it in. Holds, jumps, phase unchanged.
+
+**Tested**
+- 52/52 core tests (5 new, including John's exact timings → Pass, and released-before-block → Hit).
+- New check: Core, Runtime and Editor compiled as separate assemblies with only their asmdef references (non-transitive, like Unity). Verified it reproduces yesterday's missing-reference error.
+
+**Not yet run**
+- In Unity / Play mode: re-run the 30 m block the same way (tap back just before it, release after).

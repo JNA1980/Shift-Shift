@@ -11,6 +11,9 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
   even though the slide is only recognised 250 ms after the press. If a press made before the obstacle is still
   undecided, the Runner waits for it (at most one tap/hold threshold), so a fail can show up to ~250 ms late.
 - **Visuals start on recognition** (lane ease 120 ms, jump arc 0.5 s, slide pose), so they can lag the rules slightly.
+- **A lane change is "in between" from key-down to key-up** (day 11 fix): during that time a one-lane obstacle is
+  passed if either the lane being left or the lane being entered is clear. Dodging out late still works (key-down
+  counts) and moving back early works if the key-up comes after the obstacle, which matches what the screen shows.
 
 | Obstacle | Passes when | Gesture |
 |---|---|---|

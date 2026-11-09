@@ -51,7 +51,7 @@ namespace ShiftShift.Core
     /// </summary>
     public sealed class RunnerModel
     {
-        private struct LaneChange { public double Time; public int Delta; }
+        private struct LaneChange { public double Time; public double RecognizedAt; public int Delta; }
         private struct Interval { public double Start; public double End; }
         private sealed class Charge { public double Time; public bool Used; }
 
@@ -74,13 +74,16 @@ namespace ShiftShift.Core
 
         // ---------- input ----------
 
+        /// <param name="time">Song time of the key-down (what the gesture is judged by).</param>
         /// <param name="alternateStreak">ShiftInput.AlternateStreak at the time the event fired.</param>
-        public void OnGestureFired(GestureType type, double time, int alternateStreak)
+        /// <param name="recognizedAt">Song time the gesture was recognised (key-up for taps). Defaults to <paramref name="time"/>.</param>
+        public void OnGestureFired(GestureType type, double time, int alternateStreak, double recognizedAt = double.NaN)
         {
+            if (double.IsNaN(recognizedAt) || recognizedAt < time) recognizedAt = time;
             switch (type)
             {
-                case GestureType.TapLeft: AddLaneChange(time, -1); break;
-                case GestureType.TapRight: AddLaneChange(time, +1); break;
+                case GestureType.TapLeft: AddLaneChange(time, recognizedAt, -1); break;
+                case GestureType.TapRight: AddLaneChange(time, recognizedAt, +1); break;
                 case GestureType.BothTap: _jumps.Add(time); break;
                 case GestureType.Alternate:
                     if (alternateStreak > 0 && alternateStreak % _rules.ChargeTaps == 0)
@@ -108,12 +111,26 @@ namespace ShiftShift.Core
 
         // ---------- state at a song time ----------
 
+        /// <summary>Lane counting every lane change from its key-down (decision A).</summary>
         public int LaneAt(double time)
         {
             int lane = 0;
             foreach (var c in _laneChanges)
             {
-                if (c.Time > time) break; // list is kept sorted by time
+                if (c.Time > time) break; // list is kept sorted by key-down time
+                lane = Math.Max(-1, Math.Min(1, lane + c.Delta));
+            }
+            return lane;
+        }
+
+        /// <summary>Lane counting lane changes only once recognised (key-up): where the runner is shown.</summary>
+        public int RecognizedLaneAt(double time)
+        {
+            int lane = 0;
+            foreach (var c in _laneChanges)
+            {
+                if (c.Time > time) break;
+                if (c.RecognizedAt > time) continue;
                 lane = Math.Max(-1, Math.Min(1, lane + c.Delta));
             }
             return lane;
@@ -147,7 +164,10 @@ namespace ShiftShift.Core
         public ObstacleOutcome Resolve(ObstacleInfo o)
         {
             double t = o.Time;
-            if (!o.AllLanes && LaneAt(t) != o.Lane) return ObstacleOutcome.Pass;
+            // A lane change is "in between" from key-down to key-up: safe if either the lane being left or the lane
+            // being entered is clear (day 11 fix: moving back just before a block, released after it, looked fine
+            // on screen but failed).
+            if (!o.AllLanes && (LaneAt(t) != o.Lane || RecognizedLaneAt(t) != o.Lane)) return ObstacleOutcome.Pass;
 
             bool phased = IsPhased(t);
             if (o.Layer == ObstacleLayer.Solid && phased) return ObstacleOutcome.Pass;
@@ -177,12 +197,12 @@ namespace ShiftShift.Core
             return false;
         }
 
-        private void AddLaneChange(double time, int delta)
+        private void AddLaneChange(double time, double recognizedAt, int delta)
         {
             // Taps are reported on key-up but timed at key-down, so keep the list sorted by key-down time.
             int idx = _laneChanges.Count;
             while (idx > 0 && _laneChanges[idx - 1].Time > time) idx--;
-            _laneChanges.Insert(idx, new LaneChange { Time = time, Delta = delta });
+            _laneChanges.Insert(idx, new LaneChange { Time = time, RecognizedAt = recognizedAt, Delta = delta });
         }
     }
 }
