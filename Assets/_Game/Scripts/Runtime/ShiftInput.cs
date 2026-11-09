@@ -35,6 +35,13 @@ namespace ShiftShift
         public int AlternateStreak => _classifier?.AlternateStreak ?? 0;
         public bool IsDown(Side side) => _classifier != null && _classifier.IsDown(side);
 
+        /// <summary>A key is down whose gesture is not known yet; see GestureClassifier.TryGetUnresolvedPress.</summary>
+        public bool TryGetUnresolvedPress(out double downTime)
+        {
+            downTime = 0;
+            return _classifier != null && _classifier.TryGetUnresolvedPress(out downTime);
+        }
+
         private GestureClassifier _classifier;
         private int _settingsVersion;
 

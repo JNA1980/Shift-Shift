@@ -79,7 +79,7 @@ namespace ShiftShift
                 $"Alternate streak: {input.AlternateStreak}", _style);
             GUILayout.Label($"Clock {now:F3}s   beat {input.Clock.BeatAt(now):F2}", _style);
             GUILayout.Label(
-                $"Thresholds: tap/hold {s.tapHoldMs:F0} ms · both {s.bothWindowMs:F0} ms · alternate ±{s.alternateBeatTolerance:F2} beat",
+                $"Thresholds: tap/hold {s.tapHoldMs:F0} ms · both {s.bothWindowMs:F0} ms · alternate ±{s.alternateBeatTolerance:F2} beat · charge {s.chargeTaps}",
                 _style);
             GUILayout.Space(6);
             var sb = new StringBuilder();

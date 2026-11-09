@@ -20,6 +20,9 @@ namespace ShiftShift
         [Tooltip("How far from a beat line (in beats) an Alternate tap may land and still count.")]
         [Range(0.05f, 0.45f)] public float alternateBeatTolerance = 0.25f;
 
+        [Tooltip("Alternate streak needed for one charge (breaks the next Wall).")]
+        [Range(2, 8)] public int chargeTaps = 4;
+
         /// <summary>Bumped on every Inspector edit so listeners can pick up changes in Play mode.</summary>
         public int Version { get; private set; }
 

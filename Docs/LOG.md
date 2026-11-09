@@ -99,3 +99,24 @@
 - Playbook Day 0 (0.1–0.4) and 1.1 complete. Plan "done when" for days 9–10 met: WebGL build runs in a browser and all 7 gestures log correctly. About one day ahead of plan.
 - Still John's (not blocking): itch.io draft project, butler install + login, tools/itch.env.
 - Next: playbook 1.2 Runner + TrackBuilder (day 11).
+
+## 2026-11-09 — D11: Runner, TrackBuilder, chase camera (playbook 1.2)
+
+**Done**
+- RunnerModel (Core): lanes, slide/sprint/phase intervals, jump window, charges, obstacle judging. Decision A: all actions count from key-down; Runner waits on undecided presses before judging.
+- Runner (forward position from song time, visuals, RunFailed/RunCompleted, debug panel top-right), Obstacle, TrackPiece, TrackBuilder, ChaseCamera (lag + sprint FOV kick).
+- GestureClassifier/ShiftInput: TryGetUnresolvedPress (additive). GestureSettings: chargeTaps = 4.
+- Shift+Shift > Create Greybox Scene: materials, track pieces (Straight/Tunnel/Bridge/Gap 2.5 m), obstacle prefabs, 200 m Greybox scene with one obstacle of each behaviour.
+- Docs/RUNNER.md: rules and six decisions taken while building (notably: sprint does not change speed).
+
+**Tested**
+- 47/47 core tests (`dotnet test tools/CoreTests`): 17 runner rule tests + 3 unresolved-press tests added.
+- Runtime and greybox editor scripts compile against stand-in Unity types.
+
+**Cannot verify without Play mode (playbook 1.2 asks for this list)**
+- Lane ease feel (120 ms) and whether the visual lag behind key-down feels responsive.
+- Jump arc height/duration vs. the 2.5 m gap; slide pose; phase material swap.
+- Chase camera lag, look-ahead, sprint FOV kick.
+- Fail timing: whether a fail judged up to ~250 ms late (decision A wait) is noticeable.
+- That obstacle positions match the rules (lane from X, time from Z) in the generated scene.
+- The generated scene, prefabs and URP materials themselves (editor script not run by Unity yet).

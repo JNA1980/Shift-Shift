@@ -309,6 +309,38 @@ namespace ShiftShift.Tests
             Assert.AreEqual(0, _c.AlternateStreak);
         }
 
+        // ---------- unresolved press (used by the Runner for decision A) ----------
+
+        [Test]
+        public void UnresolvedPress_WhileUndecided_ReportsKeyDownTime()
+        {
+            Assert.IsFalse(_c.TryGetUnresolvedPress(out _));
+            _c.Press(Side.Left, 1.0);
+            Assert.IsTrue(_c.TryGetUnresolvedPress(out double down));
+            Assert.AreEqual(1.0, down, 1e-9);
+        }
+
+        [Test]
+        public void UnresolvedPress_ClearsOnTapOrHold()
+        {
+            Tap(Side.Left, 0, 0.1);
+            Assert.IsFalse(_c.TryGetUnresolvedPress(out _));
+            _c.Press(Side.Right, 1.0);
+            _c.Update(1.3); // became a hold
+            Assert.IsFalse(_c.TryGetUnresolvedPress(out _));
+        }
+
+        [Test]
+        public void UnresolvedPress_PendingBoth_ReportsFirstKeyDown()
+        {
+            _c.Press(Side.Left, 2.0);
+            _c.Press(Side.Right, 2.05);
+            Assert.IsTrue(_c.TryGetUnresolvedPress(out double down));
+            Assert.AreEqual(2.0, down, 1e-9);
+            _c.Update(2.3); // became BothHold
+            Assert.IsFalse(_c.TryGetUnresolvedPress(out _));
+        }
+
         // ---------- misc ----------
 
         [Test]

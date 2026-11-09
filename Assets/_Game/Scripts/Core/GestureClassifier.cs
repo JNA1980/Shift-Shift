@@ -54,6 +54,23 @@ namespace ShiftShift.Core
 
         public bool IsDown(Side side) => Key(side).IsDown;
 
+        /// <summary>
+        /// True while a press is down whose gesture is not yet known (it could still become a tap, hold or
+        /// both-gesture). <paramref name="downTime"/> is the earliest such key-down. The Runner waits on this before
+        /// judging an obstacle reached after that key-down (decision A: actions count from key-down).
+        /// </summary>
+        public bool TryGetUnresolvedPress(out double downTime)
+        {
+            downTime = double.MaxValue;
+            bool any = false;
+            if (_both == BothState.Pending) { downTime = _bothStart; any = true; }
+            if (Unresolved(_left)) { downTime = Math.Min(downTime, _left.DownTime); any = true; }
+            if (Unresolved(_right)) { downTime = Math.Min(downTime, _right.DownTime); any = true; }
+            return any;
+        }
+
+        private static bool Unresolved(KeyState k) => k.IsDown && !k.Consumed && !k.HoldStarted;
+
         public void Reset()
         {
             _left = default;
