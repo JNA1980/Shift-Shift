@@ -17,6 +17,21 @@ namespace ShiftShift.Core
 
     public enum ObstacleOutcome { Pass, Hit, Break }
 
+    /// <summary>Outcome plus the key-down time of the gesture that answered the obstacle (NaN if none was needed).</summary>
+    public readonly struct Resolution
+    {
+        public readonly ObstacleOutcome Outcome;
+        public readonly double AnswerTime;
+
+        public Resolution(ObstacleOutcome outcome, double answerTime)
+        {
+            Outcome = outcome;
+            AnswerTime = answerTime;
+        }
+
+        public bool HasAnswer => !double.IsNaN(AnswerTime);
+    }
+
     public struct ObstacleInfo
     {
         public ObstacleKind Kind;
@@ -161,33 +176,90 @@ namespace ShiftShift.Core
         /// Judges the runner against an obstacle at the moment it is reached. A Break uses up one charge.
         /// Call in obstacle-time order, and only once no key-down at or before obstacle.Time is still undecided.
         /// </summary>
-        public ObstacleOutcome Resolve(ObstacleInfo o)
+        public ObstacleOutcome Resolve(ObstacleInfo o) => ResolveWithAnswer(o).Outcome;
+
+        /// <summary>
+        /// Like <see cref="Resolve"/>, plus which gesture answered it, for the Judge:
+        /// bar = the lane change out of its lane; low/gate/phase barrier = start of the slide/sprint/phase hold covering
+        /// it; gap = the jump; wall = the tap that earned the charge. NaN when the runner never needed to act
+        /// (e.g. a bar in another lane).
+        /// </summary>
+        public Resolution ResolveWithAnswer(ObstacleInfo o)
         {
+            ObstacleOutcome outcome = ResolveOutcome(o, out double answer);
+            return new Resolution(outcome, outcome == ObstacleOutcome.Hit ? double.NaN : answer);
+        }
+
+        private ObstacleOutcome ResolveOutcome(ObstacleInfo o, out double answer)
+        {
+            answer = double.NaN;
             double t = o.Time;
+            if (!o.AllLanes) answer = LastDodgeFrom(o.Lane, t);
             // A lane change is "in between" from key-down to key-up: safe if either the lane being left or the lane
             // being entered is clear (day 11 fix: moving back just before a block, released after it, looked fine
             // on screen but failed).
             if (!o.AllLanes && (LaneAt(t) != o.Lane || RecognizedLaneAt(t) != o.Lane)) return ObstacleOutcome.Pass;
 
+            answer = double.NaN;
             bool phased = IsPhased(t);
-            if (o.Layer == ObstacleLayer.Solid && phased) return ObstacleOutcome.Pass;
+            if (o.Layer == ObstacleLayer.Solid && phased)
+            {
+                if (o.AllLanes) answer = HoldStartCovering(GestureType.BothHold, t); // phase barrier
+                return ObstacleOutcome.Pass;
+            }
             if (o.Layer == ObstacleLayer.Ghost && !phased) return ObstacleOutcome.Pass;
 
             switch (o.Kind)
             {
-                case ObstacleKind.Low: return IsSliding(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
-                case ObstacleKind.Gate: return IsSprinting(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
-                case ObstacleKind.Gap: return IsAirborne(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
+                case ObstacleKind.Low:
+                    answer = HoldStartCovering(GestureType.HoldLeft, t);
+                    return IsSliding(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
+                case ObstacleKind.Gate:
+                    answer = HoldStartCovering(GestureType.HoldRight, t);
+                    return IsSprinting(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
+                case ObstacleKind.Gap:
+                    answer = JumpCovering(t);
+                    return IsAirborne(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
                 case ObstacleKind.Wall:
                     foreach (var c in _charges)
                     {
                         if (c.Used || c.Time > t) continue;
                         c.Used = true;
+                        answer = c.Time;
                         return ObstacleOutcome.Break;
                     }
                     return ObstacleOutcome.Hit;
                 default: return ObstacleOutcome.Hit; // Block
             }
+        }
+
+        /// <summary>Key-down of the last lane change at or before t that left <paramref name="lane"/>; NaN if none.</summary>
+        private double LastDodgeFrom(int lane, double t)
+        {
+            double found = double.NaN;
+            int current = 0;
+            foreach (var c in _laneChanges)
+            {
+                if (c.Time > t) break;
+                int before = current;
+                current = Math.Max(-1, Math.Min(1, current + c.Delta));
+                if (before == lane && current != lane) found = c.Time;
+            }
+            return found;
+        }
+
+        private double HoldStartCovering(GestureType type, double t)
+        {
+            foreach (var i in _holds[type])
+                if (t >= i.Start && t < i.End) return i.Start;
+            return double.NaN;
+        }
+
+        private double JumpCovering(double t)
+        {
+            foreach (double start in _jumps)
+                if (t >= start && t <= start + _rules.JumpSeconds) return start;
+            return double.NaN;
         }
 
         private bool HoldActive(GestureType type, double time)
