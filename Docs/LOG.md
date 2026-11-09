@@ -163,3 +163,8 @@
 
 **Not yet run**
 - In Unity / Play mode: re-run the 30 m block the same way (tap back just before it, release after).
+
+## 2026-11-09 — D11: wall feel note (for M1 review, day 15)
+
+- John: after L R L R the red wall "looked like I failed but it went through". Rules are correct (charge breaks the next wall; no extra input needed). The look comes from: wall hidden only when the runner reaches its centre (capsule already touching the face), no break effect yet (day 27 juice), and a possible up-to-250 ms wait when a key was down just before the wall (decision A).
+- Not changed. Option if needed: break walls at their front face. Decide at M1 review.
