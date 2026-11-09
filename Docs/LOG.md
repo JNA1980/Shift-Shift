@@ -60,3 +60,9 @@
 
 **Not yet run**
 - Windows PowerShell 5.1 on John's PC; real butler upload (needs itch draft project + `butler login`).
+
+## 2026-11-09 — D10: Input System errors after script reload
+
+- After pulling the input changes, Play mode logged InputActionState errors ("Map/Control/Binding index out of range", NullReferenceException on Key:/Keyboard/leftShift). Gestures still worked.
+- None of our code uses InputActions (ShiftInput polls Keyboard directly). After restarting Unity: 0 errors. Conclusion: stale action state after the domain reload (template's project-wide actions, or an Input System 1.20.1 reload bug).
+- If it recurs after pulls: restart Unity. If it becomes a nuisance: Project Settings > Input System Package > Project-wide Actions = None (nothing in the game uses them).
