@@ -265,3 +265,4 @@
 
 **Done**
 - Assets/_Game/Levels/test_gestures.json: one of each gesture, 4 beats apart, 100 BPM, 40 beats (fits click_100). Validated against the level rules.
+- Restart after a fail feels under a second (John). Playbook 1.4 targets met: count-in, flash + hit-stop, instant restart, results, calibration; Chrome and Firefox tested.
