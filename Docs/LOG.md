@@ -200,3 +200,7 @@
 - Fix: both tools create the new scene first, then load/create assets. Track fill piece now assigned through the verified Set(); the spawner logs any missing type prefab.
 - Runner: FindObjectsByType without the deprecated sort parameter (6000.6 warning).
 - Greybox scene from day 11 is unaffected. LevelTest.unity must be deleted and regenerated.
+
+## 2026-11-09 — D12: clearer level-file errors in the level test tool
+
+- Regenerating LevelTest failed with "level00.json is missing or invalid" (it had loaded fine on the previous run; file unchanged in git). Waiting on `git status` from John to see whether it was deleted. The tool now says which: not found (and whether the file exists on disk) vs. the list of validation errors.
