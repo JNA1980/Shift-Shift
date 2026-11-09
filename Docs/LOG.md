@@ -137,3 +137,14 @@
 - Wall charge kept failing: with no beat cue, on-beat taps were effectively random. With Alternate Beat Tolerance temporarily at 0.45 (not committed), the charge and wall work.
 - Added a beat dot to GestureDebugHud: lit for the first 20% of each beat (yellow on beat 1 of the bar, green otherwise) with the beat number 1-4. Debug aid until the Conductor's click track (day 12).
 - Not run in Unity yet. Compiles against stand-in types.
+
+## 2026-11-09 — D11: greybox played (John)
+
+**Tested (editor, Greybox scene)**
+- Day 11 question answered: moving the capsule with two keys feels responsive.
+- Wall charge works with a beat reference (tolerance back at 0.25; beat dot added).
+- Greybox scene with settings assigned committed (bf4d5c4).
+
+**Open bug (not yet diagnosed)**
+- "Sometimes after an obstacle is passed I have to wait before changing lane, or it fails."
+  Hypotheses: (1) blocks judged at their centre while they look passed ~80 ms earlier, so a tap back counts as inside the lane (decision A uses key-down); (2) phase lockout ignores taps (would not cause a fail); (3) ordering bug. Waiting on the `[Run] Failed` line plus the preceding `[Gesture]` taps to compare times.
