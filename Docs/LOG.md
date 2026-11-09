@@ -236,3 +236,15 @@
 
 - Single tap on the last click: +111 ms. Tapping every click: only 4 of ~16 measured clicks counted (mean +7, spread 29).
 - Hypotheses: (1) Windows Sticky Keys popup after 5 Shift presses (start + 4 practice taps = exactly 5) stealing focus; (2) taps beyond the ±240 ms cutoff; (3) Game view focus. Result screen now shows "counted X of Y taps" and the Console logs every tap's offset to tell them apart.
+
+## 2026-11-09 — D13: first Web builds of the run loop (John)
+
+**Tested**
+- Build And Run failed until the Web profile's Client Browser Type was set (it pointed at a non-default browser with no executable). Then ran in **Chrome and Firefox** (same localhost server).
+- Both browsers: count-in, play, fail screen ("Shift to retry"), level complete with results panel.
+- Firefox fail "bar b16 lane 0" was legitimate (tapped into the bar's lane at beat 13.3).
+- Score 0 in completed runs is expected: level00's bars sit in the side lanes and the runner starts in the middle, so most need no action (ungraded). Grades only appear when dodging a bar in your own lane.
+
+**Pending from John**
+- Calibration offset/spread/counted-of-taps for Editor, Chrome, Firefox (Sticky Keys shortcut checked off).
+- Restart time after a fail (< 1 s target). Grades seen when dodging on the click.
