@@ -204,3 +204,25 @@
 ## 2026-11-09 — D12: clearer level-file errors in the level test tool
 
 - Regenerating LevelTest failed with "level00.json is missing or invalid" (it had loaded fine on the previous run; file unchanged in git). Waiting on `git status` from John to see whether it was deleted. The tool now says which: not found (and whether the file exists on disk) vs. the list of validation errors.
+
+## 2026-11-09 — D12: level00 sync check (John)
+
+- Obstacles reach the runner exactly as the click sounds ("the click happens just as the obstacle passes by"): sync is correct as built. It feels early because the obstacle visibly approaches before it is level with the runner. offsetMs experiments did not help (it is not latency). John: keep A (click = obstacle level with runner); revisit at M1 review if pressing on the click feels wrong.
+- level00.json had been deleted while deleting the broken LevelTest scene; restored. Laptop speakers.
+
+## 2026-11-09 — D13: judge, scoring, run loop, calibration (playbook 1.4)
+
+**Done**
+- Rules: RunnerModel.ResolveWithAnswer (which gesture answered), Judge (Perfect 50 / Good 120 / OK / none / Miss), ScoreKeeper (100/50, x2/x3/x4 at 10/25/50), Calibration maths. Windows in GestureSettings.
+- Decisions (flagged): OK grade for answers outside the window (0 points, streak reset); bars needing no action are ungraded; a gap's beat is the take-off (hole placed half a jump later).
+- Runtime: Runner emits Judged per obstacle; Conductor: two-bar count-in, saved user offset, level set from code, StartNow; GameFlow (level by name, count-in pulses, flash + 60 ms hit-stop, instant restart by scene reload, results, local best); LatencyCalibration scene (F2 from the debug overlay); Boot loads Run.
+- Shift+Shift > Set Up Run Scenes: fills Run, creates Calibrate, Boot → Run, build list Boot, Menu, Run, Calibrate, …
+- Docs/SCORING.md.
+
+**Tested**
+- 80/80 core tests (18 new: grades per obstacle type, scoring, multiplier steps, calibration maths).
+- Per-assembly compile check passes.
+
+**Not yet run**
+- Everything in Unity and in WebGL: count-in, restart time (< 1 s target), hit-stop, results, calibration, F2 in the browser.
+- F1 is the browser's help key in Chrome; the debug overlay toggle may not work in WebGL (F2 should).

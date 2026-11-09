@@ -266,6 +266,123 @@ namespace ShiftShift.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        // ---------- Run, Calibrate and Boot scenes (playbook 1.4) ----------
+
+        private const string RunScenePath = "Assets/_Game/Scenes/Run.unity";
+        private const string BootScenePath = "Assets/_Game/Scenes/Boot.unity";
+        private const string CalibrateScenePath = "Assets/_Game/Scenes/Calibrate.unity";
+
+        /// <summary>
+        /// Shift+Shift > Set Up Run Scenes: fills the (empty) Run scene with the run loop, creates the Calibrate
+        /// scene, makes Boot load Run, and puts Boot, Menu, Run, Calibrate (then anything else) in the build list.
+        /// Leaves a scene alone if it is already set up.
+        /// </summary>
+        [MenuItem("Shift+Shift/Set Up Run Scenes")]
+        public static void SetUpRunScenes()
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            var levelJson = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelJsonPath);
+            if (levelJson == null)
+            {
+                Debug.LogError($"[RunSetup] {LevelJsonPath} not found.");
+                return;
+            }
+            var log = new List<string>();
+
+            // Run scene (open it FIRST, then load assets: see Create()).
+            var run = EditorSceneManager.OpenScene(RunScenePath, OpenSceneMode.Single);
+            if (Object.FindAnyObjectByType<GameFlow>() != null)
+            {
+                log.Add("Run scene already has a GameFlow: left alone");
+            }
+            else
+            {
+                EnsureClickTrack();
+                Kit k = EnsureAssets();
+                Camera cam = Camera.main;
+                ShiftInput input = CreateInput();
+
+                var conductorGo = new GameObject("Conductor");
+                var conductor = conductorGo.AddComponent<Conductor>();
+                Set(conductor, "input", input);
+                SetBool(conductor, "showStartPrompt", false); // GameFlow draws the prompt
+
+                // Track: from 60 m behind beat 0 (delay + two-bar count-in) to well past the longest level.
+                const float metresPerBeat = 5f;
+                LevelData level = JsonUtility.FromJson<LevelData>(levelJson.text);
+                var trackGo = new GameObject("Track");
+                trackGo.transform.position = new Vector3(0, 0, -60f);
+                var builder = trackGo.AddComponent<TrackBuilder>();
+                builder.lengthMetres = Mathf.Max(400f, (float)level.lengthBeats * metresPerBeat + 120f);
+                Set(builder, "fillPiece", k.Straight);
+                builder.Build();
+
+                Runner runner = CreateRunnerAndCamera(cam, input, builder, conductor);
+
+                var spawner = new GameObject("Obstacles").AddComponent<ObstacleSpawner>();
+                Set(spawner, "conductor", conductor);
+                Set(spawner, "runner", runner);
+                SetTypePrefabs(spawner, new[]
+                {
+                    ("bar", k.Block), ("low", k.Low), ("gate", k.Gate), ("gap", k.GapMarker), ("ghost", k.Barrier), ("wall", k.Wall),
+                });
+
+                var flow = new GameObject("GameFlow").AddComponent<GameFlow>();
+                Set(flow, "conductor", conductor);
+                Set(flow, "runner", runner);
+                var so = new SerializedObject(flow);
+                SerializedProperty levels = so.FindProperty("levels");
+                levels.arraySize = 1;
+                levels.GetArrayElementAtIndex(0).objectReferenceValue = levelJson;
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+                EditorSceneManager.SaveScene(run);
+                log.Add("Run scene set up: input, conductor, track, runner, camera, spawner, GameFlow (level00)");
+            }
+
+            // Calibrate scene
+            if (!File.Exists(CalibrateScenePath))
+            {
+                var cal = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+                new GameObject("Calibration").AddComponent<LatencyCalibration>();
+                EditorSceneManager.SaveScene(cal, CalibrateScenePath);
+                log.Add("Created Calibrate scene");
+            }
+            else log.Add("Calibrate scene exists: left alone");
+
+            // Boot scene loads Run
+            var boot = EditorSceneManager.OpenScene(BootScenePath, OpenSceneMode.Single);
+            if (Object.FindAnyObjectByType<Boot>() == null)
+            {
+                new GameObject("Boot").AddComponent<Boot>();
+                EditorSceneManager.SaveScene(boot);
+                log.Add("Boot scene now loads Run");
+            }
+            else log.Add("Boot scene already has a Boot loader: left alone");
+
+            // Build list
+            string[] wanted = { BootScenePath, "Assets/_Game/Scenes/Menu.unity", RunScenePath, CalibrateScenePath };
+            var list = new List<EditorBuildSettingsScene>();
+            foreach (string p in wanted)
+                if (File.Exists(p)) list.Add(new EditorBuildSettingsScene(p, true));
+            foreach (EditorBuildSettingsScene s in EditorBuildSettings.scenes)
+                if (System.Array.IndexOf(wanted, s.path) < 0) list.Add(s);
+            EditorBuildSettings.scenes = list.ToArray();
+            log.Add("Build list: " + string.Join(", ", list.ConvertAll(s => Path.GetFileNameWithoutExtension(s.path))));
+
+            EditorSceneManager.OpenScene(RunScenePath, OpenSceneMode.Single);
+            Debug.Log("[RunSetup] Done.\n- " + string.Join("\n- ", log));
+        }
+
+        private static void SetBool(Object target, string field, bool value)
+        {
+            var so = new SerializedObject(target);
+            SerializedProperty p = so.FindProperty(field);
+            if (p == null) { Debug.LogError($"[Setup] {target.GetType().Name} has no field '{field}'."); return; }
+            p.boolValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static void Place(GameObject prefab, Transform parent, int lane, float z)
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);

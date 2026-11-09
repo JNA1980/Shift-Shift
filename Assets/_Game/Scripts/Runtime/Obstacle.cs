@@ -18,5 +18,10 @@ namespace ShiftShift
 
         [Tooltip("Length along the track in metres. Gaps are checked at both edges; other kinds at their centre.")]
         [Min(0.1f)] public float depth = 0.5f;
+
+        [Tooltip("Set by the ObstacleSpawner: the chart beat the answer is judged against. Hand-placed obstacles are " +
+                 "judged against the moment the runner reaches them.")]
+        public bool hasTargetBeat;
+        public double targetBeat;
     }
 }

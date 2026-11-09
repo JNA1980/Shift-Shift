@@ -44,17 +44,22 @@ namespace ShiftShift
 
         public event Action<Obstacle> RunFailed;
         public event Action RunCompleted;
+        /// <summary>Each obstacle once, when it is cleared (or Miss when hit). See Judge / Docs/SCORING.md.</summary>
+        public event Action<Obstacle, Grade> Judged;
 
         public RunState State { get; private set; } = RunState.Running;
         public bool IsSprinting => _model != null && _model.IsSprinting(Now);
         public bool IsPhased => _model != null && _model.IsPhased(Now);
         public float MetresPerBeat => metresPerBeat;
         public float LaneWidth => laneWidth;
+        public float JumpSeconds => jumpSeconds;
 
         private struct Check
         {
             public ObstacleInfo Info; // Info.Time is filled in from Beat when judged (the clock can change at start)
             public double Beat;
+            public double TargetBeat; // what the answer is graded against
+            public bool Final;        // the obstacle's last check: grade it here
             public Obstacle Obstacle;
         }
 
@@ -121,16 +126,17 @@ namespace ShiftShift
                 Vector3 p = o.transform.position;
                 int lane = Mathf.Clamp(Mathf.RoundToInt(p.x / laneWidth), -1, 1);
                 var info = new ObstacleInfo { Kind = o.kind, Layer = o.layer, Lane = lane, AllLanes = o.allLanes };
+                double target = o.hasTargetBeat ? o.targetBeat : p.z / metresPerBeat;
 
                 if (o.kind == ObstacleKind.Gap)
                 {
                     // Must be in the air at both edges of a gap.
-                    AddCheck(info, o, p.z - o.depth * 0.5f);
-                    AddCheck(info, o, p.z + o.depth * 0.5f);
+                    AddCheck(info, o, p.z - o.depth * 0.5f, target, false);
+                    AddCheck(info, o, p.z + o.depth * 0.5f, target, true);
                 }
                 else
                 {
-                    AddCheck(info, o, p.z);
+                    AddCheck(info, o, p.z, target, true);
                 }
             }
             _checks.Sort((a, b) => a.Beat.CompareTo(b.Beat));
@@ -138,9 +144,9 @@ namespace ShiftShift
             Debug.Log($"[Run] {_checks.Count} obstacle checks, run ends at {EndZ:0} m, {metresPerBeat:0.#} m per beat.");
         }
 
-        private void AddCheck(ObstacleInfo info, Obstacle o, float z)
+        private void AddCheck(ObstacleInfo info, Obstacle o, float z, double targetBeat, bool final)
         {
-            _checks.Add(new Check { Info = info, Beat = z / metresPerBeat, Obstacle = o });
+            _checks.Add(new Check { Info = info, Beat = z / metresPerBeat, TargetBeat = targetBeat, Final = final, Obstacle = o });
         }
 
         private void OnHoldStarted(GestureType type, double time)
@@ -191,13 +197,20 @@ namespace ShiftShift
                 // Decision A: a press made before this obstacle may still turn out to be the answer. Wait for it.
                 if (input.TryGetUnresolvedPress(out double down) && down <= c.Info.Time) break;
 
-                ObstacleOutcome outcome = _model.Resolve(c.Info);
-                if (outcome == ObstacleOutcome.Hit)
+                Resolution r = _model.ResolveWithAnswer(c.Info);
+                if (r.Outcome == ObstacleOutcome.Hit)
                 {
+                    Judged?.Invoke(c.Obstacle, Grade.Miss);
                     Fail(c, z);
                     return;
                 }
-                if (outcome == ObstacleOutcome.Break) c.Obstacle.gameObject.SetActive(false);
+                if (r.Outcome == ObstacleOutcome.Break) c.Obstacle.gameObject.SetActive(false);
+                if (c.Final)
+                {
+                    GestureSettings gs = input.Settings;
+                    Grade g = Judge.GradeOf(r, Clock.SongTimeAtBeat(c.TargetBeat), gs.perfectMs / 1000.0, gs.goodMs / 1000.0);
+                    Judged?.Invoke(c.Obstacle, g);
+                }
                 _nextCheck++;
             }
 

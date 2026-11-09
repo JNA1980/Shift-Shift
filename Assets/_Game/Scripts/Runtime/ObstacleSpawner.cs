@@ -7,7 +7,8 @@ namespace ShiftShift
     /// <summary>
     /// Places the level's obstacles (playbook 1.3): each event's beat becomes a Z position using the runner's metres
     /// per beat, its lane an X position, and the prefab for its type is instantiated with the Obstacle rules from
-    /// <see cref="ObstacleTypes"/>. Runs in Awake, before the Runner collects obstacles in Start.
+    /// <see cref="ObstacleTypes"/>. Gaps are shifted half a jump later (their beat is the take-off). Runs in Awake,
+    /// before the Runner collects obstacles in Start.
     /// </summary>
     [DefaultExecutionOrder(-50)]
     public sealed class ObstacleSpawner : MonoBehaviour
@@ -47,6 +48,9 @@ namespace ShiftShift
 
                 float x = spec.AllLanes ? 0f : e.RunnerLane * runner.LaneWidth;
                 float z = (float)(e.beat * runner.MetresPerBeat);
+                // A gap's beat is the take-off: place the hole half a jump later so jumping on the click clears it.
+                if (spec.Kind == ObstacleKind.Gap)
+                    z += (float)(runner.JumpSeconds * conductor.Bpm / 60.0 * runner.MetresPerBeat * 0.5);
                 GameObject go = Instantiate(prefab, new Vector3(x, 0f, z), Quaternion.identity, transform);
                 go.name = $"{e.type} b{e.beat:0.##}" + (spec.AllLanes ? "" : $" lane {e.lane}");
 
@@ -55,6 +59,8 @@ namespace ShiftShift
                 o.kind = spec.Kind;
                 o.layer = spec.Layer;
                 o.allLanes = spec.AllLanes;
+                o.hasTargetBeat = true;
+                o.targetBeat = e.beat;
                 spawned++;
             }
             Debug.Log($"[Spawner] Spawned {spawned} obstacles for {conductor.Level.name}.");

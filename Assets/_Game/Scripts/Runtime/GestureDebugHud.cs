@@ -42,7 +42,17 @@ namespace ShiftShift
 
         private void Update()
         {
-            if (UnityEngine.InputSystem.Keyboard.current?.f1Key.wasPressedThisFrame == true) visible = !visible;
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb == null) return;
+            if (kb.f1Key.wasPressedThisFrame) visible = !visible;
+            if (kb.f2Key.wasPressedThisFrame)
+            {
+                // Latency calibration (playbook 1.4). It returns to the Run scene.
+                if (Application.CanStreamedLevelBeLoaded("Calibrate"))
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("Calibrate");
+                else
+                    Debug.LogWarning("Calibrate scene is not in the build list (Shift+Shift > Set Up Run Scenes).");
+            }
         }
 
         private void OnFired(GestureType type, double t)
@@ -101,7 +111,7 @@ namespace ShiftShift
             foreach (string l in _lines) sb.AppendLine(l);
             GUILayout.Label(sb.ToString(), _style);
             GUILayout.FlexibleSpace();
-            GUILayout.Label("F1: hide", _style);
+            GUILayout.Label("F1: hide   ·   F2: latency calibration", _style);
             GUILayout.EndArea();
         }
     }

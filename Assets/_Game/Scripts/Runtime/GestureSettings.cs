@@ -23,6 +23,12 @@ namespace ShiftShift
         [Tooltip("Alternate streak needed for one charge (breaks the next Wall).")]
         [Range(2, 8)] public int chargeTaps = 4;
 
+        [Header("Judge windows (playbook 1.4)")]
+        [Tooltip("Answer within this of the obstacle's beat = Perfect.")]
+        [Range(10f, 150f)] public float perfectMs = 50f;
+        [Tooltip("Answer within this = Good. Later or earlier but still passed = OK.")]
+        [Range(20f, 300f)] public float goodMs = 120f;
+
         /// <summary>Bumped on every Inspector edit so listeners can pick up changes in Play mode.</summary>
         public int Version { get; private set; }
 
@@ -36,6 +42,7 @@ namespace ShiftShift
         private void OnValidate()
         {
             if (tapHoldMs <= bothWindowMs) tapHoldMs = bothWindowMs + 1f;
+            if (goodMs < perfectMs) goodMs = perfectMs;
             Version++;
         }
     }

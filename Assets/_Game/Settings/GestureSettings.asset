@@ -16,3 +16,5 @@ MonoBehaviour:
   bothWindowMs: 80
   alternateBeatTolerance: 0.25
   chargeTaps: 4
+  perfectMs: 50
+  goodMs: 120
