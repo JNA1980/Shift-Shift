@@ -47,3 +47,6 @@ crashlytics-build.properties
 !/tools/CoreTests/CoreTests.csproj
 /tools/CoreTests/bin/
 /tools/CoreTests/obj/
+
+# Build intermediates at project root
+/Data/
