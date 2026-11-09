@@ -64,6 +64,20 @@ namespace ShiftShift
             Debug.Log("[Gesture] " + line);
         }
 
+        /// <summary>
+        /// Beat cue for testing on-beat input before the Conductor's click track exists: lit for the first 20% of each
+        /// beat, with the beat's position in the bar (1-4). Debug aid only.
+        /// </summary>
+        private static string BeatDot(double beat)
+        {
+            if (beat < 0) return "";
+            double whole = System.Math.Floor(beat);
+            bool lit = beat - whole < 0.2;
+            int inBar = (int)(whole % 4) + 1;
+            string dot = lit ? (inBar == 1 ? "<color=yellow>●</color>" : "<color=lime>●</color>") : "<color=#555555>●</color>";
+            return $"<size=26>{dot}</size> {inBar}";
+        }
+
         private void OnGUI()
         {
             if (!visible || input == null || !input.enabled || input.Clock == null) return;
@@ -77,7 +91,8 @@ namespace ShiftShift
                 $"L-Shift: {(input.IsDown(Side.Left) ? "<color=lime>DOWN</color>" : "up")}    " +
                 $"R-Shift: {(input.IsDown(Side.Right) ? "<color=lime>DOWN</color>" : "up")}    " +
                 $"Alternate streak: {input.AlternateStreak}", _style);
-            GUILayout.Label($"Clock {now:F3}s   beat {input.Clock.BeatAt(now):F2}", _style);
+            double beat = input.Clock.BeatAt(now);
+            GUILayout.Label($"Clock {now:F3}s   beat {beat:F2}   {BeatDot(beat)}", _style);
             GUILayout.Label(
                 $"Thresholds: tap/hold {s.tapHoldMs:F0} ms · both {s.bothWindowMs:F0} ms · alternate ±{s.alternateBeatTolerance:F2} beat · charge {s.chargeTaps}",
                 _style);
