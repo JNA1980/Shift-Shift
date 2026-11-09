@@ -37,8 +37,7 @@ namespace ShiftShift.EditorTools
             }
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
-            var settings = AssetDatabase.LoadAssetAtPath<GestureSettings>(SettingsPath);
-            if (settings == null)
+            if (AssetDatabase.LoadAssetAtPath<GestureSettings>(SettingsPath) == null)
             {
                 Debug.LogError($"[Greybox] Missing {SettingsPath}.");
                 return;
@@ -71,12 +70,12 @@ namespace ShiftShift.EditorTools
             GameObject barrier = ObstaclePrefab("PhaseBarrier", ObstacleKind.Block, ObstacleLayer.Solid, true, 0.3f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.3f), "Barrier"));
 
-            BuildScene(settings, straight, tunnel, bridge, gap, block, low, gate, wall, ghost, barrier);
+            BuildScene(straight, tunnel, bridge, gap, block, low, gate, wall, ghost, barrier);
         }
 
         // ---------- scene ----------
 
-        private static void BuildScene(GestureSettings settings, TrackPiece straight, TrackPiece tunnel, TrackPiece bridge,
+        private static void BuildScene(TrackPiece straight, TrackPiece tunnel, TrackPiece bridge,
             TrackPiece gap, GameObject block, GameObject low, GameObject gate, GameObject wall, GameObject ghost,
             GameObject barrier)
         {
@@ -86,7 +85,9 @@ namespace ShiftShift.EditorTools
             // Input + HUD
             var inputGo = new GameObject("Input");
             var input = inputGo.AddComponent<ShiftInput>();
-            Set(input, "settings", settings);
+            // Load just before assigning: creating prefabs and materials above can reload assets and leave an
+            // earlier reference stale (day 11: the field ended up empty).
+            Set(input, "settings", AssetDatabase.LoadAssetAtPath<GestureSettings>(SettingsPath));
             inputGo.AddComponent<GestureDebugHud>();
 
             // Track: 0-60 straight, 60-70 tunnel, 70-100 straight, 100-102.5 gap, 102.5-112.5 bridge, then straight to 200.
@@ -272,6 +273,9 @@ namespace ShiftShift.EditorTools
             }
             p.objectReferenceValue = value;
             so.ApplyModifiedPropertiesWithoutUndo();
+            if (new SerializedObject(target).FindProperty(field).objectReferenceValue == null)
+                Debug.LogError($"[Greybox] Could not assign {target.GetType().Name}.{field} " +
+                               $"({(value == null ? "value was null" : value.name)}). Assign it by hand in the Inspector.");
         }
     }
 }

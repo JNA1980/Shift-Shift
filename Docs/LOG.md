@@ -126,3 +126,8 @@
 - Unity compile errors in GreyboxSetup.cs: `ShiftShift.Core` not found. Cause: ShiftShift.Editor.asmdef did not reference ShiftShift.Core (the stand-in compile builds everything as one assembly, so it cannot catch missing asmdef references). Added the reference.
 - Warning CS0618 in Runner.cs: `FindObjectsByType(FindObjectsSortMode)` is deprecated in 6000.6. Harmless; left as is until the replacement overload is confirmed from the full warning text.
 - John confirmed: sprint does not change forward speed.
+
+## 2026-11-09 — D11: greybox scene, first Play
+
+- 47/47 tests pass in Unity. Greybox scene generated (track, runner, obstacles, camera all wired) but Play failed: ShiftInput.settings was empty in the generated scene, so input disabled itself and the Runner refused to start. All other references set by the tool were fine.
+- Likely cause (not confirmed): the settings asset was loaded at the start of the tool, before ~20 prefab/material assets were created; an asset reload in between left the reference stale. Fix: load it just before assigning, and every assignment is now verified and logs an error if it did not stick. John assigns it by hand in the existing scene.
