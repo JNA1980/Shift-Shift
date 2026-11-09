@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c36285c916d4456b7711cb08be40f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.Obstacle
-  kind: 0
+  kind: 5
   layer: 0
   allLanes: 1
   depth: 0.3

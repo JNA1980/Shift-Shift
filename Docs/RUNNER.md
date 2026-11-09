@@ -19,12 +19,15 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
 | Obstacle | Passes when | Gesture |
 |---|---|---|
 | Block (one lane) | runner in another lane | Tap L / Tap R |
-| Low bar | sliding | Hold L |
+| Low bar (all lanes) | sliding | Hold L |
 | Gate (all lanes) | sprinting | Hold R |
 | Gap (all lanes) | in the air at both edges | Both tap (0.5 s jump) |
 | Wall (all lanes) | a charge is available (used up) | Alternate × 4 on the beat |
-| Solid layer | runner phased → ignored | Both hold |
-| Ghost layer | only hits while phased | (let go of phase, or change lane) |
+| Phase barrier (all lanes) | phased | Both hold |
+| Ghost layer (any kind) | only hits while phased | (let go of phase, or change lane) |
+
+Phase passes **only** phase barriers. Every other obstacle needs its own answer whether phased or not (day 13 fix:
+phase used to pass every solid obstacle, so holding both skipped the level).
 
 Lane comes from the obstacle's X (lanes at -2, 0, 2 m), timing from its Z. Forward position = metres per beat (5) x
 current beat: 10 m/s at the stub's 120 BPM, 8.3 m/s at 100 BPM. With a Conductor the runner waits for the start and
@@ -36,7 +39,7 @@ ignores gestures until then.
    time; actually speeding up would make every later obstacle arrive off the beat. Sprint = state for gates + FOV
    kick (60 → 72). Confirmed by John, day 11: keep it.
 2. **A charge lasts until the next wall uses it.** Every 4th on-beat alternation earns one.
-3. **Walls are in the solid layer**, so a phased runner also passes them. Levels should not overlap phase and walls.
+3. ~~Walls are in the solid layer, so a phased runner also passes them.~~ Changed day 13: only a charge breaks a wall.
 4. **Gaps are checked at both edges**, other obstacles at their centre.
 5. **Charge taps also change lanes** (open question 1 in INPUT.md). Walls span all lanes, so it only looks odd.
 6. Camera smoothing uses frame time (visual only, not rhythm timing).

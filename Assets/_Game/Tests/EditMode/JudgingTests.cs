@@ -78,7 +78,7 @@ namespace ShiftShift.Tests
         public void PhaseBarrier_PhaseOnBeat_IsGood()
         {
             _m.OnHoldStarted(GestureType.BothHold, 2.92);
-            Assert.AreEqual(Grade.Good, G(_m.ResolveWithAnswer(Obs(ObstacleKind.Block, 3.0, all: true)), 3.0));
+            Assert.AreEqual(Grade.Good, G(_m.ResolveWithAnswer(Obs(ObstacleKind.Barrier, 3.0, all: true)), 3.0));
         }
 
         [Test]

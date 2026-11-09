@@ -26,7 +26,7 @@ logged and the level does not start.
 | type | Obstacle | Lanes | Passed by |
 |---|---|---|---|
 | bar | Block | one | being in another lane |
-| low | Low bar | one | slide (Hold L) |
+| low | Low bar | all | slide (Hold L) |
 | gate | Speed gate | all | sprint (Hold R) |
 | gap | Hole in the floor (2.5 m) | all | jump (Both tap) |
 | ghost | Phase barrier | all | phase (Both hold) |

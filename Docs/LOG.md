@@ -266,3 +266,19 @@
 **Done**
 - Assets/_Game/Levels/test_gestures.json: one of each gesture, 4 beats apart, 100 BPM, 40 beats (fits click_100). Validated against the level rules.
 - Restart after a fail feels under a second (John). Playbook 1.4 targets met: count-in, flash + hit-stop, instant restart, results, calibration; Chrome and Firefox tested.
+
+## 2026-11-10 — D13: one answer per obstacle (phase exploit fix, all-lane low bars)
+
+**Found (John, test level):** holding both Shift keys passed the low bar (beat 16), the gate (20) and the wall (36). Cause: the playbook 1.2 rule "phased runners ignore Solid obstacles" made phase pass everything; it also broke 1.4's "exactly one correct gesture per obstacle".
+
+**Changed**
+- New ObstacleKind.Barrier (added last; kinds are saved as numbers). Only a Barrier is passed by phasing; low/gate/gap/wall/bar need their own answer, phased or not. Ghost-layer obstacles still only hit while phased.
+- Chart "ghost" → Barrier. PhaseBarrier prefab kind set to Barrier (prefab file edited).
+- Low bars span all lanes (John): chart "low" is all-lane; LowBar prefab all-lane and full track width (prefab file edited).
+- Wall: only a charge breaks it. A charge still lasts until the next wall (early charge = OK grade); unchanged unless John asks.
+- Docs RUNNER, LEVELS, SCORING updated.
+
+**Tested**
+- 86/86 core tests (new: phase does not pass low/gate/wall/gap/lane block; barrier without phase hits; low maps to all lanes). Per-assembly compile check passes.
+
+**Not yet run** in Unity: prefab edits (kind 5 = Barrier, LowBar scale 7), test level replay.

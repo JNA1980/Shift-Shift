@@ -75,8 +75,8 @@ namespace ShiftShift.EditorTools
 
             k.Block = ObstaclePrefab("Block", ObstacleKind.Block, ObstacleLayer.Solid, false, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1f, 0), new Vector3(1.6f, 2f, 0.6f), "Obstacle"));
-            k.Low = ObstaclePrefab("LowBar", ObstacleKind.Low, ObstacleLayer.Solid, false, 0.4f,
-                go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(1.8f, 0.4f, 0.4f), "Low"));
+            k.Low = ObstaclePrefab("LowBar", ObstacleKind.Low, ObstacleLayer.Solid, true, 0.4f,
+                go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 0.4f, 0.4f), "Low"));
             k.Gate = ObstaclePrefab("Gate", ObstacleKind.Gate, ObstacleLayer.Solid, true, 0.4f, go =>
             {
                 Box(go, "PostL", new Vector3(-3.3f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.3f), "Gate");
@@ -87,7 +87,7 @@ namespace ShiftShift.EditorTools
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.6f), "Wall"));
             k.Ghost = ObstaclePrefab("GhostBlock", ObstacleKind.Block, ObstacleLayer.Ghost, false, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1f, 0), new Vector3(1.6f, 2f, 0.6f), "Ghost"));
-            k.Barrier = ObstaclePrefab("PhaseBarrier", ObstacleKind.Block, ObstacleLayer.Solid, true, 0.3f,
+            k.Barrier = ObstaclePrefab("PhaseBarrier", ObstacleKind.Barrier, ObstacleLayer.Solid, true, 0.3f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.3f), "Barrier"));
 
             k.GapMarker = ObstaclePrefab("GapMarker", ObstacleKind.Gap, ObstacleLayer.Solid, true, 2.5f,

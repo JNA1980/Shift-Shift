@@ -10,9 +10,14 @@ namespace ShiftShift.Core
         Gate,  // speed gate: sprint through it (Hold R)
         Gap,   // missing floor: be in the air (Both tap)
         Wall,  // breakable wall: needs a charge (Alternate x ChargeTaps)
+        Barrier, // phase barrier: only passable while phased (Both hold). Added last: kinds are saved as numbers.
     }
 
-    /// <summary>Which world an obstacle lives in. Phased runners (Both hold) ignore Solid and collide with Ghost.</summary>
+    /// <summary>
+    /// Which world an obstacle lives in. Ghost obstacles only hit a phased runner. Solid obstacles hit whether phased or
+    /// not (day 13 fix: phase used to pass every Solid obstacle, so holding both skipped the level); only a Barrier
+    /// is passed by phasing.
+    /// </summary>
     public enum ObstacleLayer { Solid, Ghost }
 
     public enum ObstacleOutcome { Pass, Hit, Break }
@@ -202,15 +207,14 @@ namespace ShiftShift.Core
 
             answer = double.NaN;
             bool phased = IsPhased(t);
-            if (o.Layer == ObstacleLayer.Solid && phased)
-            {
-                if (o.AllLanes) answer = HoldStartCovering(GestureType.BothHold, t); // phase barrier
-                return ObstacleOutcome.Pass;
-            }
             if (o.Layer == ObstacleLayer.Ghost && !phased) return ObstacleOutcome.Pass;
 
+            // Every obstacle has exactly one answer (playbook 1.4); phase is the answer only for a Barrier.
             switch (o.Kind)
             {
+                case ObstacleKind.Barrier:
+                    answer = HoldStartCovering(GestureType.BothHold, t);
+                    return phased ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
                 case ObstacleKind.Low:
                     answer = HoldStartCovering(GestureType.HoldLeft, t);
                     return IsSliding(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;

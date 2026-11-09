@@ -80,11 +80,11 @@ namespace ShiftShift.Core
         private static readonly Dictionary<string, Spec> Specs = new Dictionary<string, Spec>
         {
             { "bar", new Spec(ObstacleKind.Block, ObstacleLayer.Solid, false) }, // change lane
-            { "low", new Spec(ObstacleKind.Low, ObstacleLayer.Solid, false) },   // slide
+            { "low", new Spec(ObstacleKind.Low, ObstacleLayer.Solid, true) },    // slide (all lanes: no dodging it, John day 13)
             { "gate", new Spec(ObstacleKind.Gate, ObstacleLayer.Solid, true) },  // sprint
             { "gap", new Spec(ObstacleKind.Gap, ObstacleLayer.Solid, true) },    // jump
             // "ghost": a barrier across all lanes that only phase (Both hold) gets through (playbook 1.4: ghost -> phase held).
-            { "ghost", new Spec(ObstacleKind.Block, ObstacleLayer.Solid, true) },
+            { "ghost", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, true) },
             { "wall", new Spec(ObstacleKind.Wall, ObstacleLayer.Solid, true) },  // charge
         };
 

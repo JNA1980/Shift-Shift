@@ -147,12 +147,36 @@ namespace ShiftShift.Tests
         // ---------- phase ----------
 
         [Test]
-        public void Phased_IgnoresSolid_CollidesWithGhost()
+        public void Phased_PassesBarrier_CollidesWithGhost()
         {
             _m.OnHoldStarted(GestureType.BothHold, 1.0);
-            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Block, 1.2, all: true)));
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Barrier, 1.2, all: true)));
             Assert.AreEqual(ObstacleOutcome.Hit,
                 _m.Resolve(Obs(ObstacleKind.Block, 1.3, lane: 0, layer: ObstacleLayer.Ghost)));
+        }
+
+        [Test]
+        public void Barrier_WithoutPhase_Hits()
+        {
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Barrier, 1.0, all: true)));
+        }
+
+        [TestCase(ObstacleKind.Low)]
+        [TestCase(ObstacleKind.Gate)]
+        [TestCase(ObstacleKind.Wall)]
+        [TestCase(ObstacleKind.Gap)]
+        public void Phase_DoesNotPassOtherObstacles(ObstacleKind kind)
+        {
+            // Day 13: holding both used to pass every solid obstacle.
+            _m.OnHoldStarted(GestureType.BothHold, 1.0);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(kind, 1.5, all: true)));
+        }
+
+        [Test]
+        public void Phase_DoesNotPassBlockInYourLane()
+        {
+            _m.OnHoldStarted(GestureType.BothHold, 1.0);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Block, 1.5, lane: 0)));
         }
 
         [Test]
