@@ -193,3 +193,10 @@
 **Not yet run**
 - Anything in Unity: PlayScheduled timing, whether obstacles pass exactly on the click, generated scene and WAV import.
 - WebGL: PlayScheduled and audio start after the key press (day 13).
+
+## 2026-11-09 — D12: fix empty references in generated scenes (root cause)
+
+- LevelTest generated without a track ("TrackBuilder: no fill piece assigned"). Root cause, also behind day 11's empty Settings field: the tools loaded existing assets and then called EditorSceneManager.NewScene(Single), which unloads assets nothing references yet, leaving the references empty. Freshly created prefabs survived, which is why only some fields failed.
+- Fix: both tools create the new scene first, then load/create assets. Track fill piece now assigned through the verified Set(); the spawner logs any missing type prefab.
+- Runner: FindObjectsByType without the deprecated sort parameter (6000.6 warning).
+- Greybox scene from day 11 is unaffected. LevelTest.unity must be deleted and regenerated.

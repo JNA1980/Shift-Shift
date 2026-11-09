@@ -116,7 +116,7 @@ namespace ShiftShift
         private void CollectObstacles()
         {
             _checks.Clear();
-            foreach (Obstacle o in FindObjectsByType<Obstacle>(FindObjectsSortMode.None))
+            foreach (Obstacle o in FindObjectsByType<Obstacle>())
             {
                 Vector3 p = o.transform.position;
                 int lane = Mathf.Clamp(Mathf.RoundToInt(p.x / laneWidth), -1, 1);

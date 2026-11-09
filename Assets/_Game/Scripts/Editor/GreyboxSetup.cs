@@ -44,8 +44,11 @@ namespace ShiftShift.EditorTools
                 return;
             }
 
+            // New scene FIRST: NewScene(Single) unloads assets nothing references yet, which left earlier references
+            // empty (day 11 Settings field, day 12 track piece). Load everything after it.
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             Kit k = EnsureAssets();
-            BuildScene(k.Straight, k.Tunnel, k.Bridge, k.Gap, k.Block, k.Low, k.Gate, k.Wall, k.Ghost, k.Barrier);
+            BuildScene(scene, k.Straight, k.Tunnel, k.Bridge, k.Gap, k.Block, k.Low, k.Gate, k.Wall, k.Ghost, k.Barrier);
         }
 
         // ---------- shared asset kit ----------
@@ -94,11 +97,10 @@ namespace ShiftShift.EditorTools
 
         // ---------- scene ----------
 
-        private static void BuildScene(TrackPiece straight, TrackPiece tunnel, TrackPiece bridge,
+        private static void BuildScene(UnityEngine.SceneManagement.Scene scene, TrackPiece straight, TrackPiece tunnel, TrackPiece bridge,
             TrackPiece gap, GameObject block, GameObject low, GameObject gate, GameObject wall, GameObject ghost,
             GameObject barrier)
         {
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             Camera cam = Camera.main;
 
             ShiftInput input = CreateInput();
@@ -107,7 +109,7 @@ namespace ShiftShift.EditorTools
             var trackGo = new GameObject("Track");
             var builder = trackGo.AddComponent<TrackBuilder>();
             builder.lengthMetres = 200f;
-            builder.fillPiece = straight;
+            Set(builder, "fillPiece", straight);
             builder.sequence = new List<TrackPiece>
             {
                 straight, straight, straight, straight, straight, straight, tunnel, straight, straight, straight, gap, bridge,
@@ -196,10 +198,10 @@ namespace ShiftShift.EditorTools
                 return;
             }
 
+            // New scene FIRST, then load assets (see Create()).
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             EnsureClickTrack();
             Kit k = EnsureAssets();
-
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             Camera cam = Camera.main;
             ShiftInput input = CreateInput();
 
@@ -214,7 +216,7 @@ namespace ShiftShift.EditorTools
             trackGo.transform.position = new Vector3(0, 0, -20f);
             var builder = trackGo.AddComponent<TrackBuilder>();
             builder.lengthMetres = (float)level.lengthBeats * metresPerBeat + 40f;
-            builder.fillPiece = k.Straight;
+            Set(builder, "fillPiece", k.Straight);
             builder.Build();
 
             Runner runner = CreateRunnerAndCamera(cam, input, builder, conductor);
@@ -252,6 +254,7 @@ namespace ShiftShift.EditorTools
                 SerializedProperty e = list.GetArrayElementAtIndex(i);
                 e.FindPropertyRelative("type").stringValue = map[i].type;
                 e.FindPropertyRelative("prefab").objectReferenceValue = map[i].prefab;
+                if (map[i].prefab == null) Debug.LogError($"[LevelTest] No prefab for type '{map[i].type}'.");
             }
             so.ApplyModifiedPropertiesWithoutUndo();
         }
