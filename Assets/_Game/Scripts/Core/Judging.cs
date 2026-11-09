@@ -15,7 +15,7 @@ namespace ShiftShift.Core
     /// <summary>Grades an obstacle from its outcome and answer timing (playbook 1.4). Docs/SCORING.md.</summary>
     public static class Judge
     {
-        public static Grade GradeOf(Resolution r, double targetTime, double perfectSeconds, double goodSeconds)
+        public static Grade GradeOf(ObstacleResolution r, double targetTime, double perfectSeconds, double goodSeconds)
         {
             if (r.Outcome == ObstacleOutcome.Hit) return Grade.Miss;
             if (!r.HasAnswer) return Grade.None;

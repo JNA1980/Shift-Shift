@@ -226,3 +226,8 @@
 **Not yet run**
 - Everything in Unity and in WebGL: count-in, restart time (< 1 s target), hit-stop, results, calibration, F2 in the browser.
 - F1 is the browser's help key in Chrome; the debug overlay toggle may not work in WebGL (F2 should).
+
+## 2026-11-09 — D13: fix compile error (Safe Mode)
+
+- Unity opened in Safe Mode: `Resolution` (Core) was ambiguous with `UnityEngine.Resolution` in Runner.cs. Renamed ours to `ObstacleResolution`. The stand-in compile check did not know Unity's `Resolution`; it now includes common UnityEngine type names and reproduces the exact error (Runner.cs(200,17) CS0104) when the old name is put back.
+- 80/80 tests, per-assembly check passes.

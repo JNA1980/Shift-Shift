@@ -14,7 +14,7 @@ namespace ShiftShift.Tests
         private static ObstacleInfo Obs(ObstacleKind kind, double t, int lane = 0, bool all = false) =>
             new ObstacleInfo { Kind = kind, Time = t, Lane = lane, AllLanes = all, Layer = ObstacleLayer.Solid };
 
-        private static Grade G(Resolution r, double target) => Judge.GradeOf(r, target, 0.050, 0.120);
+        private static Grade G(ObstacleResolution r, double target) => Judge.GradeOf(r, target, 0.050, 0.120);
 
         // ---------- answers ----------
 

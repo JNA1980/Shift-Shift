@@ -197,7 +197,7 @@ namespace ShiftShift
                 // Decision A: a press made before this obstacle may still turn out to be the answer. Wait for it.
                 if (input.TryGetUnresolvedPress(out double down) && down <= c.Info.Time) break;
 
-                Resolution r = _model.ResolveWithAnswer(c.Info);
+                ObstacleResolution r = _model.ResolveWithAnswer(c.Info);
                 if (r.Outcome == ObstacleOutcome.Hit)
                 {
                     Judged?.Invoke(c.Obstacle, Grade.Miss);

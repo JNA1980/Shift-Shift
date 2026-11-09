@@ -18,12 +18,12 @@ namespace ShiftShift.Core
     public enum ObstacleOutcome { Pass, Hit, Break }
 
     /// <summary>Outcome plus the key-down time of the gesture that answered the obstacle (NaN if none was needed).</summary>
-    public readonly struct Resolution
+    public readonly struct ObstacleResolution
     {
         public readonly ObstacleOutcome Outcome;
         public readonly double AnswerTime;
 
-        public Resolution(ObstacleOutcome outcome, double answerTime)
+        public ObstacleResolution(ObstacleOutcome outcome, double answerTime)
         {
             Outcome = outcome;
             AnswerTime = answerTime;
@@ -184,10 +184,10 @@ namespace ShiftShift.Core
         /// it; gap = the jump; wall = the tap that earned the charge. NaN when the runner never needed to act
         /// (e.g. a bar in another lane).
         /// </summary>
-        public Resolution ResolveWithAnswer(ObstacleInfo o)
+        public ObstacleResolution ResolveWithAnswer(ObstacleInfo o)
         {
             ObstacleOutcome outcome = ResolveOutcome(o, out double answer);
-            return new Resolution(outcome, outcome == ObstacleOutcome.Hit ? double.NaN : answer);
+            return new ObstacleResolution(outcome, outcome == ObstacleOutcome.Hit ? double.NaN : answer);
         }
 
         private ObstacleOutcome ResolveOutcome(ObstacleInfo o, out double answer)
