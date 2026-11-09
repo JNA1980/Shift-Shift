@@ -39,3 +39,13 @@
 **Not yet run**
 - Nothing above has been compiled by Unity or played. Needs: compile, Test Runner, Play InputTest, Web build.
 - dspTime in WebGL: does the clock advance before the first click/key? Does it move smoothly enough for 120 ms windows?
+
+## 2026-11-09 — D10: project setup per playbook 0.3
+
+**Done**
+- `Shift+Shift > Apply Project Setup` (Assets/_Game/Scripts/Editor/ProjectSetup.cs): creates missing folders (Materials, UI, Settings, …), Boot/Menu/Run scenes, build list Boot → Menu → Run (InputTest kept after), a neutral URP Volume profile at Assets/_Game/Materials/PostProcessProfile.asset, and Web player settings (1280x720, Brotli + fallback, data caching, explicit exceptions, strip engine code, IL2CPP optimise for size). Re-runnable; never overwrites scenes or the profile.
+- Already correct before this: Active Input Handling = Input System only.
+
+**Not yet run**
+- Not compiled by Unity. Least certain line: `PlayerSettings.SetIl2CppCodeGeneration(...)` in Unity 6000.6.
+- Left for the editor: Windows x64 build profile; Web build profile "Code Optimization".
