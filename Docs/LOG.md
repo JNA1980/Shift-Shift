@@ -66,3 +66,17 @@
 - After pulling the input changes, Play mode logged InputActionState errors ("Map/Control/Binding index out of range", NullReferenceException on Key:/Keyboard/leftShift). Gestures still worked.
 - None of our code uses InputActions (ShiftInput polls Keyboard directly). After restarting Unity: 0 errors. Conclusion: stale action state after the domain reload (template's project-wide actions, or an Input System 1.20.1 reload bug).
 - If it recurs after pulls: restart Unity. If it becomes a nuisance: Project Settings > Input System Package > Project-wide Actions = None (nothing in the game uses them).
+
+## 2026-11-09 — D10: dspTime clock verified in the Web build (Edge)
+
+**Tested (John, Web build, Edge, InputTest)**
+- DspClock advances before any click/key (no frozen clock before audio unlock).
+- Holds decide at +255 ms against a 250 ms threshold (~5 ms frame delay); hold ends at +0 ms.
+- Tap timestamps look smooth (gaps 279–328 ms, no fixed step), so no audio-buffer quantisation visible at this level.
+- Alternate streak counts up. Alt+Tab while holding Shift: key not stuck.
+- All 7 gestures register; no errors in Unity's console after the build.
+
+**Uncertain**
+- Chrome and Firefox not yet tested (day 28 browser pass). Browser F12 console not checked on this build.
+- Input-to-audio latency not measured yet (day 13, needs Conductor + clicks).
+- Info message from the template's experimental `com.unity.pipeline` package on every build: harmless; removal is out of scope for now.
