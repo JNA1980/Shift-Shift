@@ -231,3 +231,8 @@
 
 - Unity opened in Safe Mode: `Resolution` (Core) was ambiguous with `UnityEngine.Resolution` in Runner.cs. Renamed ours to `ObstacleResolution`. The stand-in compile check did not know Unity's `Resolution`; it now includes common UnityEngine type names and reproduces the exact error (Runner.cs(200,17) CS0104) when the old name is put back.
 - 80/80 tests, per-assembly check passes.
+
+## 2026-11-09 — D13: first calibration runs (editor)
+
+- Single tap on the last click: +111 ms. Tapping every click: only 4 of ~16 measured clicks counted (mean +7, spread 29).
+- Hypotheses: (1) Windows Sticky Keys popup after 5 Shift presses (start + 4 practice taps = exactly 5) stealing focus; (2) taps beyond the ±240 ms cutoff; (3) Game view focus. Result screen now shows "counted X of Y taps" and the Console logs every tap's offset to tell them apart.

@@ -83,7 +83,17 @@ namespace ShiftShift
             _source.Stop();
             _result = Calibration.Compute(_clickTimes, _taps, Beat * 0.4);
             _state = State.Result;
-            Debug.Log($"[Calibration] mean {_result.MeanMs:0.0} ms, spread {_result.SpreadMs:0.0} ms, {_result.Count} taps.");
+            // Every tap against its nearest click, so lost taps (focus, Sticky Keys) and far-off taps can be told apart.
+            var lines = new System.Text.StringBuilder();
+            foreach (double tap in _taps)
+            {
+                double best = double.MaxValue;
+                foreach (double c in _clickTimes)
+                    if (System.Math.Abs(tap - c) < System.Math.Abs(best)) best = tap - c;
+                lines.Append($"{best * 1000:+0;-0;0} ");
+            }
+            Debug.Log($"[Calibration] mean {_result.MeanMs:0.0} ms, spread {_result.SpreadMs:0.0} ms, " +
+                      $"{_result.Count} of {_taps.Count} taps counted (cutoff ±{Beat * 0.4 * 1000:0} ms). Offsets: {lines}");
         }
 
         private void Save()
@@ -122,7 +132,7 @@ namespace ShiftShift
                     break;
                 default:
                     bool enough = _result.Count >= clicks / 2;
-                    text = $"<b>Result</b>\n\nOffset {_result.MeanMs:+0;-0;0} ms\nspread ±{_result.SpreadMs:0} ms   ({_result.Count} taps counted)\n\n" +
+                    text = $"<b>Result</b>\n\nOffset {_result.MeanMs:+0;-0;0} ms\nspread ±{_result.SpreadMs:0} ms   (counted {_result.Count} of {_taps.Count} taps)\n\n" +
                            (enough ? "Right Shift: save   ·   Left Shift: try again   ·   Esc: back"
                                    : "Not enough taps counted.\nLeft Shift: try again   ·   Esc: back") +
                            $"\n\n<size=18>A spread over ±40 ms means the taps were uneven: try again.</size>";
