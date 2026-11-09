@@ -24,5 +24,7 @@ namespace ShiftShift
         public double SongTime => AudioSettings.dspTime - _start;
 
         public double BeatAt(double songTime) => songTime * _beatsPerSecond;
+
+        public double SongTimeAtBeat(double beat) => beat / _beatsPerSecond;
     }
 }

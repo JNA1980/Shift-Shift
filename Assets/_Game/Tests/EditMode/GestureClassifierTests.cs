@@ -15,6 +15,7 @@ namespace ShiftShift.Tests
             public double Bpm = 120;
             public double SongTime { get; set; }
             public double BeatAt(double songTime) => songTime * Bpm / 60.0;
+            public double SongTimeAtBeat(double beat) => beat * 60.0 / Bpm;
         }
 
         private enum Kind { Fired, Started, Ended }

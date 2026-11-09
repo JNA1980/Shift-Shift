@@ -26,6 +26,9 @@ namespace ShiftShift.Core
 
         /// <summary>Beat number (0 = first beat) at a given song time. Used to judge whether a tap was on the beat.</summary>
         double BeatAt(double songTime);
+
+        /// <summary>Song time (s) of a beat number; the inverse of <see cref="BeatAt"/>.</summary>
+        double SongTimeAtBeat(double beat);
     }
 
     /// <summary>

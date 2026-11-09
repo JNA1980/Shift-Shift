@@ -14,6 +14,7 @@ namespace ShiftShift.EditorTools
     /// - obstacle prefabs Block/LowBar/Gate/Wall/GhostBlock/PhaseBarrier (Assets/_Game/Prefabs/Obstacles),
     /// - Assets/_Game/Scenes/Greybox.unity: input + debug HUD, runner, chase camera, 200 m track,
     ///   and a starter set of obstacles (one of each behaviour) to move around by hand.
+    /// Also Shift+Shift > Create Level Test Scene (playbook 1.3), see CreateLevelTestScene.
     /// Never overwrites an existing scene or asset; delete one to regenerate it.
     /// </summary>
     public static class GreyboxSetup
@@ -43,34 +44,52 @@ namespace ShiftShift.EditorTools
                 return;
             }
 
+            Kit k = EnsureAssets();
+            BuildScene(k.Straight, k.Tunnel, k.Bridge, k.Gap, k.Block, k.Low, k.Gate, k.Wall, k.Ghost, k.Barrier);
+        }
+
+        // ---------- shared asset kit ----------
+
+        private sealed class Kit
+        {
+            public TrackPiece Straight, Tunnel, Bridge, Gap;
+            public GameObject Block, Low, Gate, Wall, Ghost, Barrier, GapMarker;
+        }
+
+        /// <summary>Materials, track pieces and obstacle prefabs; creates only what is missing.</summary>
+        private static Kit EnsureAssets()
+        {
+            var k = new Kit();
             EnsureFolder("Assets/_Game/Materials", "Greybox");
             EnsureFolder("Assets/_Game/Prefabs", "Track");
             EnsureFolder("Assets/_Game/Prefabs", "Obstacles");
             CreateMaterials();
 
-            TrackPiece straight = TrackPrefab("Straight", 10f, BuildStraight);
-            TrackPiece tunnel = TrackPrefab("Tunnel", 10f, BuildTunnel);
-            TrackPiece bridge = TrackPrefab("Bridge", 10f, BuildBridge);
-            TrackPiece gap = TrackPrefab("Gap", 2.5f, BuildGap);
+            k.Straight = TrackPrefab("Straight", 10f, BuildStraight);
+            k.Tunnel = TrackPrefab("Tunnel", 10f, BuildTunnel);
+            k.Bridge = TrackPrefab("Bridge", 10f, BuildBridge);
+            k.Gap = TrackPrefab("Gap", 2.5f, BuildGap);
 
-            GameObject block = ObstaclePrefab("Block", ObstacleKind.Block, ObstacleLayer.Solid, false, 0.6f,
+            k.Block = ObstaclePrefab("Block", ObstacleKind.Block, ObstacleLayer.Solid, false, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1f, 0), new Vector3(1.6f, 2f, 0.6f), "Obstacle"));
-            GameObject low = ObstaclePrefab("LowBar", ObstacleKind.Low, ObstacleLayer.Solid, false, 0.4f,
+            k.Low = ObstaclePrefab("LowBar", ObstacleKind.Low, ObstacleLayer.Solid, false, 0.4f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(1.8f, 0.4f, 0.4f), "Low"));
-            GameObject gate = ObstaclePrefab("Gate", ObstacleKind.Gate, ObstacleLayer.Solid, true, 0.4f, go =>
+            k.Gate = ObstaclePrefab("Gate", ObstacleKind.Gate, ObstacleLayer.Solid, true, 0.4f, go =>
             {
                 Box(go, "PostL", new Vector3(-3.3f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.3f), "Gate");
                 Box(go, "PostR", new Vector3(3.3f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.3f), "Gate");
                 Box(go, "Beam", new Vector3(0, 3.4f, 0), new Vector3(6.9f, 0.25f, 0.3f), "Gate");
             });
-            GameObject wall = ObstaclePrefab("Wall", ObstacleKind.Wall, ObstacleLayer.Solid, true, 0.6f,
+            k.Wall = ObstaclePrefab("Wall", ObstacleKind.Wall, ObstacleLayer.Solid, true, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.6f), "Wall"));
-            GameObject ghost = ObstaclePrefab("GhostBlock", ObstacleKind.Block, ObstacleLayer.Ghost, false, 0.6f,
+            k.Ghost = ObstaclePrefab("GhostBlock", ObstacleKind.Block, ObstacleLayer.Ghost, false, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1f, 0), new Vector3(1.6f, 2f, 0.6f), "Ghost"));
-            GameObject barrier = ObstaclePrefab("PhaseBarrier", ObstacleKind.Block, ObstacleLayer.Solid, true, 0.3f,
+            k.Barrier = ObstaclePrefab("PhaseBarrier", ObstacleKind.Block, ObstacleLayer.Solid, true, 0.3f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.3f), "Barrier"));
 
-            BuildScene(straight, tunnel, bridge, gap, block, low, gate, wall, ghost, barrier);
+            k.GapMarker = ObstaclePrefab("GapMarker", ObstacleKind.Gap, ObstacleLayer.Solid, true, 2.5f,
+                go => Box(go, "Hole", new Vector3(0, 0.01f, 0), new Vector3(TrackWidth, 0.02f, 2.5f), "Hole"));
+            return k;
         }
 
         // ---------- scene ----------
@@ -82,13 +101,7 @@ namespace ShiftShift.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             Camera cam = Camera.main;
 
-            // Input + HUD
-            var inputGo = new GameObject("Input");
-            var input = inputGo.AddComponent<ShiftInput>();
-            // Load just before assigning: creating prefabs and materials above can reload assets and leave an
-            // earlier reference stale (day 11: the field ended up empty).
-            Set(input, "settings", AssetDatabase.LoadAssetAtPath<GestureSettings>(SettingsPath));
-            inputGo.AddComponent<GestureDebugHud>();
+            ShiftInput input = CreateInput();
 
             // Track: 0-60 straight, 60-70 tunnel, 70-100 straight, 100-102.5 gap, 102.5-112.5 bridge, then straight to 200.
             var trackGo = new GameObject("Track");
@@ -101,27 +114,7 @@ namespace ShiftShift.EditorTools
             };
             builder.Build();
 
-            // Runner
-            var runnerGo = new GameObject("Runner");
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "Body";
-            Object.DestroyImmediate(body.GetComponent<Collider>());
-            body.transform.SetParent(runnerGo.transform, false);
-            body.transform.localPosition = new Vector3(0, 1f, 0);
-            var bodyRenderer = body.GetComponent<Renderer>();
-            bodyRenderer.sharedMaterial = Mats["Runner"];
-            var runner = runnerGo.AddComponent<Runner>();
-            Set(runner, "input", input);
-            Set(runner, "track", builder);
-            Set(runner, "body", body.transform);
-            Set(runner, "bodyRenderer", bodyRenderer);
-            Set(runner, "normalMaterial", Mats["Runner"]);
-            Set(runner, "phaseMaterial", Mats["Phase"]);
-
-            // Camera
-            var chase = cam.gameObject.AddComponent<ChaseCamera>();
-            Set(chase, "target", runner);
-            cam.transform.position = new Vector3(0, 4, -7);
+            CreateRunnerAndCamera(cam, input, builder, null);
 
             // Starter obstacles (10 m/s stub speed: 10 m = 1 s = 2 beats at 120 BPM)
             var parent = new GameObject("Obstacles").transform;
@@ -137,6 +130,130 @@ namespace ShiftShift.EditorTools
             EditorSceneManager.SaveScene(scene, ScenePath);
             Debug.Log($"[Greybox] Created {ScenePath}. Press Play. Obstacles are under 'Obstacles'; move them by hand " +
                       "(X = lane: -2, 0, 2; Z = distance in metres).");
+        }
+
+        private static ShiftInput CreateInput()
+        {
+            var inputGo = new GameObject("Input");
+            var input = inputGo.AddComponent<ShiftInput>();
+            // Load just before assigning: creating prefabs and materials can reload assets and leave an earlier
+            // reference stale (day 11: the field ended up empty).
+            Set(input, "settings", AssetDatabase.LoadAssetAtPath<GestureSettings>(SettingsPath));
+            inputGo.AddComponent<GestureDebugHud>();
+            return input;
+        }
+
+        private static Runner CreateRunnerAndCamera(Camera cam, ShiftInput input, TrackBuilder builder, Conductor conductor)
+        {
+            var runnerGo = new GameObject("Runner");
+            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            body.name = "Body";
+            Object.DestroyImmediate(body.GetComponent<Collider>());
+            body.transform.SetParent(runnerGo.transform, false);
+            body.transform.localPosition = new Vector3(0, 1f, 0);
+            var bodyRenderer = body.GetComponent<Renderer>();
+            bodyRenderer.sharedMaterial = Mats["Runner"];
+            var runner = runnerGo.AddComponent<Runner>();
+            Set(runner, "input", input);
+            if (conductor != null) Set(runner, "conductor", conductor);
+            Set(runner, "track", builder);
+            Set(runner, "body", body.transform);
+            Set(runner, "bodyRenderer", bodyRenderer);
+            Set(runner, "normalMaterial", Mats["Runner"]);
+            Set(runner, "phaseMaterial", Mats["Phase"]);
+
+            var chase = cam.gameObject.AddComponent<ChaseCamera>();
+            Set(chase, "target", runner);
+            cam.transform.position = new Vector3(0, 4, -7);
+            return runner;
+        }
+
+        // ---------- level test scene (playbook 1.3) ----------
+
+        private const string LevelScenePath = "Assets/_Game/Scenes/LevelTest.unity";
+        private const string LevelJsonPath = "Assets/_Game/Levels/level00.json";
+        private const string ClickPath = "Assets/_Game/Audio/Resources/click_100.wav";
+
+        /// <summary>
+        /// Shift+Shift > Create Level Test Scene: generates the 100 BPM click track if missing (Audio/Resources) and a
+        /// scene where the Conductor plays level00.json and the ObstacleSpawner places its obstacles.
+        /// </summary>
+        [MenuItem("Shift+Shift/Create Level Test Scene")]
+        public static void CreateLevelTestScene()
+        {
+            if (File.Exists(LevelScenePath))
+            {
+                EditorUtility.DisplayDialog("Level test", $"{LevelScenePath} already exists. Delete it first to regenerate.", "OK");
+                return;
+            }
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+
+            var json = AssetDatabase.LoadAssetAtPath<TextAsset>(LevelJsonPath);
+            LevelData level = json != null ? JsonUtility.FromJson<LevelData>(json.text) : null;
+            if (level == null || level.Validate().Count > 0)
+            {
+                Debug.LogError($"[LevelTest] {LevelJsonPath} is missing or invalid.");
+                return;
+            }
+
+            EnsureClickTrack();
+            Kit k = EnsureAssets();
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            Camera cam = Camera.main;
+            ShiftInput input = CreateInput();
+
+            var conductorGo = new GameObject("Conductor");
+            var conductor = conductorGo.AddComponent<Conductor>(); // adds its AudioSource
+            Set(conductor, "levelJson", AssetDatabase.LoadAssetAtPath<TextAsset>(LevelJsonPath));
+            Set(conductor, "input", input);
+
+            // Track from 20 m behind the start (lead-in) to 20 m past the last beat; 5 m per beat (Runner default).
+            const float metresPerBeat = 5f;
+            var trackGo = new GameObject("Track");
+            trackGo.transform.position = new Vector3(0, 0, -20f);
+            var builder = trackGo.AddComponent<TrackBuilder>();
+            builder.lengthMetres = (float)level.lengthBeats * metresPerBeat + 40f;
+            builder.fillPiece = k.Straight;
+            builder.Build();
+
+            Runner runner = CreateRunnerAndCamera(cam, input, builder, conductor);
+
+            var spawnerGo = new GameObject("Obstacles");
+            var spawner = spawnerGo.AddComponent<ObstacleSpawner>();
+            Set(spawner, "conductor", conductor);
+            Set(spawner, "runner", runner);
+            SetTypePrefabs(spawner, new[]
+            {
+                ("bar", k.Block), ("low", k.Low), ("gate", k.Gate), ("gap", k.GapMarker), ("ghost", k.Barrier), ("wall", k.Wall),
+            });
+
+            EditorSceneManager.SaveScene(scene, LevelScenePath);
+            Debug.Log($"[LevelTest] Created {LevelScenePath} for {level.name}. Press Play, then Shift to start.");
+        }
+
+        private static void EnsureClickTrack()
+        {
+            if (File.Exists(ClickPath)) return;
+            EnsureFolder("Assets/_Game", "Audio");
+            EnsureFolder("Assets/_Game/Audio", "Resources");
+            File.WriteAllBytes(ClickPath, ClickTrack.GenerateWav(100, 40)); // 32-beat level + 8 spare beats
+            AssetDatabase.ImportAsset(ClickPath);
+            Debug.Log($"[LevelTest] Generated {ClickPath} (100 BPM, 40 beats, beat 0 at 0 ms).");
+        }
+
+        private static void SetTypePrefabs(ObstacleSpawner spawner, (string type, GameObject prefab)[] map)
+        {
+            var so = new SerializedObject(spawner);
+            SerializedProperty list = so.FindProperty("prefabs");
+            list.arraySize = map.Length;
+            for (int i = 0; i < map.Length; i++)
+            {
+                SerializedProperty e = list.GetArrayElementAtIndex(i);
+                e.FindPropertyRelative("type").stringValue = map[i].type;
+                e.FindPropertyRelative("prefab").objectReferenceValue = map[i].prefab;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void Place(GameObject prefab, Transform parent, int lane, float z)
@@ -238,6 +355,7 @@ namespace ShiftShift.EditorTools
             Mat("Wall", new Color(0.85f, 0.15f, 0.2f));
             Mat("Ghost", new Color(0.65f, 0.35f, 0.95f));
             Mat("Barrier", new Color(0.25f, 0.35f, 0.9f));
+            Mat("Hole", new Color(0.05f, 0.05f, 0.07f));
         }
 
         private static void Mat(string name, Color color)

@@ -9,7 +9,10 @@ namespace ShiftShift
     /// The auto-runner (playbook 1.2). Rules live in RunnerModel (engine-free, tested); this component feeds it
     /// gestures, moves the visuals, and judges obstacles as the runner reaches them. Docs/RUNNER.md.
     ///
-    /// - Forward position comes from song time: z = speed * Clock.SongTime (no frame time; CLAUDE.md).
+    /// - Forward position comes from the song: z = metresPerBeat * beat (no frame time; CLAUDE.md), so obstacles
+    ///   placed at beat * metresPerBeat are reached exactly on their beat, whatever the BPM.
+    /// - With a Conductor: waits (and ignores gestures) until it starts; the run ends at the level's last beat.
+    ///   Without one (Greybox scene): runs on ShiftInput's stub clock until the end of the track.
     /// - Collisions are judged by rules at the obstacle's song time (decision A: actions count from key-down),
     ///   so an obstacle may be judged up to one tap/hold threshold late while a press is still undecided.
     /// - Visuals start when a gesture is recognised (lane ease, jump arc, slide pose), which can be later than
@@ -20,13 +23,15 @@ namespace ShiftShift
         public enum RunState { Running, Failed, Completed }
 
         [SerializeField] private ShiftInput input;
+        [Tooltip("Optional. When set, the runner waits for it to start and uses its clock and level length.")]
+        [SerializeField] private Conductor conductor;
         [SerializeField] private TrackBuilder track;
         [SerializeField] private Transform body;
         [SerializeField] private Renderer bodyRenderer;
 
         [Header("Movement")]
-        [Tooltip("Metres per second until the Conductor sets it from the BPM (day 12).")]
-        [SerializeField, Min(1f)] private float stubSpeed = 10f;
+        [Tooltip("Distance per beat. Speed = this x BPM / 60 (5 m/beat: 10 m/s at 120 BPM, 8.3 m/s at 100 BPM).")]
+        [SerializeField, Min(1f)] private float metresPerBeat = 5f;
         [SerializeField, Min(0.5f)] private float laneWidth = 2f;
         [SerializeField, Min(0.01f)] private float laneEaseSeconds = 0.12f;
         [SerializeField, Min(0.1f)] private float jumpSeconds = 0.5f;
@@ -43,10 +48,13 @@ namespace ShiftShift
         public RunState State { get; private set; } = RunState.Running;
         public bool IsSprinting => _model != null && _model.IsSprinting(Now);
         public bool IsPhased => _model != null && _model.IsPhased(Now);
+        public float MetresPerBeat => metresPerBeat;
+        public float LaneWidth => laneWidth;
 
         private struct Check
         {
-            public ObstacleInfo Info;
+            public ObstacleInfo Info; // Info.Time is filled in from Beat when judged (the clock can change at start)
+            public double Beat;
             public Obstacle Obstacle;
         }
 
@@ -62,13 +70,21 @@ namespace ShiftShift
         private Vector3 _bodyBaseScale, _bodyBasePos;
         private float _frozenZ;
 
-        private double Now => input.Clock.SongTime;
+        private IClock Clock => conductor != null ? conductor : input.Clock;
+        private double Now => Clock.SongTime;
+        private bool Waiting => conductor != null && !conductor.IsStarted;
 
         private void Start()
         {
             if (input == null || !input.enabled || input.Clock == null || track == null || body == null)
             {
                 Debug.LogError("Runner: assign ShiftInput (with GestureSettings), TrackBuilder and Body.", this);
+                enabled = false;
+                return;
+            }
+            if (conductor != null && conductor.Level == null)
+            {
+                Debug.LogError("Runner: the Conductor has no valid level.", this);
                 enabled = false;
                 return;
             }
@@ -79,8 +95,8 @@ namespace ShiftShift
                 ChargeTaps = input.Settings.chargeTaps,
             });
             input.GestureFired += OnGestureFired;
-            input.HoldStarted += _model.OnHoldStarted;
-            input.HoldEnded += _model.OnHoldEnded;
+            input.HoldStarted += OnHoldStarted;
+            input.HoldEnded += OnHoldEnded;
 
             _bodyBaseScale = body.localScale;
             _bodyBasePos = body.localPosition;
@@ -91,9 +107,11 @@ namespace ShiftShift
         {
             if (input == null || _model == null) return;
             input.GestureFired -= OnGestureFired;
-            input.HoldStarted -= _model.OnHoldStarted;
-            input.HoldEnded -= _model.OnHoldEnded;
+            input.HoldStarted -= OnHoldStarted;
+            input.HoldEnded -= OnHoldEnded;
         }
+
+        private float EndZ => conductor != null ? (float)(conductor.Level.lengthBeats * metresPerBeat) : track.LengthMetres;
 
         private void CollectObstacles()
         {
@@ -115,19 +133,29 @@ namespace ShiftShift
                     AddCheck(info, o, p.z);
                 }
             }
-            _checks.Sort((a, b) => a.Info.Time.CompareTo(b.Info.Time));
+            _checks.Sort((a, b) => a.Beat.CompareTo(b.Beat));
             _nextCheck = 0;
-            Debug.Log($"[Run] {_checks.Count} obstacle checks, track {track.LengthMetres:0} m at {stubSpeed:0.#} m/s.");
+            Debug.Log($"[Run] {_checks.Count} obstacle checks, run ends at {EndZ:0} m, {metresPerBeat:0.#} m per beat.");
         }
 
         private void AddCheck(ObstacleInfo info, Obstacle o, float z)
         {
-            info.Time = z / stubSpeed;
-            _checks.Add(new Check { Info = info, Obstacle = o });
+            _checks.Add(new Check { Info = info, Beat = z / metresPerBeat, Obstacle = o });
+        }
+
+        private void OnHoldStarted(GestureType type, double time)
+        {
+            if (!Waiting) _model.OnHoldStarted(type, time);
+        }
+
+        private void OnHoldEnded(GestureType type, double time)
+        {
+            if (!Waiting) _model.OnHoldEnded(type, time);
         }
 
         private void OnGestureFired(GestureType type, double time)
         {
+            if (Waiting) return; // gestures before the start are on another clock
             double now = Now;
             _model.OnGestureFired(type, time, input.AlternateStreak, now);
             if (State != RunState.Running) return;
@@ -149,11 +177,17 @@ namespace ShiftShift
             if (State != RunState.Running) return;
 
             double now = Now;
-            float z = (float)(now * stubSpeed);
+            float z = (float)(Clock.BeatAt(now) * metresPerBeat);
+            if (Waiting)
+            {
+                ApplyVisuals(now, z);
+                return;
+            }
 
-            while (_nextCheck < _checks.Count && _checks[_nextCheck].Info.Time <= now)
+            while (_nextCheck < _checks.Count && Clock.SongTimeAtBeat(_checks[_nextCheck].Beat) <= now)
             {
                 Check c = _checks[_nextCheck];
+                c.Info.Time = Clock.SongTimeAtBeat(c.Beat);
                 // Decision A: a press made before this obstacle may still turn out to be the answer. Wait for it.
                 if (input.TryGetUnresolvedPress(out double down) && down <= c.Info.Time) break;
 
@@ -167,10 +201,10 @@ namespace ShiftShift
                 _nextCheck++;
             }
 
-            if (z >= track.LengthMetres)
+            if (z >= EndZ)
             {
                 State = RunState.Completed;
-                _frozenZ = track.LengthMetres;
+                _frozenZ = EndZ;
                 Debug.Log("[Run] Completed.");
                 RunCompleted?.Invoke();
             }
@@ -183,6 +217,7 @@ namespace ShiftShift
             State = RunState.Failed;
             _failedOn = c.Obstacle;
             _frozenZ = z;
+            if (conductor != null) conductor.StopSong();
             Debug.Log($"[Run] Failed on {c.Obstacle.name} ({c.Info.Kind}, {c.Info.Layer}, " +
                       $"{(c.Info.AllLanes ? "all lanes" : "lane " + c.Info.Lane)}) at {c.Info.Time:F3}s.");
             RunFailed?.Invoke(c.Obstacle);
@@ -216,13 +251,13 @@ namespace ShiftShift
             if (_style == null) _style = new GUIStyle(GUI.skin.label) { fontSize = 16, richText = true };
 
             double now = Now;
-            string status = State == RunState.Running ? "running"
+            string status = Waiting ? "waiting for start" : State == RunState.Running ? "running"
                 : State == RunState.Completed ? "<color=lime>COMPLETED</color>"
                 : $"<color=red>FAILED</color> on {(_failedOn != null ? _failedOn.name : "?")}";
 
             GUILayout.BeginArea(new Rect(Screen.width - 360, 10, 350, 190), GUI.skin.box);
             GUILayout.Label($"Run: {status}", _style);
-            GUILayout.Label($"z {transform.position.z:0.0} / {track.LengthMetres:0} m   lane {_model.LaneAt(now)}", _style);
+            GUILayout.Label($"z {transform.position.z:0.0} / {EndZ:0} m   lane {_model.LaneAt(now)}   beat {Clock.BeatAt(now):0.00}", _style);
             GUILayout.Label(
                 $"{Flag("slide", _model.IsSliding(now))} {Flag("sprint", _model.IsSprinting(now))} " +
                 $"{Flag("air", _model.IsAirborne(now))} {Flag("phase", _model.IsPhased(now))} " +

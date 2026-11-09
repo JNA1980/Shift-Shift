@@ -5,7 +5,8 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
 
 ## How obstacles are judged
 
-- **By rules, not physics.** When the runner reaches an obstacle (song time = obstacle Z / speed), the state at that
+- **By rules, not physics.** When the runner reaches an obstacle (beat = obstacle Z / metres per beat, converted to
+  song time by the clock), the state at that
   moment decides: Pass, Hit (run fails) or Break (wall). Colliders are not used.
 - **Decision A (John, day 10): actions count from key-down.** A slide that was pressed before a low bar passes it,
   even though the slide is only recognised 250 ms after the press. If a press made before the obstacle is still
@@ -25,7 +26,9 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
 | Solid layer | runner phased → ignored | Both hold |
 | Ghost layer | only hits while phased | (let go of phase, or change lane) |
 
-Lane comes from the obstacle's X (lanes at -2, 0, 2 m), timing from its Z.
+Lane comes from the obstacle's X (lanes at -2, 0, 2 m), timing from its Z. Forward position = metres per beat (5) x
+current beat: 10 m/s at the stub's 120 BPM, 8.3 m/s at 100 BPM. With a Conductor the runner waits for the start and
+ignores gestures until then.
 
 ## Decisions taken while building (flag if you disagree)
 
