@@ -248,3 +248,20 @@
 **Pending from John**
 - Calibration offset/spread/counted-of-taps for Editor, Chrome, Firefox (Sticky Keys shortcut checked off).
 - Restart time after a fail (< 1 s target). Grades seen when dodging on the click.
+
+## 2026-11-09 — D13: browser calibration results and M1 gesture decision
+
+**Measured (WebGL, laptop speakers, builds without the counted-of-taps display)**
+
+| Browser | Offset | Spread | Taps counted |
+|---|---|---|---|
+| Chrome | +74 ms | ±29 ms | 16 |
+| Firefox | −27 ms | ±35 ms | 15 |
+| Edge | −36 ms | ±63 ms | 8 (too few; redo) |
+
+- Kill criterion 2 (beat sync off by > 60 ms in WebGL with no fix): **passes**. The offset is compensated by calibration; the jitter (spread ~±30 ms) is within budget.
+- Chrome and Firefox differ by ~100 ms, so calibration has to be per browser. Flagged (not built): prompt calibration on first launch, since itch players will not find F2.
+- **Decision (John): keep all 7 gestures.** Recorded in SCOPE.md.
+
+**Done**
+- Assets/_Game/Levels/test_gestures.json: one of each gesture, 4 beats apart, 100 BPM, 40 beats (fits click_100). Validated against the level rules.

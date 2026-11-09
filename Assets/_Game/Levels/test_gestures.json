@@ -1,0 +1,45 @@
+{
+  "name": "Test - all gestures",
+  "bpm": 100.0,
+  "audioClip": "click_100",
+  "offsetMs": 0.0,
+  "palette": "dawn",
+  "lengthBeats": 40.0,
+  "events": [
+    {
+      "beat": 8.0,
+      "lane": 1,
+      "type": "bar"
+    },
+    {
+      "beat": 12.0,
+      "lane": 0,
+      "type": "bar"
+    },
+    {
+      "beat": 16.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 20.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 24.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 28.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 36.0,
+      "lane": 1,
+      "type": "wall"
+    }
+  ]
+}
