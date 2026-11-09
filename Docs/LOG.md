@@ -92,3 +92,10 @@
 - Whether Shift+Shift > Build WebGL (BuildPipeline.BuildPlayer) uses the active profile's player settings or the global ones. Check the first time the menu build is used (by day 24).
 - The Web profile is a Development preset (C++ config Debug, Development Build). A release profile is needed before the itch upload (day 24/28).
 - Web "Code Optimization" option is not offered in 6000.6; skipped.
+
+## 2026-11-09 — D10: closed
+
+- Web profile player settings verified in the committed profile asset (d630369): 1280x720, Brotli, decompression fallback on, data caching on, explicit exceptions only, strip engine code, IL2CPP code generation = size, Input System only. C++ compiler configuration is Debug (Development profile); Release profile still needed before upload.
+- Playbook Day 0 (0.1–0.4) and 1.1 complete. Plan "done when" for days 9–10 met: WebGL build runs in a browser and all 7 gestures log correctly. About one day ahead of plan.
+- Still John's (not blocking): itch.io draft project, butler install + login, tools/itch.env.
+- Next: playbook 1.2 Runner + TrackBuilder (day 11).
