@@ -8,53 +8,72 @@ namespace ShiftShift
 {
     /// <summary>
     /// Reads Left/Right Shift each frame and feeds the engine-free <see cref="GestureClassifier"/>.
-    /// Timestamps come from <see cref="Clock"/>; until the Conductor exists (day 13) this is
-    /// real time since startup. The Conductor should set Clock to its song-time function.
+    /// All times are song time from <see cref="Clock"/>. Until the Conductor exists (day 12) the clock is a
+    /// dspTime stub at <see cref="stubBpm"/>; the Conductor will call <see cref="SetClock"/>.
     ///
-    /// Known limitation: key timestamps are quantised to the frame (~16 ms at 60 fps).
-    /// Revisit on day 13 if the latency test shows it matters.
+    /// Known limitation: key timestamps are taken once per frame (~16 ms at 60 fps). Revisit on day 13.
     /// </summary>
     [DefaultExecutionOrder(-100)] // classify before gameplay scripts read gestures this frame
     public sealed class ShiftInput : MonoBehaviour
     {
-        [Header("Timing (ms) — starting values, tune on day 15")]
-        [SerializeField, Range(20, 200)] private float bothWindowMs = 80f;
-        [SerializeField, Range(100, 500)] private float holdThresholdMs = 250f;
-        [SerializeField, Range(200, 1500)] private float alternateMaxGapMs = 600f;
+        [SerializeField] private GestureSettings settings;
 
-        public event Action<GestureEvent> GestureDetected;
+        [Header("Stub clock, used until the Conductor exists (day 12)")]
+        [SerializeField, Range(60f, 200f)] private float stubBpm = 120f;
 
-        /// <summary>Current time in seconds used to stamp key events. Replace with song time once the Conductor exists.</summary>
-        public Func<double> Clock { get; set; }
+        /// <summary>A gesture was recognised. Time = song time of the key-down.</summary>
+        public event Action<GestureType, double> GestureFired;
 
+        /// <summary>HoldLeft, HoldRight or BothHold began. Time = song time of the key-down.</summary>
+        public event Action<GestureType, double> HoldStarted;
+
+        /// <summary>HoldLeft, HoldRight or BothHold ended. Time = song time of the key-up.</summary>
+        public event Action<GestureType, double> HoldEnded;
+
+        public IClock Clock { get; private set; }
+        public GestureSettings Settings => settings;
+        public int AlternateStreak => _classifier?.AlternateStreak ?? 0;
         public bool IsDown(Side side) => _classifier != null && _classifier.IsDown(side);
 
         private GestureClassifier _classifier;
+        private int _settingsVersion;
 
         private void Awake()
         {
-            if (Clock == null) Clock = () => Time.realtimeSinceStartupAsDouble;
+            if (settings == null)
+            {
+                Debug.LogError("ShiftInput: no GestureSettings asset assigned (Assets/_Game/Settings/GestureSettings).", this);
+                enabled = false;
+                return;
+            }
+            if (Clock == null) Clock = new DspClock(stubBpm);
             Rebuild();
         }
 
-        /// <summary>Recreates the classifier with the current inspector values (also clears held state).</summary>
-        public void Rebuild()
+        /// <summary>Swap the song clock (the Conductor calls this). Clears held-key state.</summary>
+        public void SetClock(IClock clock)
         {
-            _classifier = new GestureClassifier(new GestureSettings
-            {
-                BothWindow = bothWindowMs / 1000.0,
-                HoldThreshold = holdThresholdMs / 1000.0,
-                AlternateMaxGap = alternateMaxGapMs / 1000.0,
-            });
-            _classifier.Detected += e => GestureDetected?.Invoke(e);
+            Clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            if (settings != null) Rebuild();
         }
 
         /// <summary>Call on restart so a key held through a fail does not leak into the new run.</summary>
-        public void ResetState() => _classifier.Reset();
+        public void ResetState() => _classifier?.Reset();
+
+        private void Rebuild()
+        {
+            _classifier = new GestureClassifier(settings.ToThresholds(), Clock);
+            _classifier.GestureFired += (t, s) => GestureFired?.Invoke(t, s);
+            _classifier.HoldStarted += (t, s) => HoldStarted?.Invoke(t, s);
+            _classifier.HoldEnded += (t, s) => HoldEnded?.Invoke(t, s);
+            _settingsVersion = settings.Version;
+        }
 
         private void Update()
         {
-            double now = Clock();
+            if (settings.Version != _settingsVersion) Rebuild(); // threshold tuned in the Inspector
+
+            double now = Clock.SongTime;
             Keyboard kb = Keyboard.current;
             if (kb != null)
             {
@@ -75,15 +94,7 @@ namespace ShiftShift
 
         private void OnApplicationFocus(bool hasFocus)
         {
-            if (!hasFocus && _classifier != null) _classifier.ReleaseAll(Clock());
+            if (!hasFocus && _classifier != null) _classifier.ReleaseAll(Clock.SongTime);
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (holdThresholdMs <= bothWindowMs) holdThresholdMs = bothWindowMs + 1f;
-            if (Application.isPlaying && _classifier != null) Rebuild();
-        }
-#endif
     }
 }

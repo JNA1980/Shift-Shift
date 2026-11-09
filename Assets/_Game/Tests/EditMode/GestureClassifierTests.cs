@@ -4,24 +4,60 @@ using ShiftShift.Core;
 
 namespace ShiftShift.Tests
 {
+    /// <summary>
+    /// The classifier is fed key events directly (Press/Release/Update with explicit times), which is the
+    /// "fake input source": no real keys or Unity needed. 120 BPM => one beat = 0.5 s.
+    /// </summary>
     public class GestureClassifierTests
     {
+        private sealed class FakeClock : IClock
+        {
+            public double Bpm = 120;
+            public double SongTime { get; set; }
+            public double BeatAt(double songTime) => songTime * Bpm / 60.0;
+        }
+
+        private enum Kind { Fired, Started, Ended }
+
+        private struct Rec
+        {
+            public Kind Kind;
+            public GestureType Type;
+            public double Time;
+            public override string ToString() => $"{Kind}:{Type}@{Time:F3}";
+        }
+
         private GestureClassifier _c;
-        private List<GestureEvent> _events;
+        private List<Rec> _log;
 
         [SetUp]
         public void SetUp()
         {
-            _c = new GestureClassifier(new GestureSettings { BothWindow = 0.080, HoldThreshold = 0.250, AlternateMaxGap = 0.600 });
-            _events = new List<GestureEvent>();
-            _c.Detected += e => _events.Add(e);
+            var thresholds = new GestureThresholds
+            {
+                TapHoldSeconds = 0.250,
+                BothWindowSeconds = 0.080,
+                AlternateBeatTolerance = 0.25,
+            };
+            _c = new GestureClassifier(thresholds, new FakeClock());
+            _log = new List<Rec>();
+            _c.GestureFired += (t, s) => _log.Add(new Rec { Kind = Kind.Fired, Type = t, Time = s });
+            _c.HoldStarted += (t, s) => _log.Add(new Rec { Kind = Kind.Started, Type = t, Time = s });
+            _c.HoldEnded += (t, s) => _log.Add(new Rec { Kind = Kind.Ended, Type = t, Time = s });
         }
 
-        private GestureType[] Types()
+        private string[] Log()
         {
-            var t = new GestureType[_events.Count];
-            for (int i = 0; i < t.Length; i++) t[i] = _events[i].Type;
-            return t;
+            var a = new string[_log.Count];
+            for (int i = 0; i < a.Length; i++) a[i] = $"{_log[i].Kind}:{_log[i].Type}";
+            return a;
+        }
+
+        private List<GestureType> Fired()
+        {
+            var l = new List<GestureType>();
+            foreach (var r in _log) if (r.Kind == Kind.Fired) l.Add(r.Type);
+            return l;
         }
 
         private void Tap(Side s, double down, double up)
@@ -30,29 +66,51 @@ namespace ShiftShift.Tests
             _c.Release(s, up);
         }
 
-        // ---- taps ----
+        // ---------- tap vs hold at the threshold boundary ----------
 
         [Test]
-        public void ShortLeftPress_IsTapLeft_TimedAtKeyDown()
+        public void PressJustUnderThreshold_IsTap_TimedAtKeyDown()
         {
-            Tap(Side.Left, 1.000, 1.100);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft }, Types());
-            Assert.AreEqual(1.000, _events[0].Time, 1e-9);
-            Assert.AreEqual(1.100, _events[0].EmitTime, 1e-9);
+            Tap(Side.Left, 0.1, 0.349);
+            CollectionAssert.AreEqual(new[] { "Fired:TapLeft" }, Log());
+            Assert.AreEqual(0.1, _log[0].Time, 1e-9);
         }
 
         [Test]
-        public void ShortRightPress_IsTapRight()
+        public void PressAtThreshold_IsHold()
+        {
+            Tap(Side.Left, 0, 0.250);
+            CollectionAssert.AreEqual(new[] { "Fired:HoldLeft", "Started:HoldLeft", "Ended:HoldLeft" }, Log());
+        }
+
+        [Test]
+        public void TapRight_IsTapRight()
         {
             Tap(Side.Right, 2.0, 2.05);
-            CollectionAssert.AreEqual(new[] { GestureType.TapRight }, Types());
+            CollectionAssert.AreEqual(new[] { "Fired:TapRight" }, Log());
         }
 
         [Test]
-        public void PressJustUnderThreshold_IsTap()
+        public void Hold_StartsOnUpdateWhileHeld_EndsOnRelease()
         {
-            Tap(Side.Left, 0, 0.249);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft }, Types());
+            _c.Press(Side.Right, 1.0);
+            _c.Update(1.2);
+            Assert.IsEmpty(_log);
+            _c.Update(1.26);
+            CollectionAssert.AreEqual(new[] { "Fired:HoldRight", "Started:HoldRight" }, Log());
+            Assert.AreEqual(1.0, _log[1].Time, 1e-9, "hold start is timed at key-down");
+
+            _c.Release(Side.Right, 2.0);
+            Assert.AreEqual("Ended:HoldRight", Log()[2]);
+            Assert.AreEqual(2.0, _log[2].Time, 1e-9);
+        }
+
+        [Test]
+        public void LongPressWithNoUpdateInBetween_IsStillHold()
+        {
+            _c.Press(Side.Right, 0);
+            _c.Release(Side.Right, 0.4);
+            CollectionAssert.AreEqual(new[] { "Fired:HoldRight", "Started:HoldRight", "Ended:HoldRight" }, Log());
         }
 
         [Test]
@@ -61,88 +119,61 @@ namespace ShiftShift.Tests
             _c.Press(Side.Left, 0);
             _c.Press(Side.Left, 0.05); // key repeat
             _c.Release(Side.Left, 0.1);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft }, Types());
-            Assert.AreEqual(0.0, _events[0].Time, 1e-9);
+            CollectionAssert.AreEqual(new[] { "Fired:TapLeft" }, Log());
+            Assert.AreEqual(0.0, _log[0].Time, 1e-9);
         }
 
         [Test]
         public void ReleaseWithoutPress_IsIgnored()
         {
             _c.Release(Side.Right, 1);
-            Assert.IsEmpty(_events);
-        }
-
-        // ---- holds ----
-
-        [Test]
-        public void HeldPress_EmitsHoldStartOnUpdate_BeforeRelease()
-        {
-            _c.Press(Side.Left, 1.0);
-            _c.Update(1.2);
-            Assert.IsEmpty(_events);
-            _c.Update(1.26);
-            CollectionAssert.AreEqual(new[] { GestureType.HoldLeftStart }, Types());
-            Assert.AreEqual(1.0, _events[0].Time, 1e-9, "hold is judged at key-down");
-            Assert.AreEqual(1.25, _events[0].EmitTime, 1e-9);
-
-            _c.Release(Side.Left, 2.0);
-            CollectionAssert.AreEqual(new[] { GestureType.HoldLeftStart, GestureType.HoldLeftEnd }, Types());
-            Assert.AreEqual(2.0, _events[1].Time, 1e-9);
-        }
-
-        [Test]
-        public void LongPressWithNoUpdateInBetween_IsStillHold()
-        {
-            // A long frame hitch: release arrives without any Update after the threshold.
-            _c.Press(Side.Right, 0);
-            _c.Release(Side.Right, 0.4);
-            CollectionAssert.AreEqual(new[] { GestureType.HoldRightStart, GestureType.HoldRightEnd }, Types());
+            Assert.IsEmpty(_log);
         }
 
         [Test]
         public void HoldOneKey_TapOther_AreIndependent()
         {
             _c.Press(Side.Left, 0);
-            _c.Update(0.3);           // slide starts
-            Tap(Side.Right, 0.5, 0.6); // lane change while sliding
+            _c.Update(0.3);
+            Tap(Side.Right, 0.6, 0.65);
             _c.Release(Side.Left, 1.0);
             CollectionAssert.AreEqual(new[]
             {
-                GestureType.HoldLeftStart, GestureType.TapRight, GestureType.HoldLeftEnd,
-            }, Types());
+                "Fired:HoldLeft", "Started:HoldLeft", "Fired:TapRight", "Ended:HoldLeft",
+            }, Log());
         }
 
-        // ---- both ----
+        // ---------- both-tap inside and outside the 80 ms window ----------
 
         [Test]
-        public void BothWithinWindow_QuickRelease_IsBothTap_TimedAtFirstKeyDown()
+        public void BothInsideWindow_IsBothTap_TimedAtFirstKeyDown()
         {
             _c.Press(Side.Left, 1.000);
             _c.Press(Side.Right, 1.060);
             _c.Release(Side.Left, 1.120);
             _c.Release(Side.Right, 1.130);
-            CollectionAssert.AreEqual(new[] { GestureType.BothTap }, Types());
-            Assert.AreEqual(1.000, _events[0].Time, 1e-9);
+            CollectionAssert.AreEqual(new[] { "Fired:BothTap" }, Log());
+            Assert.AreEqual(1.000, _log[0].Time, 1e-9);
         }
 
         [Test]
-        public void BothAtExactWindowEdge_CountsAsBoth()
+        public void BothAtExactWindowEdge_IsBothTap()
         {
             _c.Press(Side.Right, 0);
             _c.Press(Side.Left, 0.080);
             _c.Release(Side.Right, 0.1);
             _c.Release(Side.Left, 0.1);
-            CollectionAssert.AreEqual(new[] { GestureType.BothTap }, Types());
+            CollectionAssert.AreEqual(new[] { "Fired:BothTap" }, Log());
         }
 
         [Test]
-        public void SecondKeyOutsideWindow_IsNotBoth()
+        public void BothJustOutsideWindow_IsTwoTaps()
         {
             _c.Press(Side.Left, 0);
-            _c.Press(Side.Right, 0.1);
+            _c.Press(Side.Right, 0.081);
             _c.Release(Side.Left, 0.15);
             _c.Release(Side.Right, 0.2);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight, GestureType.Alternate }, Types());
+            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight }, Fired());
         }
 
         [Test]
@@ -150,32 +181,22 @@ namespace ShiftShift.Tests
         {
             Tap(Side.Left, 0, 0.03);
             Tap(Side.Right, 0.05, 0.1);
-            Assert.AreEqual(GestureType.TapLeft, _events[0].Type);
-            Assert.AreEqual(GestureType.TapRight, _events[1].Type);
+            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight }, Fired());
         }
 
         [Test]
-        public void BothHeld_IsBothHoldStartThenEnd()
+        public void BothHeld_IsBothHold_StartAndEnd()
         {
             _c.Press(Side.Left, 0);
             _c.Press(Side.Right, 0.02);
             _c.Update(0.26);
-            CollectionAssert.AreEqual(new[] { GestureType.BothHoldStart }, Types());
-            Assert.AreEqual(0.0, _events[0].Time, 1e-9);
+            CollectionAssert.AreEqual(new[] { "Fired:BothHold", "Started:BothHold" }, Log());
+            Assert.AreEqual(0.0, _log[1].Time, 1e-9);
 
             _c.Release(Side.Right, 1.5);
             _c.Release(Side.Left, 1.6);
-            CollectionAssert.AreEqual(new[] { GestureType.BothHoldStart, GestureType.BothHoldEnd }, Types());
-            Assert.AreEqual(1.5, _events[1].Time, 1e-9);
-        }
-
-        [Test]
-        public void BothHold_NeverAlsoEmitsSingleHolds()
-        {
-            _c.Press(Side.Left, 0);
-            _c.Press(Side.Right, 0.01);
-            _c.Update(1.0);
-            CollectionAssert.AreEqual(new[] { GestureType.BothHoldStart }, Types());
+            CollectionAssert.AreEqual(new[] { "Fired:BothHold", "Started:BothHold", "Ended:BothHold" }, Log());
+            Assert.AreEqual(1.5, _log[2].Time, 1e-9);
         }
 
         [Test]
@@ -184,10 +205,10 @@ namespace ShiftShift.Tests
             _c.Press(Side.Left, 0);
             _c.Press(Side.Right, 0.01);
             _c.Update(0.3);
-            _c.Release(Side.Left, 1.0); // phase ends
-            _c.Update(2.0);             // right still held long after
+            _c.Release(Side.Left, 1.0);
+            _c.Update(2.0);
             _c.Release(Side.Right, 2.1);
-            CollectionAssert.AreEqual(new[] { GestureType.BothHoldStart, GestureType.BothHoldEnd }, Types());
+            CollectionAssert.AreEqual(new[] { "Fired:BothHold", "Started:BothHold", "Ended:BothHold" }, Log());
         }
 
         [Test]
@@ -195,68 +216,100 @@ namespace ShiftShift.Tests
         {
             _c.Press(Side.Left, 0);
             _c.Press(Side.Right, 0.01);
-            _c.Release(Side.Left, 0.1);  // BothTap, right still down -> lockout
-            Tap(Side.Left, 0.2, 0.25);    // ignored
-            _c.Release(Side.Right, 0.3); // both up -> lockout clears
-            Tap(Side.Left, 0.5, 0.55);    // counts
-            CollectionAssert.AreEqual(new[] { GestureType.BothTap, GestureType.TapLeft }, Types());
+            _c.Release(Side.Left, 0.1);   // BothTap, right still down -> lockout
+            Tap(Side.Left, 0.2, 0.25);     // ignored
+            _c.Release(Side.Right, 0.3);  // both up -> lockout clears
+            Tap(Side.Left, 0.5, 0.55);     // counts
+            CollectionAssert.AreEqual(new[] { GestureType.BothTap, GestureType.TapLeft }, Fired());
         }
 
         [Test]
         public void HoldingKey_DoesNotPairWithLaterPress()
         {
             _c.Press(Side.Left, 0);
-            _c.Update(0.3); // HoldLeftStart
+            _c.Update(0.3);
             _c.Press(Side.Right, 0.31);
             _c.Release(Side.Right, 0.35);
-            CollectionAssert.AreEqual(new[] { GestureType.HoldLeftStart, GestureType.TapRight }, Types());
+            CollectionAssert.AreEqual(new[] { GestureType.HoldLeft, GestureType.TapRight }, Fired());
         }
 
-        // ---- alternate ----
+        // ---------- alternate on and off beat (120 BPM: beats at 0, 0.5, 1.0, ...) ----------
 
         [Test]
-        public void AlternatingTaps_CountUp()
+        public void Alternate_OnBeat_CountsToFour()
         {
             Tap(Side.Left, 0.0, 0.05);
             Tap(Side.Right, 0.5, 0.55);
             Tap(Side.Left, 1.0, 1.05);
             Tap(Side.Right, 1.5, 1.55);
-            var counts = new List<int>();
-            foreach (var e in _events) if (e.Type == GestureType.Alternate) counts.Add(e.AlternateCount);
-            CollectionAssert.AreEqual(new[] { 2, 3, 4 }, counts);
+            Assert.AreEqual(4, _c.AlternateStreak);
+            Assert.AreEqual(3, Fired().FindAll(t => t == GestureType.Alternate).Count);
         }
 
         [Test]
-        public void SameSideTap_RestartsAlternateStreak()
+        public void Alternate_WithinTolerance_Counts()
         {
             Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.3, 0.35);
-            Tap(Side.Right, 0.6, 0.65);
-            Tap(Side.Left, 0.9, 0.95);
-            var counts = new List<int>();
-            foreach (var e in _events) if (e.Type == GestureType.Alternate) counts.Add(e.AlternateCount);
-            CollectionAssert.AreEqual(new[] { 2, 2 }, counts);
+            Tap(Side.Right, 0.62, 0.67); // beat 1.24: 0.24 beats late
+            Assert.AreEqual(2, _c.AlternateStreak);
         }
 
         [Test]
-        public void SlowAlternation_DoesNotCount()
+        public void Alternate_OffBeat_DoesNotCount()
         {
             Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.7, 0.75);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight }, Types());
+            Tap(Side.Right, 0.63, 0.68); // beat 1.26: outside 0.25
+            Assert.AreEqual(0, _c.AlternateStreak);
+            CollectionAssert.DoesNotContain(Fired(), GestureType.Alternate);
         }
 
         [Test]
-        public void HoldBreaksAlternateStreak()
+        public void Alternate_OffBeatTapMidStreak_Resets()
         {
             Tap(Side.Left, 0.0, 0.05);
-            _c.Press(Side.Right, 0.3);
-            _c.Release(Side.Right, 0.6); // hold, not tap
-            Tap(Side.Left, 0.7, 0.75);
-            CollectionAssert.DoesNotContain(Types(), GestureType.Alternate);
+            Tap(Side.Right, 0.5, 0.55);
+            Tap(Side.Left, 0.75, 0.8);  // half a beat: off
+            Tap(Side.Right, 1.5, 1.55); // on beat 3, starts a new streak
+            Assert.AreEqual(1, _c.AlternateStreak);
         }
 
-        // ---- misc ----
+        [Test]
+        public void Alternate_SameSideTwice_RestartsAtOne()
+        {
+            Tap(Side.Left, 0.0, 0.05);
+            Tap(Side.Left, 0.5, 0.55);
+            Assert.AreEqual(1, _c.AlternateStreak);
+        }
+
+        [Test]
+        public void Alternate_SkippedBeat_RestartsAtOne()
+        {
+            Tap(Side.Left, 0.0, 0.05);
+            Tap(Side.Right, 1.0, 1.05); // beat 2, skipped beat 1
+            Assert.AreEqual(1, _c.AlternateStreak);
+        }
+
+        [Test]
+        public void Alternate_StreakExpires_WhenNextBeatPasses()
+        {
+            Tap(Side.Left, 0.0, 0.05);
+            Tap(Side.Right, 0.5, 0.55);
+            _c.Update(1.10); // beat 2.2: still inside tolerance of beat 2
+            Assert.AreEqual(2, _c.AlternateStreak);
+            _c.Update(1.13); // beat 2.26: beat 2 has passed
+            Assert.AreEqual(0, _c.AlternateStreak);
+        }
+
+        [Test]
+        public void Alternate_HoldBreaksStreak()
+        {
+            Tap(Side.Left, 0.0, 0.05);
+            _c.Press(Side.Right, 0.5);
+            _c.Release(Side.Right, 0.8);
+            Assert.AreEqual(0, _c.AlternateStreak);
+        }
+
+        // ---------- misc ----------
 
         [Test]
         public void ReleaseAll_EndsHeldGestures()
@@ -264,7 +317,7 @@ namespace ShiftShift.Tests
             _c.Press(Side.Left, 0);
             _c.Update(0.3);
             _c.ReleaseAll(0.5);
-            CollectionAssert.AreEqual(new[] { GestureType.HoldLeftStart, GestureType.HoldLeftEnd }, Types());
+            Assert.AreEqual("Ended:HoldLeft", Log()[2]);
             Assert.IsFalse(_c.IsDown(Side.Left));
         }
 
@@ -274,15 +327,19 @@ namespace ShiftShift.Tests
             _c.Press(Side.Left, 0);
             _c.Reset();
             _c.Update(1.0);
-            Assert.IsEmpty(_events);
+            Assert.IsEmpty(_log);
             Assert.IsFalse(_c.IsDown(Side.Left));
         }
 
         [Test]
-        public void InvalidSettings_Throw()
+        public void InvalidThresholds_Throw()
         {
-            Assert.Throws<System.ArgumentException>(() =>
-                new GestureClassifier(new GestureSettings { BothWindow = 0.3, HoldThreshold = 0.25 }));
+            Assert.Throws<System.ArgumentException>(() => new GestureClassifier(
+                new GestureThresholds { TapHoldSeconds = 0.25, BothWindowSeconds = 0.3, AlternateBeatTolerance = 0.25 },
+                new FakeClock()));
+            Assert.Throws<System.ArgumentException>(() => new GestureClassifier(
+                new GestureThresholds { TapHoldSeconds = 0.25, BothWindowSeconds = 0.08, AlternateBeatTolerance = 0.5 },
+                new FakeClock()));
         }
     }
 }

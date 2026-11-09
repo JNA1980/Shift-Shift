@@ -19,4 +19,23 @@
 - Firefox and Chrome not yet tested (only Edge).
 - Sticky Keys behaviour with the Windows shortcut on: not recorded.
 - Input timestamps use realtimeSinceStartup, not dspTime yet; frame-quantised (~16 ms).
-- Playbook alignment pending (see impact list in session): GestureSettings ScriptableObject, IClock, event shape, alternate-on-beat, 0.3 project config, 0.4 PowerShell upload script.
+- Playbook alignment pending: see next entry.
+
+## 2026-11-09 — D10: input aligned with playbook prompt 1.1
+
+**Done**
+- Thresholds moved to a `GestureSettings` ScriptableObject (`Assets/_Game/Settings/GestureSettings.asset`), wired into InputTest. Live edits in Play mode rebuild the classifier.
+- `IClock` interface (Core) + `DspClock` stub (dspTime, fixed BPM, default 120 on ShiftInput).
+- Events now `GestureFired(type, songTime)`, `HoldStarted`, `HoldEnded`; GestureType is the seven gestures.
+- Alternate is now beat-based (Option 1, John's decision): within ±0.25 beats of a beat line, alternating sides, consecutive beats; streak expires when the next beat passes.
+- Overlay shows key states, clock + beat, thresholds, alternate streak and the last five gestures.
+- Kept `Scripts/Core` + `Scripts/Runtime` instead of `Scripts/Input/` (Core split lets tests run without Unity; moving files risks breaking scene references).
+
+**Tested**
+- 27/27 classifier tests pass via `dotnet test tools/CoreTests` (tap/hold boundary, both-tap in/out of window, alternate on/off beat, expiry, lockout).
+- Runtime scripts compile against stand-in Unity types (catches C# errors only).
+- Found and fixed while testing: the alternate streak expired at key-up even when the tap's key-down was on the beat.
+
+**Not yet run**
+- Nothing above has been compiled by Unity or played. Needs: compile, Test Runner, Play InputTest, Web build.
+- dspTime in WebGL: does the clock advance before the first click/key? Does it move smoothly enough for 120 ms windows?

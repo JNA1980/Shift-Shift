@@ -414,7 +414,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.GestureDebugHud
   input: {fileID: 0}
-  maxLines: 14
   visible: 1
 --- !u!114 &1829193335
 MonoBehaviour:
@@ -428,9 +427,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 029bba6a9dca5b64fb34385fca4d9682, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.ShiftInput
-  bothWindowMs: 80
-  holdThresholdMs: 250
-  alternateMaxGapMs: 600
+  settings: {fileID: 11400000, guid: ee4d86c00a624434a80930466dcd7e48, type: 2}
+  stubBpm: 120
 --- !u!4 &1829193336
 Transform:
   m_ObjectHideFlags: 0

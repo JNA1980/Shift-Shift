@@ -4,18 +4,16 @@ namespace ShiftShift.Core
 {
     /// <summary>
     /// Turns raw Left/Right Shift key-down/key-up events into the seven gestures.
-    /// Engine-free: the caller supplies timestamps (song time, in seconds) and must call
+    /// Engine-free: the caller supplies timestamps (song time, seconds) and must call
     /// <see cref="Update"/> every frame so holds are detected while keys are still down.
+    /// Rules and reasoning: Docs/INPUT.md.
     ///
-    /// Rules (see Docs/INPUT.md for the reasoning):
-    /// - Single press shorter than HoldThreshold  -> Tap (emitted on key-up, timed at key-down).
-    /// - Single press reaching HoldThreshold      -> HoldStart (timed at key-down), HoldEnd on key-up.
-    /// - Second key down within BothWindow of the first, while the first is still down -> "both" gesture:
-    ///   first key-up before HoldThreshold -> BothTap, otherwise BothHoldStart ... BothHoldEnd (on first key-up).
-    /// - After a both-gesture ends, the key still held is ignored, and new presses are ignored,
-    ///   until both keys are up (lockout). This stops a phase-shift release from turning into a sprint.
-    /// - Taps that alternate sides with onsets no more than AlternateMaxGap apart also emit Alternate(count).
-    ///   Holds and both-gestures reset the streak.
+    /// Events (all times are song time in seconds):
+    /// - GestureFired(type, t): once per gesture. Taps, holds and both-gestures report the key-down time.
+    /// - HoldStarted(type, t) / HoldEnded(type, t): for HoldLeft, HoldRight, BothHold. Start reports key-down time,
+    ///   end reports key-up time.
+    /// - Alternate: GestureFired(Alternate, t) after each on-beat tap that continues an L/R streak (streak >= 2).
+    ///   Read <see cref="AlternateStreak"/> for the count (4 = charge).
     /// </summary>
     public sealed class GestureClassifier
     {
@@ -30,23 +28,28 @@ namespace ShiftShift.Core
 
         private enum BothState { None, Pending, Holding }
 
-        private readonly GestureSettings _settings;
+        private readonly GestureThresholds _t;
+        private readonly IClock _clock;
         private KeyState _left, _right;
         private BothState _both;
         private double _bothStart;
         private bool _lockout;
 
-        private bool _hasLastTap;
-        private Side _lastTapSide;
-        private double _lastTapTime;
-        private int _alternateCount;
+        private Side _lastAltSide;
+        private double _lastAltBeat;
 
-        public event Action<GestureEvent> Detected;
+        public event Action<GestureType, double> GestureFired;
+        public event Action<GestureType, double> HoldStarted;
+        public event Action<GestureType, double> HoldEnded;
 
-        public GestureClassifier(GestureSettings settings = null)
+        /// <summary>Consecutive on-beat alternating taps, one per beat. 0 when no streak is live.</summary>
+        public int AlternateStreak { get; private set; }
+
+        public GestureClassifier(GestureThresholds thresholds, IClock clock)
         {
-            _settings = settings ?? new GestureSettings();
-            _settings.Validate();
+            _t = thresholds ?? throw new ArgumentNullException(nameof(thresholds));
+            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            _t.Validate();
         }
 
         public bool IsDown(Side side) => Key(side).IsDown;
@@ -57,7 +60,7 @@ namespace ShiftShift.Core
             _right = default;
             _both = BothState.None;
             _lockout = false;
-            ResetAlternate();
+            AlternateStreak = 0;
         }
 
         public void Press(Side side, double time)
@@ -79,13 +82,13 @@ namespace ShiftShift.Core
 
             ref KeyState other = ref Key(Other(side));
             if (other.IsDown && !other.Consumed && !other.HoldStarted &&
-                time - other.DownTime <= _settings.BothWindow)
+                time - other.DownTime <= _t.BothWindowSeconds)
             {
                 _both = BothState.Pending;
                 _bothStart = other.DownTime;
                 key.Consumed = true;
                 other.Consumed = true;
-                ResetAlternate();
+                AlternateStreak = 0;
             }
         }
 
@@ -100,12 +103,12 @@ namespace ShiftShift.Core
 
             if (_both == BothState.Pending)
             {
-                Emit(GestureType.BothTap, _bothStart, time);
+                GestureFired?.Invoke(GestureType.BothTap, _bothStart);
                 EndBoth(otherDown);
             }
             else if (_both == BothState.Holding)
             {
-                Emit(GestureType.BothHoldEnd, time, time);
+                HoldEnded?.Invoke(GestureType.BothHold, time);
                 EndBoth(otherDown);
             }
             else if (key.Consumed)
@@ -114,11 +117,11 @@ namespace ShiftShift.Core
             }
             else if (key.HoldStarted)
             {
-                Emit(side == Side.Left ? GestureType.HoldLeftEnd : GestureType.HoldRightEnd, time, time);
+                HoldEnded?.Invoke(HoldType(side), time);
             }
             else
             {
-                EmitTap(side, key.DownTime, time);
+                Tap(side, key.DownTime);
             }
 
             if (!_left.IsDown && !_right.IsDown) _lockout = false;
@@ -134,12 +137,19 @@ namespace ShiftShift.Core
         /// <summary>Call once per frame with the current song time.</summary>
         public void Update(double time)
         {
-            double threshold = _settings.HoldThreshold;
+            // A streak whose next beat has passed without a tap is over. Not while a key is down: taps resolve
+            // on key-up but are judged at key-down, so a pending press may still continue the streak.
+            if (AlternateStreak > 0 && !_left.IsDown && !_right.IsDown &&
+                _clock.BeatAt(time) > _lastAltBeat + 1 + _t.AlternateBeatTolerance)
+                AlternateStreak = 0;
+
+            double threshold = _t.TapHoldSeconds;
 
             if (_both == BothState.Pending && time - _bothStart >= threshold)
             {
                 _both = BothState.Holding;
-                Emit(GestureType.BothHoldStart, _bothStart, _bothStart + threshold);
+                GestureFired?.Invoke(GestureType.BothHold, _bothStart);
+                HoldStarted?.Invoke(GestureType.BothHold, _bothStart);
             }
 
             bool leftDue = HoldDue(ref _left, time);
@@ -157,15 +167,16 @@ namespace ShiftShift.Core
         }
 
         private bool HoldDue(ref KeyState key, double time) =>
-            key.IsDown && !key.Consumed && !key.HoldStarted && time - key.DownTime >= _settings.HoldThreshold;
+            key.IsDown && !key.Consumed && !key.HoldStarted && time - key.DownTime >= _t.TapHoldSeconds;
 
         private void StartHold(Side side)
         {
             ref KeyState key = ref Key(side);
             key.HoldStarted = true;
-            ResetAlternate();
-            Emit(side == Side.Left ? GestureType.HoldLeftStart : GestureType.HoldRightStart,
-                key.DownTime, key.DownTime + _settings.HoldThreshold);
+            AlternateStreak = 0;
+            GestureType type = HoldType(side);
+            GestureFired?.Invoke(type, key.DownTime);
+            HoldStarted?.Invoke(type, key.DownTime);
         }
 
         private void EndBoth(bool otherStillDown)
@@ -174,31 +185,34 @@ namespace ShiftShift.Core
             _lockout = otherStillDown;
         }
 
-        private void EmitTap(Side side, double onset, double releaseTime)
+        private void Tap(Side side, double onset)
         {
-            Emit(side == Side.Left ? GestureType.TapLeft : GestureType.TapRight, onset, releaseTime);
+            GestureFired?.Invoke(side == Side.Left ? GestureType.TapLeft : GestureType.TapRight, onset);
 
-            if (_hasLastTap && _lastTapSide != side && onset - _lastTapTime <= _settings.AlternateMaxGap)
-                _alternateCount++;
+            // Alternate (Option 1): each tap within tolerance of a beat line, sides alternating, one tap per beat.
+            double beat = _clock.BeatAt(onset);
+            double nearest = Math.Floor(beat + 0.5);
+            bool onBeat = Math.Abs(beat - nearest) <= _t.AlternateBeatTolerance;
+
+            if (!onBeat)
+            {
+                AlternateStreak = 0;
+                return;
+            }
+
+            if (AlternateStreak > 0 && side != _lastAltSide && nearest == _lastAltBeat + 1)
+                AlternateStreak++;
             else
-                _alternateCount = 1;
+                AlternateStreak = 1;
 
-            _hasLastTap = true;
-            _lastTapSide = side;
-            _lastTapTime = onset;
+            _lastAltSide = side;
+            _lastAltBeat = nearest;
 
-            if (_alternateCount >= 2)
-                Emit(GestureType.Alternate, onset, releaseTime, _alternateCount);
+            if (AlternateStreak >= 2)
+                GestureFired?.Invoke(GestureType.Alternate, onset);
         }
 
-        private void ResetAlternate()
-        {
-            _hasLastTap = false;
-            _alternateCount = 0;
-        }
-
-        private void Emit(GestureType type, double time, double emitTime, int alternateCount = 0) =>
-            Detected?.Invoke(new GestureEvent(type, time, emitTime, alternateCount));
+        private static GestureType HoldType(Side side) => side == Side.Left ? GestureType.HoldLeft : GestureType.HoldRight;
 
         private ref KeyState Key(Side side)
         {
