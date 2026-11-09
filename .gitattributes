@@ -1,0 +1,26 @@
+# Git LFS: audio, images, video, models (plan: "LFS for audio and any binary over 1 MB")
+*.wav  filter=lfs diff=lfs merge=lfs -text
+*.ogg  filter=lfs diff=lfs merge=lfs -text
+*.mp3  filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
+*.aif  filter=lfs diff=lfs merge=lfs -text
+*.aiff filter=lfs diff=lfs merge=lfs -text
+*.psd  filter=lfs diff=lfs merge=lfs -text
+*.tga  filter=lfs diff=lfs merge=lfs -text
+*.exr  filter=lfs diff=lfs merge=lfs -text
+*.tif  filter=lfs diff=lfs merge=lfs -text
+*.mp4  filter=lfs diff=lfs merge=lfs -text
+*.mov  filter=lfs diff=lfs merge=lfs -text
+*.fbx  filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+# PNG/JPG left out on purpose: palette LUTs and UI sprites are small; promote if any exceed 1 MB.
+
+# Unity YAML stays text so diffs work
+*.unity  text eol=lf
+*.prefab text eol=lf
+*.asset  text eol=lf
+*.mat    text eol=lf
+*.meta   text eol=lf
+*.cs     text eol=lf
+*.json   text eol=lf
+*.sh     text eol=lf
