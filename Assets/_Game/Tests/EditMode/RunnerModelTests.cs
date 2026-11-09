@@ -144,6 +144,24 @@ namespace ShiftShift.Tests
             Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Gap, 1.51, all: true)));
         }
 
+        [Test]
+        public void Jump_StaysAirborneUntilVisualLanding()
+        {
+            // John's day-13 run: key-down 14.113, recognised 14.348; far edge of the gap reached at 14.800.
+            _m.OnGestureFired(GestureType.BothTap, 14.113, 0, 14.348);
+            Assert.IsTrue(_m.IsAirborne(14.800));
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Gap, 14.800, all: true)));
+            Assert.IsFalse(_m.IsAirborne(14.849));
+        }
+
+        [Test]
+        public void Jump_StillStartsAtKeyDown()
+        {
+            _m.OnGestureFired(GestureType.BothTap, 2.0, 0, 2.2);
+            Assert.IsTrue(_m.IsAirborne(2.05), "airborne before recognition (decision A)");
+            Assert.IsFalse(_m.IsAirborne(1.99));
+        }
+
         // ---------- phase ----------
 
         [Test]

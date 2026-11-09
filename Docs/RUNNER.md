@@ -21,7 +21,7 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
 | Block (one lane) | runner in another lane | Tap L / Tap R |
 | Low bar (all lanes) | sliding | Hold L |
 | Gate (all lanes) | sprinting | Hold R |
-| Gap (all lanes) | in the air at both edges | Both tap (0.5 s jump) |
+| Gap (all lanes) | in the air at both edges | Both tap (airborne from key-down until the visual landing: recognised + 0.5 s) |
 | Wall (all lanes) | a charge is available (used up) | Alternate × 4 on the beat |
 | Phase barrier (all lanes) | phased | Both hold |
 | Ghost layer (any kind) | only hits while phased | (let go of phase, or change lane) |

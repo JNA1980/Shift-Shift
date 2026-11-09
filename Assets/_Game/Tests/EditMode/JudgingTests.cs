@@ -75,6 +75,16 @@ namespace ShiftShift.Tests
         }
 
         [Test]
+        public void Gap_JumpHalfBeatEarly_PassesButIsOk()
+        {
+            // 100 BPM: beat 24 = 14.4 s; jumped at 14.113 (recognised 14.348); far edge at 14.8.
+            _m.OnGestureFired(GestureType.BothTap, 14.113, 0, 14.348);
+            var r = _m.ResolveWithAnswer(Obs(ObstacleKind.Gap, 14.8, all: true));
+            Assert.AreEqual(ObstacleOutcome.Pass, r.Outcome);
+            Assert.AreEqual(Grade.Ok, G(r, 14.4));
+        }
+
+        [Test]
         public void PhaseBarrier_PhaseOnBeat_IsGood()
         {
             _m.OnHoldStarted(GestureType.BothHold, 2.92);

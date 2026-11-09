@@ -282,3 +282,10 @@
 - 86/86 core tests (new: phase does not pass low/gate/wall/gap/lane block; barrier without phase hits; low maps to all lanes). Per-assembly compile check passes.
 
 **Not yet run** in Unity: prefab edits (kind 5 = Barrier, LowBar scale 7), test level replay.
+
+## 2026-11-10 — D13: gap failed while the capsule looked airborne
+
+- John's run: jump key-down 14.113 s (half a beat early), recognised 14.348 s; gap far edge reached 14.800 s. Rules had the runner airborne 14.113–14.613 (from key-down), the screen 14.348–14.848 (arc starts on recognition), so the fail showed mid-air.
+- Fix (same principle as day 11's lane rule): a jump is airborne from key-down until the visual landing (recognised + 0.5 s). Grading unchanged: that jump now passes as OK.
+- 89/89 core tests (3 new, including John's exact timings). Per-assembly compile check passes. Not yet run in Unity.
+- Also from the screenshot: slide (Hold L) and sprint (Hold R) through beats 16 and 20 passed on this run.

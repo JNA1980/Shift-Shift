@@ -77,7 +77,8 @@ namespace ShiftShift.Core
 
         private readonly RunnerRules _rules;
         private readonly List<LaneChange> _laneChanges = new List<LaneChange>();
-        private readonly List<double> _jumps = new List<double>();
+        private struct Jump { public double Start; public double End; }
+        private readonly List<Jump> _jumps = new List<Jump>();
         private readonly List<Charge> _charges = new List<Charge>();
         private readonly Dictionary<GestureType, List<Interval>> _holds = new Dictionary<GestureType, List<Interval>>
         {
@@ -104,7 +105,9 @@ namespace ShiftShift.Core
             {
                 case GestureType.TapLeft: AddLaneChange(time, recognizedAt, -1); break;
                 case GestureType.TapRight: AddLaneChange(time, recognizedAt, +1); break;
-                case GestureType.BothTap: _jumps.Add(time); break;
+                // Airborne from key-down (decision A) until the visual landing (recognised + jump), so the rules never
+                // land the runner before the screen does (day 13: a gap failed while the capsule was still in the air).
+                case GestureType.BothTap: _jumps.Add(new Jump { Start = time, End = recognizedAt + _rules.JumpSeconds }); break;
                 case GestureType.Alternate:
                     if (alternateStreak > 0 && alternateStreak % _rules.ChargeTaps == 0)
                         _charges.Add(new Charge { Time = time });
@@ -162,8 +165,8 @@ namespace ShiftShift.Core
 
         public bool IsAirborne(double time)
         {
-            foreach (double start in _jumps)
-                if (time >= start && time <= start + _rules.JumpSeconds) return true;
+            foreach (Jump j in _jumps)
+                if (time >= j.Start && time <= j.End) return true;
             return false;
         }
 
@@ -261,8 +264,8 @@ namespace ShiftShift.Core
 
         private double JumpCovering(double t)
         {
-            foreach (double start in _jumps)
-                if (t >= start && t <= start + _rules.JumpSeconds) return start;
+            foreach (Jump j in _jumps)
+                if (t >= j.Start && t <= j.End) return j.Start;
             return double.NaN;
         }
 
