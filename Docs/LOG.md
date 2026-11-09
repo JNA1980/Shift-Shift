@@ -120,3 +120,9 @@
 - Fail timing: whether a fail judged up to ~250 ms late (decision A wait) is noticeable.
 - That obstacle positions match the rules (lane from X, time from Z) in the generated scene.
 - The generated scene, prefabs and URP materials themselves (editor script not run by Unity yet).
+
+## 2026-11-09 — D11: fix editor assembly reference
+
+- Unity compile errors in GreyboxSetup.cs: `ShiftShift.Core` not found. Cause: ShiftShift.Editor.asmdef did not reference ShiftShift.Core (the stand-in compile builds everything as one assembly, so it cannot catch missing asmdef references). Added the reference.
+- Warning CS0618 in Runner.cs: `FindObjectsByType(FindObjectsSortMode)` is deprecated in 6000.6. Harmless; left as is until the replacement overload is confirmed from the full warning text.
+- John confirmed: sprint does not change forward speed.

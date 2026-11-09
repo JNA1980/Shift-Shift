@@ -28,7 +28,7 @@ Lane comes from the obstacle's X (lanes at -2, 0, 2 m), timing from its Z.
 
 1. **Sprint does not change forward speed.** The playbook says "speed x1.5", but obstacle timing comes from song
    time; actually speeding up would make every later obstacle arrive off the beat. Sprint = state for gates + FOV
-   kick (60 → 72). Needs John's confirmation.
+   kick (60 → 72). Confirmed by John, day 11: keep it.
 2. **A charge lasts until the next wall uses it.** Every 4th on-beat alternation earns one.
 3. **Walls are in the solid layer**, so a phased runner also passes them. Levels should not overlap phase and walls.
 4. **Gaps are checked at both edges**, other obstacles at their centre.

@@ -2,6 +2,7 @@
     "name": "ShiftShift.Editor",
     "rootNamespace": "ShiftShift.EditorTools",
     "references": [
+        "ShiftShift.Core",
         "ShiftShift.Runtime",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Runtime"
