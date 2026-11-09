@@ -50,3 +50,6 @@ crashlytics-build.properties
 
 # Build intermediates at project root
 /Data/
+
+# itch.io upload config (holds your itch username; keep it local)
+/tools/itch.env

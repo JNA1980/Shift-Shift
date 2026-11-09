@@ -23,7 +23,8 @@ Settings > Accessibility > Keyboard > Sticky keys (or say "No" to the shortcut p
 
 - Unity 6 LTS, URP. See [Docs/SETUP.md](Docs/SETUP.md) for first-time setup.
 - In the editor: **Shift+Shift > Build WebGL** or **Build Windows**. Output lands in `Builds/`.
-- Upload: `ITCH_USER=<you> tools/butler-push.sh html` (or `windows`, `all`).
+- Upload (one-time: install butler, `butler login`, copy `tools/itch.env.example` to `tools/itch.env`):
+  `powershell -ExecutionPolicy Bypass -File tools\upload.ps1 html` (or `windows`, `all`); `tools/upload.sh` on macOS/Linux.
 
 ## Tests
 

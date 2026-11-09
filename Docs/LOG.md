@@ -49,3 +49,14 @@
 **Not yet run**
 - Not compiled by Unity. Least certain line: `PlayerSettings.SetIl2CppCodeGeneration(...)` in Unity 6000.6.
 - Left for the editor: Windows x64 build profile; Web build profile "Code Optimization".
+
+## 2026-11-09 — D10: upload scripts per playbook 0.4
+
+**Done**
+- `tools/upload.ps1` (Windows) and `tools/upload.sh` push Builds/WebGL to channel `html` and a zipped Builds/Windows to `windows`; itch user/project read from `tools/itch.env` (git-ignored; template `tools/itch.env.example`). Replaces tools/butler-push.sh. Folder kept lowercase `tools/` (case-only renames are unreliable on Windows).
+
+**Tested**
+- Both scripts run against a fake butler (PowerShell 7 on Linux): correct targets and version, Windows zip contents, and clear errors for missing env file, placeholder user, missing builds, bad channel, butler failure.
+
+**Not yet run**
+- Windows PowerShell 5.1 on John's PC; real butler upload (needs itch draft project + `butler login`).
