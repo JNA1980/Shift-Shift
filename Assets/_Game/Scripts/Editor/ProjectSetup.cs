@@ -14,6 +14,8 @@ namespace ShiftShift.EditorTools
     /// <summary>
     /// Playbook prompt 0.3 as a one-click, re-runnable setup: Shift+Shift > Apply Project Setup.
     /// Creates only what is missing (never overwrites scenes or the Volume profile) and logs every change.
+    /// Player settings: in Unity 6.6 the PlayerSettings API writes into the ACTIVE build profile (Web profile has its
+    /// own copy), so run this with the Web profile active.
     /// Not covered here (do in the editor): Windows x64 build profile, Web "Code Optimization" in the build profile.
     /// </summary>
     public static class ProjectSetup
@@ -37,6 +39,10 @@ namespace ShiftShift.EditorTools
             CreateVolumeProfile(log);
             ApplyPlayerSettings(log);
             AssetDatabase.SaveAssets();
+            // Player settings (which Unity 6.6 writes into the active build profile) only reach disk on Save Project.
+            bool saved = EditorApplication.ExecuteMenuItem("File/Save Project");
+            log.Add(saved ? "Saved project (player settings written to disk)"
+                          : "Could not run File > Save Project automatically: do it by hand so player settings are written to disk");
 
             if (!string.IsNullOrEmpty(previousScene) && File.Exists(previousScene))
                 EditorSceneManager.OpenScene(previousScene);

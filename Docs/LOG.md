@@ -80,3 +80,15 @@
 - Chrome and Firefox not yet tested (day 28 browser pass). Browser F12 console not checked on this build.
 - Input-to-audio latency not measured yet (day 13, needs Conductor + clicks).
 - Info message from the template's experimental `com.unity.pipeline` package on every build: harmless; removal is out of scope for now.
+
+## 2026-11-09 — D10: project setup applied (John)
+
+**Done**
+- Ran Shift+Shift > Apply Project Setup: Materials/UI folders, Boot/Menu/Run scenes, build list Boot → Menu → Run → InputTest, neutral Volume profile. Committed (29af827).
+- Found: the player-settings changes were not on disk until File > Save Project, and in Unity 6.6 they land in the active Web build profile's own Player Settings copy (Assets/Settings/Build Profiles/Web - Desktop - Development.asset), not ProjectSettings.asset. Confirmed in the profile UI: 1280x720, IL2CPP optimise for code size, strip engine code, Input System only. Decision: keep the profile copy (it is what Web builds use).
+- ProjectSetup now runs File > Save Project itself.
+
+**Uncertain**
+- Whether Shift+Shift > Build WebGL (BuildPipeline.BuildPlayer) uses the active profile's player settings or the global ones. Check the first time the menu build is used (by day 24).
+- The Web profile is a Development preset (C++ config Debug, Development Build). A release profile is needed before the itch upload (day 24/28).
+- Web "Code Optimization" option is not offered in 6000.6; skipped.
