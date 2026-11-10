@@ -15,6 +15,6 @@ MonoBehaviour:
   tapHoldMs: 250
   bothWindowMs: 80
   alternateBeatTolerance: 0.25
-  chargeTaps: 4
+  chargeTaps: 2
   perfectMs: 50
   goodMs: 120

@@ -30,7 +30,7 @@ logged and the level does not start.
 | gate | Speed gate | all | sprint (Hold R) |
 | gap | Hole in the floor (2.5 m) | all | jump (Both tap) |
 | ghost | Phase barrier | all | phase (Both hold) |
-| wall | Wall | all | charge (Alternate x4 on the beat) |
+| wall | Wall | all | charge (alternate L, R on consecutive clicks; Charge Taps in GestureSettings, 2) |
 
 Position: Z = beat x the Runner's metres per beat (5), so every obstacle is reached exactly on its beat.
 

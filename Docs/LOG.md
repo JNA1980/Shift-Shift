@@ -289,3 +289,8 @@
 - Fix (same principle as day 11's lane rule): a jump is airborne from key-down until the visual landing (recognised + 0.5 s). Grading unchanged: that jump now passes as OK.
 - 89/89 core tests (3 new, including John's exact timings). Per-assembly compile check passes. Not yet run in Unity.
 - Also from the screenshot: slide (Hold L) and sprint (Hold R) through beats 16 and 20 passed on this run.
+
+## 2026-11-10 — D13: charge shortened to two taps (tuning)
+
+- John asked for an easier charge ("two presses of L R"); no preference among the options offered. Set GestureSettings Charge Taps 4 → 2 (setting only, no code): L, R on consecutive clicks charges; the second tap on the wall's click = Perfect. Side effect: dodging left then right on back-to-back clicks also charges (harmless; only walls use it). Revisit at M1 (2, 3 or 4).
+- The plan's "four on-beat alternations" is now a tunable value, not a rule.
