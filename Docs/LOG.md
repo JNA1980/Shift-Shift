@@ -326,3 +326,15 @@
 
 - After Shift+Shift > Set Up Run Scenes refreshed the obstacle lists, all 8 types appear and the test level completes ("works good"). The first attempt showed "No prefab for type 'wide'/'hurdle'" and "Gate has no Panel0" because the Run scene still had its old list (the refresh had not been run after the pull).
 - **For the art pass (day 17, playbook 2.2/2.3):** the wide bar and the gate read as separate bars (one block per lane with gaps). Make the wide bar one solid piece and give the gate a frame with a clearly visible opening.
+
+## 2026-11-10 — D16: chart editor (playbook 2.1)
+
+**Done**
+- Core.Chart: place (replaces overlaps; gate/wide keep the clicked lane as the opening; all-lane types stored in lane 1), move, remove, snap 1/4 or 1/8, type counts, length in seconds, checks (errors block save; warnings: first 8 beats, different types under 1 beat apart when the spacing toggle is on), JSON writer (2-space indent, sorted by beat then lane, invariant numbers, escaped strings; same format as the existing level files).
+- ChartEditorWindow (Shift+Shift > Chart Editor): level dropdown, waveform strip, beat grid with bar numbers, three lane rows, click/drag/right-click editing, play/pause/stop/scrub/loop with the playhead taken from the audio's sample position, Save/Revert, Ctrl+S, Space, 1-8 type keys, problems panel.
+- Docs/CHART_EDITOR.md (usage, checks, editor features relied on and Unity 6 risks).
+
+**Tested**
+- 116/116 core tests (14 new chart tests, including exact JSON output). Per-assembly compile check now includes the window (stand-ins extended with the editor UI types it uses).
+
+**Not yet run** in Unity: the window, edit-mode audio playback (highest risk), waveform, save/reimport round trip.
