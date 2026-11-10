@@ -321,3 +321,8 @@
 - 102/102 core tests (10 new). Per-assembly compile check passes.
 
 **Not yet run** in Unity: new prefabs, panel hiding, scene refresh, the updated test level.
+
+## 2026-11-10 — D13: new obstacles verified in the editor (John)
+
+- After Shift+Shift > Set Up Run Scenes refreshed the obstacle lists, all 8 types appear and the test level completes ("works good"). The first attempt showed "No prefab for type 'wide'/'hurdle'" and "Gate has no Panel0" because the Run scene still had its old list (the refresh had not been run after the pull).
+- **For the art pass (day 17, playbook 2.2/2.3):** the wide bar and the gate read as separate bars (one block per lane with gaps). Make the wide bar one solid piece and give the gate a frame with a clearly visible opening.
