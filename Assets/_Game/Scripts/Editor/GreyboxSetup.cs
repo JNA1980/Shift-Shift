@@ -17,7 +17,7 @@ namespace ShiftShift.EditorTools
     /// Also Shift+Shift > Create Level Test Scene (playbook 1.3), see CreateLevelTestScene.
     /// Never overwrites an existing scene or asset; delete one to regenerate it.
     /// </summary>
-    public static class GreyboxSetup
+    public static partial class GreyboxSetup
     {
         private const string MatDir = "Assets/_Game/Materials/Greybox";
         private const string TrackDir = "Assets/_Game/Prefabs/Track";
@@ -522,6 +522,7 @@ namespace ShiftShift.EditorTools
             Mat("Barrier", new Color(0.25f, 0.35f, 0.9f));
             Mat("Hole", new Color(0.05f, 0.05f, 0.07f));
             Mat("Hurdle", new Color(1f, 0.45f, 0.75f)); // pink: short wall (orange = obstacles, red = tall wall)
+            Mat("TrackLines", new Color(0.75f, 0.75f, 0.75f)); // road edges and lane lines (day 16)
         }
 
         private static void Mat(string name, Color color)

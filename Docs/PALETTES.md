@@ -55,3 +55,17 @@ For comparison, the alternative palettes A-E (light backgrounds): 4-7 of 7 colou
 that collapses under deuteranopia or protanopia (dE 0-12).
 
 Status: proposed, not yet approved.
+
+## Decision (John, day 16): Option 3 skies, charcoal road with lines, colour = what you press
+
+- **Skies** (camera, fog): dawn #FBD9C0, overcast #C9D1D8, dusk #3B2550, night #0B1026, neon #07020F, fullshift #101418.
+- **Road** #333333 on every level (charcoal), tunnel walls / rails #2A2A2A, **edge and lane lines** #BFBFBF.
+- **Action colours, identical on every level:** lane #F27017, slide #FCC41E, sprint #00FCF9, jump #F40E9D, phase #0E79F1,
+  charge #F21E3D. Accent (runner trail) per level: dawn #1E5FA8, overcast #0E5E6F, dusk #FFD166, night #5CE1E6,
+  neon #00F5D4, fullshift #F7F7F2.
+- **Checks:** action colours vs road 3.0-9.8:1 (lane 4.3, slide 7.9, sprint 9.8, jump 3.2, phase 3.0, charge 3.0);
+  colour-blind separation >= 20 dE (normal, deuteranopia, protanopia). Road vs light skies 8-9.5:1; lines vs dark
+  skies 7-11:1.
+- **Known trade-off (John's choice):** four action colours are below the plan's 4.5:1 against what is behind them (the
+  road); 3:1 is the agreed floor. Obstacles always appear below the horizon (camera 4 m up, tallest obstacle 3.7 m),
+  i.e. against the road. Shape stays the primary cue.

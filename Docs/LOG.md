@@ -346,3 +346,17 @@
 - Moved obstacles, saved, played: they appear where placed (spawned names like `bar b7 lane 0`).
 - Playbook 2.1 question answered: **faster than editing JSON by hand; nothing clumsy.** No simplification needed.
 - Day 16 "done when" met. Next per plan: 2.2 palette and post-processing (day 17), including the art-pass note on the wide bar and gate.
+
+## 2026-11-10 — D16: palettes decided; visuals step 1 (playbook 2.2)
+
+**Decisions (John)** — see Docs/PALETTES.md: colour = what you press (six action colours identical on every level), Option 3 skies (pale dawn/overcast, dark others), charcoal road #333333 with light edge and lane lines. Four action colours sit at 3.0-4.3:1 on the road, below the plan's 4.5:1; agreed floor 3:1.
+
+**Done**
+- Palette ScriptableObject (warns in the Inspector if an action colour drops below 3:1 on the road); PaletteApplier (camera background, linear fog, recolours runtime copies of mapped materials so assets are never modified by playing; palette picked from the level JSON's "palette" field).
+- Core ColorContrast (WCAG) + tests, including the chosen colours on the charcoal road.
+- Shift+Shift > Set Up Visuals: six palette assets, edge/lane lines on Straight/Tunnel/Bridge, applier wired into Run, LevelTest and Greybox (Greybox shows "night"), tracks rebuilt, fog enabled in each scene's lighting so builds keep the fog shader variants.
+
+**Tested**
+- 120/120 core tests. Per-assembly compile check passes (stand-ins extended: RenderSettings, fog, camera clear, prefab contents).
+
+**Not yet run** in Unity: the menu, the applier, fog, how it looks. Steps 2-5 (bloom/emissive edges, camera FOV/roll + trail, phase look, solid wide bar + gate frame) not started.
