@@ -5918,12 +5918,16 @@ MonoBehaviour:
   prefabs:
   - type: bar
     prefab: {fileID: 6011010512107753533, guid: 8957dddf31ace31488d224fe9072d2fa, type: 3}
+  - type: wide
+    prefab: {fileID: 1544179683333027335, guid: 360ee614596293040a614d1614abd99c, type: 3}
   - type: low
     prefab: {fileID: 6613373350333685824, guid: f83e441a85f9cab418da69f27cab9edd, type: 3}
   - type: gate
-    prefab: {fileID: 3314999122448691615, guid: abf4b2545ff64344d979065b359f3ae5, type: 3}
+    prefab: {fileID: 8336425415929885763, guid: 82084fd91025b834eb043ddd745a2625, type: 3}
   - type: gap
     prefab: {fileID: 5182846504346825767, guid: 7498c445fe756684d81b491dc11871e2, type: 3}
+  - type: hurdle
+    prefab: {fileID: 5794791623636052627, guid: cefbb8d63165ab640914283a2f418f6c, type: 3}
   - type: ghost
     prefab: {fileID: 6615260983697364595, guid: 1f0ca8e43756cf74b9a91ac867958c9c, type: 3}
   - type: wall
