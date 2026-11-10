@@ -338,3 +338,11 @@
 - 116/116 core tests (14 new chart tests, including exact JSON output). Per-assembly compile check now includes the window (stand-ins extended with the editor UI types it uses).
 
 **Not yet run** in Unity: the window, edit-mode audio playback (highest risk), waveform, save/reimport round trip.
+
+## 2026-11-10 — D16: chart editor verified (John)
+
+**Tested (editor)**
+- 116/116 tests pass in Unity. Window opens, level00 loads, obstacles drawn in lane rows, edit-mode audio playback works (the highest risk), waveform shows the click spikes exactly on the beat lines.
+- Moved obstacles, saved, played: they appear where placed (spawned names like `bar b7 lane 0`).
+- Playbook 2.1 question answered: **faster than editing JSON by hand; nothing clumsy.** No simplification needed.
+- Day 16 "done when" met. Next per plan: 2.2 palette and post-processing (day 17), including the art-pass note on the wide bar and gate.
