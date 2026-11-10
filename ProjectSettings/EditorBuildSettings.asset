@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/_Game/Scenes/Run.unity
     guid: 1c496a92741b7d34f9ce15f465c22c99
   - enabled: 1
+    path: Assets/_Game/Scenes/Calibrate.unity
+    guid: faa30d2a23cb34046af717eb57771c66
+  - enabled: 1
     path: Assets/_Game/Scenes/InputTest.unity
     guid: 7b5e053a54fdf2e4d80c1cdd475ae0d2
   m_configObjects:

@@ -968,6 +968,6 @@ MonoBehaviour:
           m_BuildProfileEngineDiagnosticsState: 2
         m_AdaptivePerformanceEnabled: 0
         m_CodeOptimization: 0
-        m_WebGLClientBrowserPath: 
+        m_WebGLClientBrowserPath: C:/Program Files/Google/Chrome/Application/chrome.exe
         m_WebGLClientBrowserType: 4
         m_WebGLTextureSubtarget: 1
