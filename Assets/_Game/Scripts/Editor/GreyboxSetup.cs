@@ -56,7 +56,7 @@ namespace ShiftShift.EditorTools
         private sealed class Kit
         {
             public TrackPiece Straight, Tunnel, Bridge, Gap;
-            public GameObject Block, Low, Gate, Wall, Ghost, Barrier, GapMarker;
+            public GameObject Block, Low, Gate, Wall, Ghost, Barrier, GapMarker, GateOpening, WideBar, Hurdle;
         }
 
         /// <summary>Materials, track pieces and obstacle prefabs; creates only what is missing.</summary>
@@ -92,6 +92,23 @@ namespace ShiftShift.EditorTools
 
             k.GapMarker = ObstaclePrefab("GapMarker", ObstacleKind.Gap, ObstacleLayer.Solid, true, 2.5f,
                 go => Box(go, "Hole", new Vector3(0, 0.01f, 0), new Vector3(TrackWidth, 0.02f, 2.5f), "Hole"));
+
+            // Day 13 (John): gate with a one-lane opening, wide bar with one free lane, short pink hurdle.
+            // Opening types have one panel per lane (Panel0/1/2 = chart lanes left/middle/right); the spawner hides
+            // the open lane's panel.
+            k.GateOpening = ObstaclePrefab("GateOpening", ObstacleKind.Gate, ObstacleLayer.Solid, false, 0.4f, go =>
+            {
+                for (int lane = 0; lane < 3; lane++)
+                    Box(go, "Panel" + lane, new Vector3((lane - 1) * 2f, 1.75f, 0), new Vector3(1.95f, 3.5f, 0.3f), "Gate");
+                Box(go, "Beam", new Vector3(0, 3.6f, 0), new Vector3(TrackWidth, 0.25f, 0.3f), "Gate");
+            }, laneIsOpening: true);
+            k.WideBar = ObstaclePrefab("WideBar", ObstacleKind.Block, ObstacleLayer.Solid, false, 0.6f, go =>
+            {
+                for (int lane = 0; lane < 3; lane++)
+                    Box(go, "Panel" + lane, new Vector3((lane - 1) * 2f, 1f, 0), new Vector3(1.9f, 2f, 0.6f), "Obstacle");
+            }, laneIsOpening: true);
+            k.Hurdle = ObstaclePrefab("Hurdle", ObstacleKind.Hurdle, ObstacleLayer.Solid, true, 0.4f,
+                go => Box(go, "Mesh", new Vector3(0, 0.4f, 0), new Vector3(TrackWidth, 0.8f, 0.4f), "Hurdle"));
             return k;
         }
 
@@ -232,10 +249,7 @@ namespace ShiftShift.EditorTools
             var spawner = spawnerGo.AddComponent<ObstacleSpawner>();
             Set(spawner, "conductor", conductor);
             Set(spawner, "runner", runner);
-            SetTypePrefabs(spawner, new[]
-            {
-                ("bar", k.Block), ("low", k.Low), ("gate", k.Gate), ("gap", k.GapMarker), ("ghost", k.Barrier), ("wall", k.Wall),
-            });
+            SetTypePrefabs(spawner, TypeMap(k));
 
             EditorSceneManager.SaveScene(scene, LevelScenePath);
             Debug.Log($"[LevelTest] Created {LevelScenePath} for {level.name}. Press Play, then Shift to start.");
@@ -250,6 +264,13 @@ namespace ShiftShift.EditorTools
             AssetDatabase.ImportAsset(ClickPath);
             Debug.Log($"[LevelTest] Generated {ClickPath} (100 BPM, 40 beats, beat 0 at 0 ms).");
         }
+
+        /// <summary>Chart type -> prefab. One place, used by every scene the tools build or refresh.</summary>
+        private static (string type, GameObject prefab)[] TypeMap(Kit k) => new[]
+        {
+            ("bar", k.Block), ("wide", k.WideBar), ("low", k.Low), ("gate", k.GateOpening), ("gap", k.GapMarker),
+            ("hurdle", k.Hurdle), ("ghost", k.Barrier), ("wall", k.Wall),
+        };
 
         private static void SetTypePrefabs(ObstacleSpawner spawner, (string type, GameObject prefab)[] map)
         {
@@ -293,7 +314,7 @@ namespace ShiftShift.EditorTools
             var run = EditorSceneManager.OpenScene(RunScenePath, OpenSceneMode.Single);
             if (Object.FindAnyObjectByType<GameFlow>() != null)
             {
-                log.Add("Run scene already has a GameFlow: left alone");
+                RefreshSpawner(run, log, "Run");
             }
             else
             {
@@ -322,10 +343,7 @@ namespace ShiftShift.EditorTools
                 var spawner = new GameObject("Obstacles").AddComponent<ObstacleSpawner>();
                 Set(spawner, "conductor", conductor);
                 Set(spawner, "runner", runner);
-                SetTypePrefabs(spawner, new[]
-                {
-                    ("bar", k.Block), ("low", k.Low), ("gate", k.Gate), ("gap", k.GapMarker), ("ghost", k.Barrier), ("wall", k.Wall),
-                });
+                SetTypePrefabs(spawner, TypeMap(k));
 
                 var flow = new GameObject("GameFlow").AddComponent<GameFlow>();
                 Set(flow, "conductor", conductor);
@@ -339,6 +357,10 @@ namespace ShiftShift.EditorTools
                 EditorSceneManager.SaveScene(run);
                 log.Add("Run scene set up: input, conductor, track, runner, camera, spawner, GameFlow (level00)");
             }
+
+            // LevelTest scene: keep its obstacle list in step with the chart types
+            if (File.Exists(LevelScenePath))
+                RefreshSpawner(EditorSceneManager.OpenScene(LevelScenePath, OpenSceneMode.Single), log, "LevelTest");
 
             // Calibrate scene
             if (!File.Exists(CalibrateScenePath))
@@ -372,6 +394,21 @@ namespace ShiftShift.EditorTools
 
             EditorSceneManager.OpenScene(RunScenePath, OpenSceneMode.Single);
             Debug.Log("[RunSetup] Done.\n- " + string.Join("\n- ", log));
+        }
+
+        /// <summary>Re-points an existing scene's spawner at the current chart-type prefabs (new types since setup).</summary>
+        private static void RefreshSpawner(UnityEngine.SceneManagement.Scene scene, List<string> log, string label)
+        {
+            var spawner = Object.FindAnyObjectByType<ObstacleSpawner>();
+            if (spawner == null)
+            {
+                log.Add($"{label}: no ObstacleSpawner, left alone");
+                return;
+            }
+            Kit k = EnsureAssets(); // after the scene is open (see Create())
+            SetTypePrefabs(spawner, TypeMap(k));
+            EditorSceneManager.SaveScene(scene);
+            log.Add($"{label}: already set up; obstacle types refreshed ({TypeMap(k).Length} types)");
         }
 
         private static void SetBool(Object target, string field, bool value)
@@ -438,7 +475,7 @@ namespace ShiftShift.EditorTools
         }
 
         private static GameObject ObstaclePrefab(string name, ObstacleKind kind, ObstacleLayer layer, bool allLanes,
-            float depth, System.Action<GameObject> build)
+            float depth, System.Action<GameObject> build, bool laneIsOpening = false)
         {
             string path = $"{ObstacleDir}/{name}.prefab";
             var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
@@ -450,6 +487,7 @@ namespace ShiftShift.EditorTools
             o.layer = layer;
             o.allLanes = allLanes;
             o.depth = depth;
+            o.laneIsOpening = laneIsOpening;
             build(go);
             PrefabUtility.SaveAsPrefabAsset(go, path);
             Object.DestroyImmediate(go);
@@ -483,6 +521,7 @@ namespace ShiftShift.EditorTools
             Mat("Ghost", new Color(0.65f, 0.35f, 0.95f));
             Mat("Barrier", new Color(0.25f, 0.35f, 0.9f));
             Mat("Hole", new Color(0.05f, 0.05f, 0.07f));
+            Mat("Hurdle", new Color(1f, 0.45f, 0.75f)); // pink: short wall (orange = obstacles, red = tall wall)
         }
 
         private static void Mat(string name, Color color)

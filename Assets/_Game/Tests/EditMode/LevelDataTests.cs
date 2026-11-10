@@ -88,6 +88,13 @@ namespace ShiftShift.Tests
             Assert.IsTrue(low.AllLanes, "low bars span all lanes: slide is the only answer");
             Assert.IsTrue(ObstacleTypes.TryGet("wall", out var wall));
             Assert.AreEqual(ObstacleKind.Wall, wall.Kind);
+            Assert.IsTrue(ObstacleTypes.TryGet("gate", out var gate));
+            Assert.IsTrue(gate.LaneIsOpening, "gate: one open lane");
+            Assert.IsTrue(ObstacleTypes.TryGet("wide", out var wide));
+            Assert.IsTrue(wide.LaneIsOpening && wide.Kind == ObstacleKind.Block, "wide bar: one free lane");
+            Assert.IsTrue(ObstacleTypes.TryGet("hurdle", out var hurdle));
+            Assert.AreEqual(ObstacleKind.Hurdle, hurdle.Kind);
+            Assert.AreEqual(ObstacleKind.Wall, wall.Kind, "tall wall stays charge-only");
             Assert.IsFalse(ObstacleTypes.TryGet(null, out _));
         }
     }

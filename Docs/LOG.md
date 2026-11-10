@@ -302,3 +302,22 @@
 - Bug fixed: a charge had to complete strictly before the wall's moment, so a last tap aimed at the click failed about half the time. Now a charge completed up to the Good window (120 ms) after the wall still breaks it; the Runner waits that long while a streak is in progress.
 - CLAUDE.md, INPUT, RUNNER, LEVELS, SCORING updated.
 - 92/92 core tests (alternate tests rewritten for gaps; late-charge tests; two "not a jump" tests updated because a quick L then R is now also alternate step 2). Per-assembly check passes. Not yet run in Unity.
+
+## 2026-11-10 — D13: gate opening, wide bar, hurdle (John)
+
+**Decisions (John)**
+- Gate: one-lane opening whose position varies; you must change into it and sprint through.
+- Short wall ("hurdle", **pink**) cleared by jumping; the tall **red** wall stays charge-only, so all 7 gestures keep a purpose.
+- Two-lane obstacles: a new **wide bar** (one free lane) alongside the normal one-lane bars ("simple and complex"). Orange stays the colour for bars.
+
+**Done**
+- Rules: ObstacleInfo.LaneIsOpening (blocks every lane except Lane; in-between rule applies: either lane of a change in progress counts); new ObstacleKind.Hurdle (jump only). Wide bar answer = the move into its free lane.
+- Chart types: `gate` now has an opening (`lane` = opening), new `wide` (`lane` = free lane) and `hurdle`. Hurdles are placed half a jump after their beat, like gaps.
+- Prefabs (tool): GateOpening (yellow, Panel0-2), WideBar (orange, Panel0-2), Hurdle (pink); the spawner hides the open lane's panel. Shift+Shift > Set Up Run Scenes now refreshes the Run and LevelTest scenes' obstacle lists. Greybox scene untouched (old full-width gate still works).
+- test_gestures.json: bar, wide (free right), low, gate (opening left), gap, ghost barrier, hurdle, wall.
+- Docs LEVELS, RUNNER, SCORING.
+
+**Tested**
+- 102/102 core tests (10 new). Per-assembly compile check passes.
+
+**Not yet run** in Unity: new prefabs, panel hiding, scene refresh, the updated test level.

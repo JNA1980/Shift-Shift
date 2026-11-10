@@ -26,11 +26,13 @@ logged and the level does not start.
 | type | Obstacle | Lanes | Passed by |
 |---|---|---|---|
 | bar | Block | one | being in another lane |
+| wide | Wide bar (two lanes) | `lane` = the **free** lane | being in the free lane |
 | low | Low bar | all | slide (Hold L) |
-| gate | Speed gate | all | sprint (Hold R) |
+| gate | Gate with a one-lane opening | `lane` = the **opening** | being in the opening **and** sprinting (Hold R) |
 | gap | Hole in the floor (2.5 m) | all | jump (Both tap) |
+| hurdle | Short **pink** wall | all | jump (Both tap); placed half a jump after its beat, like gaps |
 | ghost | Phase barrier | all | phase (Both hold) |
-| wall | Wall | all | charge (L, R, L, R quickly, any rhythm; Charge Taps 4, gap 400 ms in GestureSettings) |
+| wall | Tall **red** wall | all | charge (L, R, L, R quickly, any rhythm; Charge Taps 4, gap 400 ms in GestureSettings) |
 
 Position: Z = beat x the Runner's metres per beat (5), so every obstacle is reached exactly on its beat.
 

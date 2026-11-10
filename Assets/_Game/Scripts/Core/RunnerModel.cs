@@ -11,6 +11,7 @@ namespace ShiftShift.Core
         Gap,   // missing floor: be in the air (Both tap)
         Wall,  // breakable wall: needs a charge (Alternate x ChargeTaps)
         Barrier, // phase barrier: only passable while phased (Both hold). Added last: kinds are saved as numbers.
+        Hurdle,  // short wall: jump it (Both tap). The tall Wall stays charge-only (John, day 13).
     }
 
     /// <summary>
@@ -44,6 +45,11 @@ namespace ShiftShift.Core
         /// <summary>-1 left, 0 middle, 1 right. Ignored when AllLanes.</summary>
         public int Lane;
         public bool AllLanes;
+        /// <summary>
+        /// The obstacle blocks every lane EXCEPT <see cref="Lane"/>: the runner must be in that lane (gate opening,
+        /// free lane of a wide bar). John, day 13.
+        /// </summary>
+        public bool LaneIsOpening;
         /// <summary>Song time (s) at which the runner reaches this obstacle.</summary>
         public double Time;
     }
@@ -205,11 +211,24 @@ namespace ShiftShift.Core
         {
             answer = double.NaN;
             double t = o.Time;
-            if (!o.AllLanes) answer = LastDodgeFrom(o.Lane, t);
-            // A lane change is "in between" from key-down to key-up: safe if either the lane being left or the lane
-            // being entered is clear (day 11 fix: moving back just before a block, released after it, looked fine
-            // on screen but failed).
-            if (!o.AllLanes && (LaneAt(t) != o.Lane || RecognizedLaneAt(t) != o.Lane)) return ObstacleOutcome.Pass;
+            // A lane change is "in between" from key-down to key-up: either lane counts, whichever is safe (day 11
+            // fix: moving back just before a block, released after it, looked fine on screen but failed).
+            if (o.LaneIsOpening)
+            {
+                // Must be in the opening (either lane of a change in progress may be it).
+                if (LaneAt(t) != o.Lane && RecognizedLaneAt(t) != o.Lane) return ObstacleOutcome.Hit;
+                if (o.Kind == ObstacleKind.Block)
+                {
+                    answer = LastMoveInto(o.Lane, t); // wide bar: the move into its free lane
+                    return ObstacleOutcome.Pass;
+                }
+                // Gate: in the opening; the kind rule below still needs the sprint.
+            }
+            else if (!o.AllLanes)
+            {
+                answer = LastDodgeFrom(o.Lane, t);
+                if (LaneAt(t) != o.Lane || RecognizedLaneAt(t) != o.Lane) return ObstacleOutcome.Pass;
+            }
 
             answer = double.NaN;
             bool phased = IsPhased(t);
@@ -228,6 +247,7 @@ namespace ShiftShift.Core
                     answer = HoldStartCovering(GestureType.HoldRight, t);
                     return IsSprinting(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
                 case ObstacleKind.Gap:
+                case ObstacleKind.Hurdle:
                     answer = JumpCovering(t);
                     return IsAirborne(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
                 case ObstacleKind.Wall:
@@ -256,6 +276,21 @@ namespace ShiftShift.Core
                 int before = current;
                 current = Math.Max(-1, Math.Min(1, current + c.Delta));
                 if (before == lane && current != lane) found = c.Time;
+            }
+            return found;
+        }
+
+        /// <summary>Key-down of the last lane change at or before t that entered <paramref name="lane"/>; NaN if none.</summary>
+        private double LastMoveInto(int lane, double t)
+        {
+            double found = double.NaN;
+            int current = 0;
+            foreach (var c in _laneChanges)
+            {
+                if (c.Time > t) break;
+                int before = current;
+                current = Math.Max(-1, Math.Min(1, current + c.Delta));
+                if (before != lane && current == lane) found = c.Time;
             }
             return found;
         }

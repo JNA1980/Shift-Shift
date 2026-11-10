@@ -10,6 +10,8 @@ Each obstacle is graded once, by the **key-down time** of the gesture that answe
 | Obstacle | Answer that is timed |
 |---|---|
 | bar | the lane change out of its lane |
+| wide bar | the lane change into its free lane (none if you were already there) |
+| hurdle | the jump (its beat is the take-off, like a gap) |
 | low / gate / ghost (phase barrier) | start of the slide / sprint / phase hold covering it (phase only answers the barrier) |
 | gap | the jump. **A gap's beat is the take-off**: the hole is placed half a jump after the beat, so jump on the click |
 | wall | the tap that completed the charge (may land up to the Good window after the wall's click) |

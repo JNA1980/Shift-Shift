@@ -46,10 +46,11 @@ namespace ShiftShift
                     continue;
                 }
 
-                float x = spec.AllLanes ? 0f : e.RunnerLane * runner.LaneWidth;
+                // Opening types are built across the whole track; their open lane's panel is hidden below.
+                float x = spec.AllLanes || spec.LaneIsOpening ? 0f : e.RunnerLane * runner.LaneWidth;
                 float z = (float)(e.beat * runner.MetresPerBeat);
-                // A gap's beat is the take-off: place the hole half a jump later so jumping on the click clears it.
-                if (spec.Kind == ObstacleKind.Gap)
+                // A gap's or hurdle's beat is the take-off: place it half a jump later so jumping on the click clears it.
+                if (spec.Kind == ObstacleKind.Gap || spec.Kind == ObstacleKind.Hurdle)
                     z += (float)(runner.JumpSeconds * conductor.Bpm / 60.0 * runner.MetresPerBeat * 0.5);
                 GameObject go = Instantiate(prefab, new Vector3(x, 0f, z), Quaternion.identity, transform);
                 go.name = $"{e.type} b{e.beat:0.##}" + (spec.AllLanes ? "" : $" lane {e.lane}");
@@ -61,6 +62,15 @@ namespace ShiftShift
                 o.allLanes = spec.AllLanes;
                 o.hasTargetBeat = true;
                 o.targetBeat = e.beat;
+                o.laneIsOpening = spec.LaneIsOpening;
+                o.openLane = e.RunnerLane;
+                if (spec.LaneIsOpening)
+                {
+                    // Prefab has one panel per lane, named Panel0/Panel1/Panel2 (chart lanes): open the event's lane.
+                    Transform panel = go.transform.Find("Panel" + e.lane);
+                    if (panel != null) panel.gameObject.SetActive(false);
+                    else Debug.LogWarning($"[Spawner] {prefab.name} has no Panel{e.lane} child to open.", go);
+                }
                 spawned++;
             }
             Debug.Log($"[Spawner] Spawned {spawned} obstacles for {conductor.Level.name}.");

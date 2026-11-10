@@ -20,7 +20,9 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
 |---|---|---|
 | Block (one lane) | runner in another lane | Tap L / Tap R |
 | Low bar (all lanes) | sliding | Hold L |
-| Gate (all lanes) | sprinting | Hold R |
+| Gate (one open lane, day 13) | in the opening **and** sprinting | lane change + Hold R |
+| Wide bar (two lanes, day 13) | in its free lane | lane change |
+| Hurdle (short pink wall, day 13) | in the air | Both tap |
 | Gap (all lanes) | in the air at both edges | Both tap (airborne from key-down until the visual landing: recognised + 0.5 s) |
 | Wall (all lanes) | a charge is available (used up); the last tap may land up to 120 ms after the wall | L, R, L, R quickly, any rhythm (each tap within 400 ms) |
 | Phase barrier (all lanes) | phased | Both hold |

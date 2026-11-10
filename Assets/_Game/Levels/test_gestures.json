@@ -13,8 +13,8 @@
     },
     {
       "beat": 12.0,
-      "lane": 0,
-      "type": "bar"
+      "lane": 2,
+      "type": "wide"
     },
     {
       "beat": 16.0,
@@ -23,7 +23,7 @@
     },
     {
       "beat": 20.0,
-      "lane": 1,
+      "lane": 0,
       "type": "gate"
     },
     {
@@ -35,6 +35,11 @@
       "beat": 28.0,
       "lane": 1,
       "type": "ghost"
+    },
+    {
+      "beat": 32.0,
+      "lane": 1,
+      "type": "hurdle"
     },
     {
       "beat": 36.0,

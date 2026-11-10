@@ -162,6 +162,57 @@ namespace ShiftShift.Tests
             Assert.IsFalse(_m.IsAirborne(1.99));
         }
 
+        // ---------- opening lane (gate with one open lane, wide bar) and hurdle: John, day 13 ----------
+
+        private static ObstacleInfo Opening(ObstacleKind kind, double t, int openLane) =>
+            new ObstacleInfo { Kind = kind, Time = t, Lane = openLane, LaneIsOpening = true, Layer = ObstacleLayer.Solid };
+
+        [Test]
+        public void GateOpening_InOpeningAndSprinting_Passes()
+        {
+            _m.OnGestureFired(GestureType.TapLeft, 1.0, 1, 1.1);
+            _m.OnHoldStarted(GestureType.HoldRight, 2.0);
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Opening(ObstacleKind.Gate, 2.1, -1)));
+        }
+
+        [Test]
+        public void GateOpening_InOpeningNotSprinting_Hits()
+        {
+            _m.OnGestureFired(GestureType.TapLeft, 1.0, 1, 1.1);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Opening(ObstacleKind.Gate, 2.1, -1)));
+        }
+
+        [Test]
+        public void GateOpening_SprintingInWrongLane_Hits()
+        {
+            _m.OnHoldStarted(GestureType.HoldRight, 2.0);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Opening(ObstacleKind.Gate, 2.1, -1)));
+        }
+
+        [Test]
+        public void WideBar_InFreeLane_Passes_OtherLane_Hits()
+        {
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Opening(ObstacleKind.Block, 1.0, 0)));
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Opening(ObstacleKind.Block, 1.0, 1)));
+        }
+
+        [Test]
+        public void WideBar_MovingIntoFreeLane_CountsFromKeyDown()
+        {
+            _m.OnGestureFired(GestureType.TapRight, 0.98, 1, 1.08); // still "in between" at 1.0: counts
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Opening(ObstacleKind.Block, 1.0, 1)));
+        }
+
+        [Test]
+        public void Hurdle_NeedsJump_PhaseDoesNotPass()
+        {
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Hurdle, 1.0, all: true)));
+            _m.OnHoldStarted(GestureType.BothHold, 1.5);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Hurdle, 1.8, all: true)));
+            _m.OnGestureFired(GestureType.BothTap, 3.0, 0, 3.1);
+            Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Hurdle, 3.2, all: true)));
+        }
+
         // ---------- phase ----------
 
         [Test]

@@ -109,6 +109,36 @@ namespace ShiftShift.Tests
             Assert.AreEqual(Grade.Perfect, G(r, 3.0));
         }
 
+        [Test]
+        public void WideBar_MoveIntoFreeLaneOnBeat_IsPerfect()
+        {
+            _m.OnGestureFired(GestureType.TapRight, 2.99, 1, 3.06);
+            var o = new ObstacleInfo { Kind = ObstacleKind.Block, Time = 3.0, Lane = 1, LaneIsOpening = true };
+            Assert.AreEqual(Grade.Perfect, G(_m.ResolveWithAnswer(o), 3.0));
+        }
+
+        [Test]
+        public void WideBar_AlreadyInFreeLane_IsNotGraded()
+        {
+            var o = new ObstacleInfo { Kind = ObstacleKind.Block, Time = 3.0, Lane = 0, LaneIsOpening = true };
+            Assert.AreEqual(Grade.None, G(_m.ResolveWithAnswer(o), 3.0));
+        }
+
+        [Test]
+        public void GateOpening_SprintOnBeat_IsPerfect()
+        {
+            _m.OnHoldStarted(GestureType.HoldRight, 3.01);
+            var o = new ObstacleInfo { Kind = ObstacleKind.Gate, Time = 3.02, Lane = 0, LaneIsOpening = true };
+            Assert.AreEqual(Grade.Perfect, G(_m.ResolveWithAnswer(o), 3.0));
+        }
+
+        [Test]
+        public void Hurdle_JumpOnBeat_IsPerfect()
+        {
+            _m.OnGestureFired(GestureType.BothTap, 3.0, 0, 3.1);
+            Assert.AreEqual(Grade.Perfect, G(_m.ResolveWithAnswer(Obs(ObstacleKind.Hurdle, 3.25, all: true)), 3.0));
+        }
+
         // ---------- scoring ----------
 
         [Test]

@@ -53,7 +53,7 @@ namespace ShiftShift.Core
         public double beat;
         /// <summary>0 left, 1 middle, 2 right (ignored for all-lane types).</summary>
         public int lane;
-        /// <summary>bar | low | gate | gap | ghost | wall</summary>
+        /// <summary>bar | wide | low | gate | gap | hurdle | ghost | wall. For wide and gate, lane = the open lane.</summary>
         public string type;
 
         /// <summary>Runner lane (-1..1) for this event.</summary>
@@ -68,21 +68,26 @@ namespace ShiftShift.Core
             public readonly ObstacleKind Kind;
             public readonly ObstacleLayer Layer;
             public readonly bool AllLanes;
+            /// <summary>Blocks every lane except the event's lane (gate opening, wide bar's free lane).</summary>
+            public readonly bool LaneIsOpening;
 
-            public Spec(ObstacleKind kind, ObstacleLayer layer, bool allLanes)
+            public Spec(ObstacleKind kind, ObstacleLayer layer, bool allLanes, bool laneIsOpening = false)
             {
                 Kind = kind;
                 Layer = layer;
                 AllLanes = allLanes;
+                LaneIsOpening = laneIsOpening;
             }
         }
 
         private static readonly Dictionary<string, Spec> Specs = new Dictionary<string, Spec>
         {
             { "bar", new Spec(ObstacleKind.Block, ObstacleLayer.Solid, false) }, // change lane
+            { "wide", new Spec(ObstacleKind.Block, ObstacleLayer.Solid, false, true) }, // two lanes blocked: be in the free lane
             { "low", new Spec(ObstacleKind.Low, ObstacleLayer.Solid, true) },    // slide (all lanes: no dodging it, John day 13)
-            { "gate", new Spec(ObstacleKind.Gate, ObstacleLayer.Solid, true) },  // sprint
+            { "gate", new Spec(ObstacleKind.Gate, ObstacleLayer.Solid, false, true) }, // sprint through the one open lane
             { "gap", new Spec(ObstacleKind.Gap, ObstacleLayer.Solid, true) },    // jump
+            { "hurdle", new Spec(ObstacleKind.Hurdle, ObstacleLayer.Solid, true) }, // short wall: jump
             // "ghost": a barrier across all lanes that only phase (Both hold) gets through (playbook 1.4: ghost -> phase held).
             { "ghost", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, true) },
             { "wall", new Spec(ObstacleKind.Wall, ObstacleLayer.Solid, true) },  // charge

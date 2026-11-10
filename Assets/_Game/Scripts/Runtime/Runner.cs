@@ -125,8 +125,11 @@ namespace ShiftShift
             foreach (Obstacle o in FindObjectsByType<Obstacle>())
             {
                 Vector3 p = o.transform.position;
-                int lane = Mathf.Clamp(Mathf.RoundToInt(p.x / laneWidth), -1, 1);
-                var info = new ObstacleInfo { Kind = o.kind, Layer = o.layer, Lane = lane, AllLanes = o.allLanes };
+                int lane = o.laneIsOpening ? o.openLane : Mathf.Clamp(Mathf.RoundToInt(p.x / laneWidth), -1, 1);
+                var info = new ObstacleInfo
+                {
+                    Kind = o.kind, Layer = o.layer, Lane = lane, AllLanes = o.allLanes, LaneIsOpening = o.laneIsOpening,
+                };
                 double target = o.hasTargetBeat ? o.targetBeat : p.z / metresPerBeat;
 
                 if (o.kind == ObstacleKind.Gap)
