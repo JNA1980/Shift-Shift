@@ -8,7 +8,7 @@ namespace ShiftShift.Tests
         private RunnerModel _m;
 
         [SetUp]
-        public void SetUp() => _m = new RunnerModel(new RunnerRules { JumpSeconds = 0.5, ChargeTaps = 4 });
+        public void SetUp() => _m = new RunnerModel(new RunnerRules { JumpSeconds = 0.5, ChargeTaps = 4, ChargeGraceSeconds = 0.12 });
 
         private static ObstacleInfo Obs(ObstacleKind kind, double t, int lane = 0, bool all = false,
             ObstacleLayer layer = ObstacleLayer.Solid) =>
@@ -224,9 +224,23 @@ namespace ShiftShift.Tests
         }
 
         [Test]
-        public void Charge_EarnedAfterWall_DoesNotCount()
+        public void Charge_EarnedWellAfterWall_DoesNotCount()
         {
             _m.OnGestureFired(GestureType.Alternate, 2.5, 4);
+            Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Wall, 2.0, all: true)));
+        }
+
+        [Test]
+        public void Charge_LastTapSlightlyLate_StillBreaksWall()
+        {
+            _m.OnGestureFired(GestureType.Alternate, 2.10, 4); // 100 ms after the wall's moment, inside 120 ms grace
+            Assert.AreEqual(ObstacleOutcome.Break, _m.Resolve(Obs(ObstacleKind.Wall, 2.0, all: true)));
+        }
+
+        [Test]
+        public void Charge_PastGrace_Hits()
+        {
+            _m.OnGestureFired(GestureType.Alternate, 2.13, 4);
             Assert.AreEqual(ObstacleOutcome.Hit, _m.Resolve(Obs(ObstacleKind.Wall, 2.0, all: true)));
         }
 
@@ -243,6 +257,7 @@ namespace ShiftShift.Tests
         public void InvalidRules_Throw()
         {
             Assert.Throws<System.ArgumentException>(() => new RunnerModel(new RunnerRules { JumpSeconds = 0, ChargeTaps = 4 }));
+            Assert.Throws<System.ArgumentException>(() => new RunnerModel(new RunnerRules { JumpSeconds = 0.5, ChargeTaps = 4, ChargeGraceSeconds = -1 }));
             Assert.Throws<System.ArgumentException>(() => new RunnerModel(new RunnerRules { JumpSeconds = 0.5, ChargeTaps = 1 }));
         }
     }

@@ -54,11 +54,14 @@ namespace ShiftShift.Core
         public double JumpSeconds;
         /// <summary>Alternate streak needed for one charge.</summary>
         public int ChargeTaps;
+        /// <summary>A charge completed this long after a wall's moment still breaks it (the Good window).</summary>
+        public double ChargeGraceSeconds;
 
         public void Validate()
         {
             if (JumpSeconds <= 0) throw new ArgumentException("JumpSeconds must be > 0");
             if (ChargeTaps < 2) throw new ArgumentException("ChargeTaps must be >= 2");
+            if (ChargeGraceSeconds < 0) throw new ArgumentException("ChargeGraceSeconds must be >= 0");
         }
     }
 
@@ -228,9 +231,11 @@ namespace ShiftShift.Core
                     answer = JumpCovering(t);
                     return IsAirborne(t) ? ObstacleOutcome.Pass : ObstacleOutcome.Hit;
                 case ObstacleKind.Wall:
+                    // A last tap slightly after the wall's click still counts (day 13: aiming the last tap at the
+                    // click failed half the time when it landed a little late).
                     foreach (var c in _charges)
                     {
-                        if (c.Used || c.Time > t) continue;
+                        if (c.Used || c.Time > t + _rules.ChargeGraceSeconds) continue;
                         c.Used = true;
                         answer = c.Time;
                         return ObstacleOutcome.Break;

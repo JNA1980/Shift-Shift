@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.GestureSettings
   tapHoldMs: 250
   bothWindowMs: 80
-  alternateBeatTolerance: 0.25
-  chargeTaps: 2
+  alternateMaxGapMs: 400
+  chargeTaps: 4
   perfectMs: 50
   goodMs: 120

@@ -9,7 +9,7 @@ namespace ShiftShift.Tests
         private RunnerModel _m;
 
         [SetUp]
-        public void SetUp() => _m = new RunnerModel(new RunnerRules { JumpSeconds = 0.5, ChargeTaps = 4 });
+        public void SetUp() => _m = new RunnerModel(new RunnerRules { JumpSeconds = 0.5, ChargeTaps = 4, ChargeGraceSeconds = 0.12 });
 
         private static ObstacleInfo Obs(ObstacleKind kind, double t, int lane = 0, bool all = false) =>
             new ObstacleInfo { Kind = kind, Time = t, Lane = lane, AllLanes = all, Layer = ObstacleLayer.Solid };
@@ -89,6 +89,15 @@ namespace ShiftShift.Tests
         {
             _m.OnHoldStarted(GestureType.BothHold, 2.92);
             Assert.AreEqual(Grade.Good, G(_m.ResolveWithAnswer(Obs(ObstacleKind.Barrier, 3.0, all: true)), 3.0));
+        }
+
+        [Test]
+        public void Wall_LastTap100msLate_IsGood()
+        {
+            _m.OnGestureFired(GestureType.Alternate, 3.10, 4);
+            var r = _m.ResolveWithAnswer(Obs(ObstacleKind.Wall, 3.0, all: true));
+            Assert.AreEqual(ObstacleOutcome.Break, r.Outcome);
+            Assert.AreEqual(Grade.Good, G(r, 3.0));
         }
 
         [Test]

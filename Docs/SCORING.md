@@ -12,7 +12,7 @@ Each obstacle is graded once, by the **key-down time** of the gesture that answe
 | bar | the lane change out of its lane |
 | low / gate / ghost (phase barrier) | start of the slide / sprint / phase hold covering it (phase only answers the barrier) |
 | gap | the jump. **A gap's beat is the take-off**: the hole is placed half a jump after the beat, so jump on the click |
-| wall | the tap that completed the charge |
+| wall | the tap that completed the charge (may land up to the Good window after the wall's click) |
 
 | Grade | When | Points | Streak |
 |---|---|---|---|

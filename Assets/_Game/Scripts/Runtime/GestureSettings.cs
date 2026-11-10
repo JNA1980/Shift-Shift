@@ -17,8 +17,8 @@ namespace ShiftShift
         [Tooltip("Second key down within this of the first = a 'both' gesture.")]
         [Range(20f, 200f)] public float bothWindowMs = 80f;
 
-        [Tooltip("How far from a beat line (in beats) an Alternate tap may land and still count.")]
-        [Range(0.05f, 0.45f)] public float alternateBeatTolerance = 0.25f;
+        [Tooltip("Max time between alternating taps for a charge streak to continue. No beat needed.")]
+        [Range(150f, 1000f)] public float alternateMaxGapMs = 400f;
 
         [Tooltip("Alternate streak needed for one charge (breaks the next Wall).")]
         [Range(2, 8)] public int chargeTaps = 4;
@@ -36,7 +36,7 @@ namespace ShiftShift
         {
             TapHoldSeconds = tapHoldMs / 1000.0,
             BothWindowSeconds = bothWindowMs / 1000.0,
-            AlternateBeatTolerance = alternateBeatTolerance,
+            AlternateMaxGapSeconds = alternateMaxGapMs / 1000.0,
         };
 
         private void OnValidate()

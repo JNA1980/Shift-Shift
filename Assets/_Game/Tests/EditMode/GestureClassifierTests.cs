@@ -38,7 +38,7 @@ namespace ShiftShift.Tests
             {
                 TapHoldSeconds = 0.250,
                 BothWindowSeconds = 0.080,
-                AlternateBeatTolerance = 0.25,
+                AlternateMaxGapSeconds = 0.400,
             };
             _c = new GestureClassifier(thresholds, new FakeClock());
             _log = new List<Rec>();
@@ -174,7 +174,8 @@ namespace ShiftShift.Tests
             _c.Press(Side.Right, 0.081);
             _c.Release(Side.Left, 0.15);
             _c.Release(Side.Right, 0.2);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight }, Fired());
+            // Two separate taps, not a jump (a quick L then R also counts as alternate step 2).
+            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight, GestureType.Alternate }, Fired());
         }
 
         [Test]
@@ -182,7 +183,8 @@ namespace ShiftShift.Tests
         {
             Tap(Side.Left, 0, 0.03);
             Tap(Side.Right, 0.05, 0.1);
-            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight }, Fired());
+            CollectionAssert.AreEqual(new[] { GestureType.TapLeft, GestureType.TapRight, GestureType.Alternate }, Fired());
+            CollectionAssert.DoesNotContain(Fired(), GestureType.BothTap);
         }
 
         [Test]
@@ -234,79 +236,81 @@ namespace ShiftShift.Tests
             CollectionAssert.AreEqual(new[] { GestureType.HoldLeft, GestureType.TapRight }, Fired());
         }
 
-        // ---------- alternate on and off beat (120 BPM: beats at 0, 0.5, 1.0, ...) ----------
+        // ---------- alternate: quick alternating taps, no beat needed (gap <= 400 ms) ----------
 
         [Test]
-        public void Alternate_OnBeat_CountsToFour()
+        public void Alternate_QuickTaps_CountToFour()
         {
-            Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.5, 0.55);
-            Tap(Side.Left, 1.0, 1.05);
-            Tap(Side.Right, 1.5, 1.55);
+            Tap(Side.Left, 0.00, 0.05);
+            Tap(Side.Right, 0.30, 0.35);
+            Tap(Side.Left, 0.60, 0.65);
+            Tap(Side.Right, 0.90, 0.95);
             Assert.AreEqual(4, _c.AlternateStreak);
             Assert.AreEqual(3, Fired().FindAll(t => t == GestureType.Alternate).Count);
         }
 
         [Test]
-        public void Alternate_WithinTolerance_Counts()
+        public void Alternate_AnyRhythm_Counts()
+        {
+            // Off any beat grid, uneven spacing: still counts as long as each gap is within 400 ms.
+            Tap(Side.Left, 0.13, 0.18);
+            Tap(Side.Right, 0.29, 0.33);
+            Tap(Side.Left, 0.68, 0.72);
+            Assert.AreEqual(3, _c.AlternateStreak);
+        }
+
+        [Test]
+        public void Alternate_GapAtLimit_Counts()
         {
             Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.62, 0.67); // beat 1.24: 0.24 beats late
+            Tap(Side.Right, 0.4, 0.45);
             Assert.AreEqual(2, _c.AlternateStreak);
         }
 
         [Test]
-        public void Alternate_OffBeat_DoesNotCount()
+        public void Alternate_GapTooLong_RestartsAtOne()
         {
             Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.63, 0.68); // beat 1.26: outside 0.25
-            Assert.AreEqual(0, _c.AlternateStreak);
-            CollectionAssert.DoesNotContain(Fired(), GestureType.Alternate);
-        }
-
-        [Test]
-        public void Alternate_OffBeatTapMidStreak_Resets()
-        {
-            Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.5, 0.55);
-            Tap(Side.Left, 0.75, 0.8);  // half a beat: off
-            Tap(Side.Right, 1.5, 1.55); // on beat 3, starts a new streak
+            Tap(Side.Right, 0.41, 0.46);
             Assert.AreEqual(1, _c.AlternateStreak);
+            CollectionAssert.DoesNotContain(Fired(), GestureType.Alternate);
         }
 
         [Test]
         public void Alternate_SameSideTwice_RestartsAtOne()
         {
             Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Left, 0.5, 0.55);
+            Tap(Side.Left, 0.2, 0.25);
             Assert.AreEqual(1, _c.AlternateStreak);
         }
 
         [Test]
-        public void Alternate_SkippedBeat_RestartsAtOne()
+        public void Alternate_StreakExpires_AfterGapWithNoTap()
         {
             Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 1.0, 1.05); // beat 2, skipped beat 1
-            Assert.AreEqual(1, _c.AlternateStreak);
-        }
-
-        [Test]
-        public void Alternate_StreakExpires_WhenNextBeatPasses()
-        {
-            Tap(Side.Left, 0.0, 0.05);
-            Tap(Side.Right, 0.5, 0.55);
-            _c.Update(1.10); // beat 2.2: still inside tolerance of beat 2
+            Tap(Side.Right, 0.3, 0.35);
+            _c.Update(0.70);
             Assert.AreEqual(2, _c.AlternateStreak);
-            _c.Update(1.13); // beat 2.26: beat 2 has passed
+            _c.Update(0.71);
             Assert.AreEqual(0, _c.AlternateStreak);
+        }
+
+        [Test]
+        public void Alternate_PendingPress_DoesNotExpireStreak()
+        {
+            Tap(Side.Left, 0.0, 0.05);
+            _c.Press(Side.Right, 0.38);   // key-down inside the gap...
+            _c.Update(0.45);              // ...still undecided past it
+            _c.Release(Side.Right, 0.46);
+            Assert.AreEqual(2, _c.AlternateStreak);
         }
 
         [Test]
         public void Alternate_HoldBreaksStreak()
         {
             Tap(Side.Left, 0.0, 0.05);
-            _c.Press(Side.Right, 0.5);
-            _c.Release(Side.Right, 0.8);
+            _c.Press(Side.Right, 0.2);
+            _c.Release(Side.Right, 0.5); // hold, not tap
             Assert.AreEqual(0, _c.AlternateStreak);
         }
 
@@ -368,10 +372,10 @@ namespace ShiftShift.Tests
         public void InvalidThresholds_Throw()
         {
             Assert.Throws<System.ArgumentException>(() => new GestureClassifier(
-                new GestureThresholds { TapHoldSeconds = 0.25, BothWindowSeconds = 0.3, AlternateBeatTolerance = 0.25 },
+                new GestureThresholds { TapHoldSeconds = 0.25, BothWindowSeconds = 0.3, AlternateMaxGapSeconds = 0.4 },
                 new FakeClock()));
             Assert.Throws<System.ArgumentException>(() => new GestureClassifier(
-                new GestureThresholds { TapHoldSeconds = 0.25, BothWindowSeconds = 0.08, AlternateBeatTolerance = 0.5 },
+                new GestureThresholds { TapHoldSeconds = 0.25, BothWindowSeconds = 0.08, AlternateMaxGapSeconds = 0 },
                 new FakeClock()));
         }
     }

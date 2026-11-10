@@ -294,3 +294,11 @@
 
 - John asked for an easier charge ("two presses of L R"); no preference among the options offered. Set GestureSettings Charge Taps 4 → 2 (setting only, no code): L, R on consecutive clicks charges; the second tap on the wall's click = Perfect. Side effect: dodging left then right on back-to-back clicks also charges (harmless; only walls use it). Revisit at M1 (2, 3 or 4).
 - The plan's "four on-beat alternations" is now a tunable value, not a rule.
+
+## 2026-11-10 — D13: charge redesign (John: option A, 4 taps)
+
+- John: "L R L R doesn't seem to work". Alternatives offered (no-beat alternate, double jump, roll, double tap, mash); John chose **A: quick alternating taps, no beat, 4 taps**. The 2-tap tuning from earlier today is reverted (Charge Taps back to 4).
+- Classifier: alternate streak continues when sides alternate and key-downs are within Alternate Max Gap (400 ms, GestureSettings; replaces Alternate Beat Tolerance). Expires 400 ms after the last tap.
+- Bug fixed: a charge had to complete strictly before the wall's moment, so a last tap aimed at the click failed about half the time. Now a charge completed up to the Good window (120 ms) after the wall still breaks it; the Runner waits that long while a streak is in progress.
+- CLAUDE.md, INPUT, RUNNER, LEVELS, SCORING updated.
+- 92/92 core tests (alternate tests rewritten for gaps; late-charge tests; two "not a jump" tests updated because a quick L then R is now also alternate step 2). Per-assembly check passes. Not yet run in Unity.

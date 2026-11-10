@@ -43,15 +43,14 @@ namespace ShiftShift.Core
         /// <summary>Max gap (s) between the two key-downs for them to count as one "both" gesture.</summary>
         public double BothWindowSeconds;
 
-        /// <summary>How far (in beats) a tap may land from a beat line and still count as on-beat for Alternate.</summary>
-        public double AlternateBeatTolerance;
+        /// <summary>Max time (s) between alternating tap key-downs for an Alternate streak to continue (no beat needed).</summary>
+        public double AlternateMaxGapSeconds;
 
         public void Validate()
         {
             if (BothWindowSeconds <= 0) throw new ArgumentException("BothWindowSeconds must be > 0");
             if (TapHoldSeconds <= BothWindowSeconds) throw new ArgumentException("TapHoldSeconds must be greater than BothWindowSeconds");
-            if (AlternateBeatTolerance <= 0 || AlternateBeatTolerance >= 0.5)
-                throw new ArgumentException("AlternateBeatTolerance must be between 0 and 0.5 beats");
+            if (AlternateMaxGapSeconds <= 0) throw new ArgumentException("AlternateMaxGapSeconds must be > 0");
         }
     }
 }

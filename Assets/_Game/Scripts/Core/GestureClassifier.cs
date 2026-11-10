@@ -12,8 +12,9 @@ namespace ShiftShift.Core
     /// - GestureFired(type, t): once per gesture. Taps, holds and both-gestures report the key-down time.
     /// - HoldStarted(type, t) / HoldEnded(type, t): for HoldLeft, HoldRight, BothHold. Start reports key-down time,
     ///   end reports key-up time.
-    /// - Alternate: GestureFired(Alternate, t) after each on-beat tap that continues an L/R streak (streak >= 2).
-    ///   Read <see cref="AlternateStreak"/> for the count (4 = charge).
+    /// - Alternate: GestureFired(Alternate, t) after each tap that continues an L/R streak (streak >= 2): sides
+    ///   alternate and each key-down is within AlternateMaxGap of the previous one. No beat needed (John, day 13).
+    ///   Read <see cref="AlternateStreak"/> for the count (Charge Taps = charge).
     /// </summary>
     public sealed class GestureClassifier
     {
@@ -36,7 +37,7 @@ namespace ShiftShift.Core
         private bool _lockout;
 
         private Side _lastAltSide;
-        private double _lastAltBeat;
+        private double _lastAltTime;
 
         public event Action<GestureType, double> GestureFired;
         public event Action<GestureType, double> HoldStarted;
@@ -154,10 +155,10 @@ namespace ShiftShift.Core
         /// <summary>Call once per frame with the current song time.</summary>
         public void Update(double time)
         {
-            // A streak whose next beat has passed without a tap is over. Not while a key is down: taps resolve
-            // on key-up but are judged at key-down, so a pending press may still continue the streak.
+            // A streak is over once the gap has passed with no tap. Not while a key is down: taps resolve on key-up
+            // but are judged at key-down, so a pending press may still continue the streak.
             if (AlternateStreak > 0 && !_left.IsDown && !_right.IsDown &&
-                _clock.BeatAt(time) > _lastAltBeat + 1 + _t.AlternateBeatTolerance)
+                time - _lastAltTime > _t.AlternateMaxGapSeconds)
                 AlternateStreak = 0;
 
             double threshold = _t.TapHoldSeconds;
@@ -206,24 +207,14 @@ namespace ShiftShift.Core
         {
             GestureFired?.Invoke(side == Side.Left ? GestureType.TapLeft : GestureType.TapRight, onset);
 
-            // Alternate (Option 1): each tap within tolerance of a beat line, sides alternating, one tap per beat.
-            double beat = _clock.BeatAt(onset);
-            double nearest = Math.Floor(beat + 0.5);
-            bool onBeat = Math.Abs(beat - nearest) <= _t.AlternateBeatTolerance;
-
-            if (!onBeat)
-            {
-                AlternateStreak = 0;
-                return;
-            }
-
-            if (AlternateStreak > 0 && side != _lastAltSide && nearest == _lastAltBeat + 1)
+            // Alternate (John, day 13: option A): sides alternate, each key-down within the max gap of the last.
+            if (AlternateStreak > 0 && side != _lastAltSide && onset - _lastAltTime <= _t.AlternateMaxGapSeconds)
                 AlternateStreak++;
             else
                 AlternateStreak = 1;
 
             _lastAltSide = side;
-            _lastAltBeat = nearest;
+            _lastAltTime = onset;
 
             if (AlternateStreak >= 2)
                 GestureFired?.Invoke(GestureType.Alternate, onset);

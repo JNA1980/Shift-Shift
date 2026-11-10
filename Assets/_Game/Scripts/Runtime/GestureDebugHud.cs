@@ -104,7 +104,7 @@ namespace ShiftShift
             double beat = input.Clock.BeatAt(now);
             GUILayout.Label($"Clock {now:F3}s   beat {beat:F2}   {BeatDot(beat)}", _style);
             GUILayout.Label(
-                $"Thresholds: tap/hold {s.tapHoldMs:F0} ms · both {s.bothWindowMs:F0} ms · alternate ±{s.alternateBeatTolerance:F2} beat · charge {s.chargeTaps}",
+                $"Thresholds: tap/hold {s.tapHoldMs:F0} ms · both {s.bothWindowMs:F0} ms · alternate gap {s.alternateMaxGapMs:F0} ms · charge {s.chargeTaps}",
                 _style);
             GUILayout.Space(6);
             var sb = new StringBuilder();

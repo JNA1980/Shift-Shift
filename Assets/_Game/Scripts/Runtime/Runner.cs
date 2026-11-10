@@ -98,6 +98,7 @@ namespace ShiftShift
             {
                 JumpSeconds = jumpSeconds,
                 ChargeTaps = input.Settings.chargeTaps,
+                ChargeGraceSeconds = input.Settings.goodMs / 1000.0,
             });
             input.GestureFired += OnGestureFired;
             input.HoldStarted += OnHoldStarted;
@@ -196,6 +197,9 @@ namespace ShiftShift
                 c.Info.Time = Clock.SongTimeAtBeat(c.Beat);
                 // Decision A: a press made before this obstacle may still turn out to be the answer. Wait for it.
                 if (input.TryGetUnresolvedPress(out double down) && down <= c.Info.Time) break;
+                // A charge in progress may still complete within the grace window after a wall's moment.
+                if (c.Info.Kind == ObstacleKind.Wall && input.AlternateStreak > 0 && !_model.HasCharge(c.Info.Time) &&
+                    now < c.Info.Time + input.Settings.goodMs / 1000.0) break;
 
                 ObstacleResolution r = _model.ResolveWithAnswer(c.Info);
                 if (r.Outcome == ObstacleOutcome.Hit)
