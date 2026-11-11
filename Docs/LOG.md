@@ -427,3 +427,20 @@ Uncertain: whether scanlines draw over or under the GameFlow text (GUI.depth acr
 ## 2026-11-11 — D17: steps 4 and 5 verified
 
 John ran Set Up Visuals and played the Run scene: the phase look and the new wide bar and gate shapes work. Committed on his side. Still open: the scanline draw order against the HUD text and how the ghost colour reads on dusk/night (not tested; the test level is dawn).
+
+## 2026-11-11 — D17: modular track kit (playbook 2.3)
+
+John chose the full kit (bends, rises, drops) over a cut-down straight kit.
+
+Done:
+- Core/TrackPath.cs: 12 pieces (straight, bendLeft/Right, sLeft/Right, rise, drop, crest, dip, tunnel, bridge, pillars), each 8 beats. The path is the track's centre line; distance along it is measured on the ground plan, so distance = beat x 5 m everywhere and timing and rules are untouched. Turns and slopes ease in and out.
+- Level format: optional `track` list of {beat, piece}; validated (unknown piece, overlap, out of range). Chart keeps it on save and writes it one piece per line; new warnings (gap on a slope, more than 120 degrees one way).
+- TrackBuilder rewritten: builds at play time (order -150) from the playing level; road and line meshes generated along the path in 40 m chunks; TunnelShell / BridgeRails / Pillars prefabs repeated every 10 m along their piece. Point() and Rotation() turn (distance, sideways, height) into world space.
+- Runner, ChaseCamera, ObstacleSpawner use the track for positions; Obstacle carries its track position (hand-placed Greybox obstacles still use world X/Z on a straight track).
+- Tools: Set Up Visuals removes the pieces saved in scenes, wires the builders, creates the dressing prefabs, generates click_100_long.wav, puts test_track.json first in the Run scene's level list. Greybox keeps a gap at 100 m as a GapMarker obstacle (its tunnel is now 60-100 m, bridge 105-145 m).
+
+Tested: 133 Core tests pass (13 new: path geometry, ground distance equals s, flat joins, validation, chart save). Per-assembly compile check passes (stand-in gaps filled: Mesh, MeshFilter, LookRotation, SetPositionAndRotation and others). test_track.json validates and round-trips through the chart writer.
+Not run: nothing in Unity. Unverified: the generated road mesh (facing, shading, seams between chunks), lines flicker, camera through bends and over crests, obstacles on slopes, tunnel clearance, restart time with the track built at start, WebGL.
+Uncertain: obstacles on a rise may poke above the horizon (the 3.2 m rule assumed a flat road); the camera may see under the road on a crest; fog distance on bends.
+Unused now, left in place: TrackPiece.cs and the Straight/Tunnel/Bridge/Gap prefabs (old scenes still reference the script until Set Up Visuals is run).
+Flagged, not built: editing track pieces in the chart editor.

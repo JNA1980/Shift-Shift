@@ -1,0 +1,83 @@
+{
+  "name": "Test - track kit",
+  "bpm": 100.0,
+  "audioClip": "click_100_long",
+  "offsetMs": 0.0,
+  "palette": "dusk",
+  "lengthBeats": 104.0,
+  "events": [
+    {
+      "beat": 12.0,
+      "lane": 1,
+      "type": "bar"
+    },
+    {
+      "beat": 20.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 28.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 36.0,
+      "lane": 2,
+      "type": "gate"
+    },
+    {
+      "beat": 44.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 52.0,
+      "lane": 0,
+      "type": "bar"
+    },
+    {
+      "beat": 60.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 68.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 76.0,
+      "lane": 1,
+      "type": "wall"
+    },
+    {
+      "beat": 84.0,
+      "lane": 2,
+      "type": "bar"
+    },
+    {
+      "beat": 92.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 100.0,
+      "lane": 1,
+      "type": "bar"
+    }
+  ],
+  "track": [
+    { "beat": 8.0, "piece": "bendLeft" },
+    { "beat": 16.0, "piece": "bendRight" },
+    { "beat": 24.0, "piece": "rise" },
+    { "beat": 32.0, "piece": "tunnel" },
+    { "beat": 40.0, "piece": "drop" },
+    { "beat": 48.0, "piece": "sRight" },
+    { "beat": 56.0, "piece": "crest" },
+    { "beat": 64.0, "piece": "bridge" },
+    { "beat": 72.0, "piece": "dip" },
+    { "beat": 80.0, "piece": "sLeft" },
+    { "beat": 88.0, "piece": "pillars" }
+  ]
+}

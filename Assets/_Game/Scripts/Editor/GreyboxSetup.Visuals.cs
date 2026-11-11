@@ -46,6 +46,7 @@ namespace ShiftShift.EditorTools
             AddGlowEdges(log);       // step 2: glowing obstacle edges
             EnableBloomInProfile(log);
             EnsureCameraFeel(log);   // step 3: camera feel asset
+            EnsureLongClick(log);    // playbook 2.3: audio for the track test level
 
             foreach (string scenePath in new[] { RunScenePath, LevelScenePath, ScenePath })
             {
@@ -149,8 +150,10 @@ namespace ShiftShift.EditorTools
 
         private static void WireScene(UnityEngine.SceneManagement.Scene scene, List<Palette> palettes, List<string> log)
         {
-            // Rebuild tracks so they pick up the lines (built pieces are copies, not linked prefab instances).
-            foreach (TrackBuilder tb in Object.FindObjectsByType<TrackBuilder>()) tb.Build();
+            // Playbook 2.3: the track is built along its path when the scene plays. Remove the pieces saved in the
+            // scene by earlier versions and point the builder at its materials, dressing prefabs, level and runner.
+            foreach (TrackBuilder tb in Object.FindObjectsByType<TrackBuilder>())
+                WireTrack(tb, scene.path == ScenePath, log, Path.GetFileNameWithoutExtension(scene.path));
 
             var applier = Object.FindAnyObjectByType<PaletteApplier>();
             if (applier == null) applier = new GameObject("Visuals").AddComponent<PaletteApplier>();
@@ -189,6 +192,7 @@ namespace ShiftShift.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
             WirePostProcessing(Camera.main, log, Path.GetFileNameWithoutExtension(scene.path));
             WireFeelAndTrail(applier, log, Path.GetFileNameWithoutExtension(scene.path));
+            if (scene.path == RunScenePath) PutTrackTestLevelFirst(log);
 
             // Fog on in the scene's own lighting settings, so the fog shader variants are kept in builds.
             RenderSettings.fog = true;
@@ -198,7 +202,7 @@ namespace ShiftShift.EditorTools
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            log.Add($"{Path.GetFileNameWithoutExtension(scene.path)}: palette applier wired ({palettes.Count} palettes), track rebuilt, fog on");
+            log.Add($"{Path.GetFileNameWithoutExtension(scene.path)}: palette applier wired ({palettes.Count} palettes), fog on");
         }
 
         private static Color Hex(string h)

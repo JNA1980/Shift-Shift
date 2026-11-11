@@ -9,8 +9,10 @@ namespace ShiftShift
     /// The auto-runner (playbook 1.2). Rules live in RunnerModel (engine-free, tested); this component feeds it
     /// gestures, moves the visuals, and judges obstacles as the runner reaches them. Docs/RUNNER.md.
     ///
-    /// - Forward position comes from the song: z = metresPerBeat * beat (no frame time; CLAUDE.md), so obstacles
-    ///   placed at beat * metresPerBeat are reached exactly on their beat, whatever the BPM.
+    /// - Forward position comes from the song: distance along the track = metresPerBeat * beat (no frame time;
+    ///   CLAUDE.md), so obstacles placed at beat * metresPerBeat are reached exactly on their beat, whatever the BPM.
+    ///   The track may bend, rise and drop (playbook 2.3): the TrackBuilder turns (distance, sideways, height) into
+    ///   a world position. Rules and timing only ever use the distance.
     /// - With a Conductor: waits (and ignores gestures) until it starts; the run ends at the level's last beat.
     ///   Without one (Greybox scene): runs on ShiftInput's stub clock until the end of the track.
     /// - Collisions are judged by rules at the obstacle's song time (decision A: actions count from key-down),
@@ -53,6 +55,13 @@ namespace ShiftShift
         public float MetresPerBeat => metresPerBeat;
         public float LaneWidth => laneWidth;
         public float JumpSeconds => jumpSeconds;
+        public TrackBuilder Track => track;
+        /// <summary>Metres along the track (negative before beat 0).</summary>
+        public float Distance { get; private set; }
+        /// <summary>Sideways offset from the track's centre, as drawn (eases between lanes).</summary>
+        public float Sideways => _visualX;
+        /// <summary>Height above the road, as drawn (jump arc).</summary>
+        public float Height { get; private set; }
 
         private struct Check
         {
@@ -124,7 +133,9 @@ namespace ShiftShift
             _checks.Clear();
             foreach (Obstacle o in FindObjectsByType<Obstacle>())
             {
-                Vector3 p = o.transform.position;
+                // Spawned obstacles carry their track position; hand-placed ones (Greybox, straight track) use X and Z.
+                Vector3 p = o.hasTrackPosition
+                    ? new Vector3(o.trackSideways, 0f, o.trackDistance) : o.transform.position;
                 int lane = o.laneIsOpening ? o.openLane : Mathf.Clamp(Mathf.RoundToInt(p.x / laneWidth), -1, 1);
                 var info = new ObstacleInfo
                 {
@@ -252,7 +263,9 @@ namespace ShiftShift
             float jp = (float)((now - _jumpVisualStart) / jumpSeconds);
             if (jp >= 0f && jp <= 1f) y = 4f * jumpHeight * jp * (1f - jp);
 
-            transform.position = new Vector3(_visualX, y, z);
+            Distance = z;
+            Height = y;
+            transform.SetPositionAndRotation(track.Point(z, _visualX, y), track.Rotation(z));
 
             bool sliding = _model.IsSliding(now);
             float sy = sliding ? slideHeightScale : 1f;
@@ -277,7 +290,7 @@ namespace ShiftShift
 
             GUILayout.BeginArea(new Rect(Screen.width - 360, 10, 350, 190), GUI.skin.box);
             GUILayout.Label($"Run: {status}", _style);
-            GUILayout.Label($"z {transform.position.z:0.0} / {EndZ:0} m   lane {_model.LaneAt(now)}   beat {Clock.BeatAt(now):0.00}", _style);
+            GUILayout.Label($"at {Distance:0.0} / {EndZ:0} m   lane {_model.LaneAt(now)}   beat {Clock.BeatAt(now):0.00}", _style);
             GUILayout.Label(
                 $"{Flag("slide", _model.IsSliding(now))} {Flag("sprint", _model.IsSprinting(now))} " +
                 $"{Flag("air", _model.IsAirborne(now))} {Flag("phase", _model.IsPhased(now))} " +

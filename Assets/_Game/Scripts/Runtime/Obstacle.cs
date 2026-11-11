@@ -5,7 +5,7 @@ namespace ShiftShift
 {
     /// <summary>
     /// Marks a GameObject as an obstacle. The Runner judges it by rules (RunnerModel), not physics: lane comes from
-    /// this object's X position, timing from its Z position. Colliders are not used.
+    /// its sideways position on the track, timing from its distance along the track. Colliders are not used.
     /// Tags from the playbook map to <see cref="layer"/> (Solid / Ghost) and <see cref="kind"/> == Wall.
     /// </summary>
     public sealed class Obstacle : MonoBehaviour
@@ -27,5 +27,11 @@ namespace ShiftShift
                  "judged against the moment the runner reaches them.")]
         public bool hasTargetBeat;
         public double targetBeat;
+
+        [Tooltip("Set by the ObstacleSpawner: where the obstacle is on the track (the track can bend, so its world " +
+                 "position no longer says). Hand-placed obstacles use their X and Z position on a straight track.")]
+        public bool hasTrackPosition;
+        public float trackDistance;
+        public float trackSideways;
     }
 }

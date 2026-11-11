@@ -111,6 +111,24 @@ namespace ShiftShift.Core
             foreach (LevelEvent e in Events)
                 if (e.beat < 8) r.Warnings.Add($"beat {Fmt(e.beat)}: '{e.type}' is in the first 8 beats");
 
+            // Track pieces (playbook 2.3).
+            if (Level.track != null)
+            {
+                double turn = 0, maxTurn = 0;
+                foreach (TrackEvent t in Level.track)
+                {
+                    if (!TrackPieces.TryGet(t.piece, out TrackPieces.Spec spec)) continue;
+                    if (!spec.TurnReturns) turn += spec.TurnDegrees;
+                    maxTurn = Math.Max(maxTurn, Math.Abs(turn));
+                    if (spec.RiseMetres == 0) continue;
+                    foreach (LevelEvent e in Events)
+                        if (e.type == "gap" && e.beat >= t.beat - 1 && e.beat < t.beat + spec.LengthBeats)
+                            r.Warnings.Add($"beat {Fmt(e.beat)}: gap on a sloped piece ('{t.piece}'): the hole may not sit flush");
+                }
+                if (maxTurn > 120)
+                    r.Warnings.Add($"track turns {Fmt(maxTurn)} degrees one way: it may cross itself; mix left and right bends");
+            }
+
             if (strictSpacing)
                 for (int i = 0; i + 1 < Events.Count; i++)
                 {
@@ -131,6 +149,7 @@ namespace ShiftShift.Core
             palette = Level.palette,
             lengthBeats = Level.lengthBeats,
             events = Events.ToArray(),
+            track = Level.track, // edited by hand in the JSON for now; kept as loaded
         };
 
         /// <summary>Human-readable JSON, two-space indent, events sorted by beat then lane, invariant number format.</summary>
@@ -155,7 +174,20 @@ namespace ShiftShift.Core
                 sb.Append("      \"type\": ").Append(Str(e.type)).Append('\n');
                 sb.Append("    }");
             }
-            sb.Append(Events.Count > 0 ? "\n  ]\n" : "]\n");
+            bool hasTrack = Level.track != null && Level.track.Length > 0;
+            sb.Append(Events.Count > 0 ? "\n  ]" : "]").Append(hasTrack ? ",\n" : "\n");
+            if (hasTrack)
+            {
+                // One line per piece: short, and easy to edit by hand.
+                sb.Append("  \"track\": [");
+                for (int i = 0; i < Level.track.Length; i++)
+                {
+                    TrackEvent t = Level.track[i];
+                    sb.Append(i == 0 ? "\n" : ",\n");
+                    sb.Append("    { \"beat\": ").Append(Fmt(t.beat)).Append(", \"piece\": ").Append(Str(t.piece)).Append(" }");
+                }
+                sb.Append("\n  ]\n");
+            }
             sb.Append("}\n");
             return sb.ToString();
         }

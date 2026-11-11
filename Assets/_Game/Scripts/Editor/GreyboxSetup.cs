@@ -57,6 +57,7 @@ namespace ShiftShift.EditorTools
         {
             public TrackPiece Straight, Tunnel, Bridge, Gap;
             public GameObject Block, Low, Gate, Wall, Ghost, Barrier, GapMarker, GateOpening, WideBar, Hurdle;
+            public GameObject TunnelShell, BridgeRails, Pillars; // track dressing (playbook 2.3)
         }
 
         /// <summary>Materials, track pieces and obstacle prefabs; creates only what is missing.</summary>
@@ -72,6 +73,7 @@ namespace ShiftShift.EditorTools
             k.Tunnel = TrackPrefab("Tunnel", 10f, BuildTunnel);
             k.Bridge = TrackPrefab("Bridge", 10f, BuildBridge);
             k.Gap = TrackPrefab("Gap", 2.5f, BuildGap);
+            EnsureDressing(k); // playbook 2.3: the road itself is generated; these dress tunnel/bridge/pillars pieces
 
             k.Block = ObstaclePrefab("Block", ObstacleKind.Block, ObstacleLayer.Solid, false, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1f, 0), new Vector3(1.6f, 2f, 0.6f), "Obstacle"));
@@ -127,18 +129,14 @@ namespace ShiftShift.EditorTools
 
             ShiftInput input = CreateInput();
 
-            // Track: 0-60 straight, 60-70 tunnel, 70-100 straight, 100-102.5 gap, 102.5-112.5 bridge, then straight to 200.
+            // Track (built when the scene plays): tunnel 60-100 m, gap 100-102.5 m, bridge 105-145 m. Straight shape
+            // only: the obstacles here are placed by hand in world positions.
             var trackGo = new GameObject("Track");
             var builder = trackGo.AddComponent<TrackBuilder>();
             builder.lengthMetres = 200f;
-            Set(builder, "fillPiece", straight);
-            builder.sequence = new List<TrackPiece>
-            {
-                straight, straight, straight, straight, straight, straight, tunnel, straight, straight, straight, gap, bridge,
-            };
-            builder.Build();
 
-            CreateRunnerAndCamera(cam, input, builder, null);
+            Runner greyboxRunner = CreateRunnerAndCamera(cam, input, builder, null);
+            ConfigureTrack(builder, null, greyboxRunner);
 
             // Starter obstacles (10 m/s stub speed: 10 m = 1 s = 2 beats at 120 BPM)
             var parent = new GameObject("Obstacles").transform;
@@ -146,7 +144,7 @@ namespace ShiftShift.EditorTools
             Place(block, parent, -1, 45); Place(block, parent, 1, 45); // back to the middle
             Place(low, parent, 0, 65);                         // slide (inside the tunnel)
             Place(gate, parent, 0, 85);                        // sprint
-            // 100-102.5 m: gap piece (jump), placed by the track
+            Place(AssetDatabase.LoadAssetAtPath<GameObject>($"{ObstacleDir}/GapMarker.prefab"), parent, 0, 101.25f); // jump
             Place(barrier, parent, 0, 130);                    // phase through it...
             Place(ghost, parent, 0, 130);                      // ...but not in the middle lane
             Place(wall, parent, 0, 170);                       // charge: L,R,L,R on the beat before it
@@ -239,16 +237,12 @@ namespace ShiftShift.EditorTools
             Set(conductor, "levelJson", AssetDatabase.LoadAssetAtPath<TextAsset>(LevelJsonPath));
             Set(conductor, "input", input);
 
-            // Track from 20 m behind the start (lead-in) to 20 m past the last beat; 5 m per beat (Runner default).
-            const float metresPerBeat = 5f;
+            // The track is built from the level when the scene plays (playbook 2.3).
             var trackGo = new GameObject("Track");
-            trackGo.transform.position = new Vector3(0, 0, -20f);
             var builder = trackGo.AddComponent<TrackBuilder>();
-            builder.lengthMetres = (float)level.lengthBeats * metresPerBeat + 40f;
-            Set(builder, "fillPiece", k.Straight);
-            builder.Build();
 
             Runner runner = CreateRunnerAndCamera(cam, input, builder, conductor);
+            ConfigureTrack(builder, conductor, runner);
 
             var spawnerGo = new GameObject("Obstacles");
             var spawner = spawnerGo.AddComponent<ObstacleSpawner>();
@@ -333,17 +327,13 @@ namespace ShiftShift.EditorTools
                 Set(conductor, "input", input);
                 SetBool(conductor, "showStartPrompt", false); // GameFlow draws the prompt
 
-                // Track: from 60 m behind beat 0 (delay + two-bar count-in) to well past the longest level.
-                const float metresPerBeat = 5f;
-                LevelData level = JsonUtility.FromJson<LevelData>(levelJson.text);
+                // Track: built from the playing level when the scene starts, from 60 m behind beat 0 (delay +
+                // two-bar count-in) to 60 m past the last beat (playbook 2.3).
                 var trackGo = new GameObject("Track");
-                trackGo.transform.position = new Vector3(0, 0, -60f);
                 var builder = trackGo.AddComponent<TrackBuilder>();
-                builder.lengthMetres = Mathf.Max(400f, (float)level.lengthBeats * metresPerBeat + 120f);
-                Set(builder, "fillPiece", k.Straight);
-                builder.Build();
 
                 Runner runner = CreateRunnerAndCamera(cam, input, builder, conductor);
+                ConfigureTrack(builder, conductor, runner);
 
                 var spawner = new GameObject("Obstacles").AddComponent<ObstacleSpawner>();
                 Set(spawner, "conductor", conductor);

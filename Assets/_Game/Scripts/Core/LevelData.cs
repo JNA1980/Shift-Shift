@@ -19,6 +19,8 @@ namespace ShiftShift.Core
         public string palette;
         public double lengthBeats;
         public LevelEvent[] events;
+        /// <summary>Optional track pieces (playbook 2.3). Missing or empty = a straight track.</summary>
+        public TrackEvent[] track;
 
         /// <summary>Problems that would make the level unplayable. Empty list = valid.</summary>
         public List<string> Validate()
@@ -43,6 +45,7 @@ namespace ShiftShift.Core
                 if (!ObstacleTypes.TryGet(e.type, out _)) errors.Add($"{at}: unknown type '{e.type}'");
                 if (!seen.Add((e.beat, e.lane))) errors.Add($"{at}: two events on the same beat and lane");
             }
+            errors.AddRange(TrackPieces.Validate(track, lengthBeats));
             return errors;
         }
     }

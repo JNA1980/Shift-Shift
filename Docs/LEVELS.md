@@ -38,3 +38,35 @@ Position: Z = beat x the Runner's metres per beat (5), so every obstacle is reac
 
 **Not in the format yet:** ghost-layer obstacles (hit only while phased, the purple block in the Greybox). Level 4's
 "two overlapping layers" needs them; add an optional `"layer": "ghost"` field when level 4 is authored.
+
+## Track pieces (day 17, playbook 2.3)
+
+A level can shape its track with an optional `track` list. Everything not covered by a piece is straight road.
+
+```json
+"track": [
+  { "beat": 8.0, "piece": "bendLeft" },
+  { "beat": 16.0, "piece": "tunnel" }
+]
+```
+
+Every piece is 8 beats (40 m) long and starts on its `beat`. Pieces must be in order and must not overlap.
+
+| Piece | What it does |
+|---|---|
+| straight | Plain road (the default; no need to list it) |
+| bendLeft, bendRight | Turns 20 degrees and stays turned |
+| sLeft, sRight | Swings out and back: the road shifts sideways, same heading after |
+| rise, drop | 4 m up or down, and stays there |
+| crest, dip | 2.5 m hill or hollow, back to the same height |
+| tunnel | Straight road inside a tunnel |
+| bridge | Straight road with rails and piers |
+| pillars | Straight road under a row of archways |
+
+Rules:
+- Bends and slopes never change timing: an obstacle on beat N is reached on beat N whatever the track does.
+- Obstacles are placed and turned along the track, so they sit square across the road on bends and slopes.
+- The chart editor keeps the `track` list when it saves but cannot edit it yet: edit it in the JSON file.
+- The chart check warns about a gap on a sloped piece (the flat hole may not sit flush) and about more than 120
+  degrees of turn one way (the track may cross itself).
+- Test level: `test_track.json` uses every piece once, with one obstacle on each.

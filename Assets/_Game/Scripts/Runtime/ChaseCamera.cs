@@ -3,8 +3,9 @@ using UnityEngine;
 namespace ShiftShift
 {
     /// <summary>
-    /// Follows the runner from behind (settings in <see cref="CameraFeel"/>). Sideways and vertical movement lag
-    /// slightly; forward movement is locked so the camera never drifts back at speed. Field of view widens while
+    /// Follows the runner from behind ALONG THE TRACK (settings in <see cref="CameraFeel"/>): it sits on the track's
+    /// path behind the runner and looks at the path ahead, so it swings through bends and tips over rises with the
+    /// road. Sideways and vertical movement lag slightly; forward movement is locked so it never drifts back. Field of view widens while
     /// sprinting and more while phased; the camera rolls slightly into lane changes.
     /// Uses frame time for smoothing only: camera feel, not rhythm timing.
     /// </summary>
@@ -15,7 +16,7 @@ namespace ShiftShift
         [SerializeField] private CameraFeel feel;
 
         private Camera _cam;
-        private float _vx, _vy, _roll, _rollVel, _lastTargetX;
+        private float _x, _y, _vx, _vy, _roll, _rollVel, _lastTargetX;
         private bool _hasLast;
 
         private void Awake()
@@ -27,19 +28,23 @@ namespace ShiftShift
                 feel = ScriptableObject.CreateInstance<CameraFeel>();
             }
             _cam.fieldOfView = feel.baseFov;
+            _x = feel.offset.x;
+            _y = feel.offset.y;
         }
 
         private void LateUpdate()
         {
-            if (target == null) return;
+            if (target == null || target.Track == null) return;
             float dt = Mathf.Max(Time.deltaTime, 1e-4f);
 
-            Vector3 t = target.transform.position;
-            Vector3 cur = transform.position;
-            float x = Mathf.SmoothDamp(cur.x, t.x + feel.offset.x, ref _vx, feel.lateralLagSeconds);
-            float y = Mathf.SmoothDamp(cur.y, feel.offset.y + t.y * 0.5f, ref _vy, feel.lateralLagSeconds);
-            transform.position = new Vector3(x, y, t.z + feel.offset.z);
-            transform.LookAt(new Vector3(x, 1f, t.z + feel.lookAhead));
+            // Track positions: sideways and height relative to the road, distance along it.
+            TrackBuilder track = target.Track;
+            float s = target.Distance;
+            var t = new Vector3(target.Sideways, target.Height, 0f);
+            _x = Mathf.SmoothDamp(_x, t.x + feel.offset.x, ref _vx, feel.lateralLagSeconds);
+            _y = Mathf.SmoothDamp(_y, feel.offset.y + t.y * 0.5f, ref _vy, feel.lateralLagSeconds);
+            transform.position = track.Point(s + feel.offset.z, _x, _y);
+            transform.LookAt(track.Point(s + feel.lookAhead, _x, 1f));
 
             // Roll into the direction of a lane change: tilt proportional to the runner's sideways speed.
             float sideways = _hasLast ? (t.x - _lastTargetX) / dt : 0f;

@@ -5,8 +5,8 @@ using UnityEngine;
 namespace ShiftShift
 {
     /// <summary>
-    /// Places the level's obstacles (playbook 1.3): each event's beat becomes a Z position using the runner's metres
-    /// per beat, its lane an X position, and the prefab for its type is instantiated with the Obstacle rules from
+    /// Places the level's obstacles (playbook 1.3): each event's beat becomes a distance along the track using the
+    /// runner's metres per beat, its lane a sideways offset, and the prefab for its type is instantiated with the Obstacle rules from
     /// <see cref="ObstacleTypes"/>. Gaps are shifted half a jump later (their beat is the take-off). Runs in Awake,
     /// before the Runner collects obstacles in Start.
     /// </summary>
@@ -26,11 +26,12 @@ namespace ShiftShift
 
         private void Awake()
         {
-            if (conductor == null || runner == null || conductor.Level == null)
+            if (conductor == null || runner == null || conductor.Level == null || runner.Track == null)
             {
-                Debug.LogError("[Spawner] Needs a Conductor with a valid level and a Runner.", this);
+                Debug.LogError("[Spawner] Needs a Conductor with a valid level and a Runner with a track.", this);
                 return;
             }
+            TrackBuilder track = runner.Track;
 
             var byType = new Dictionary<string, GameObject>();
             foreach (TypePrefab p in prefabs)
@@ -52,7 +53,8 @@ namespace ShiftShift
                 // A gap's or hurdle's beat is the take-off: place it half a jump later so jumping on the click clears it.
                 if (spec.Kind == ObstacleKind.Gap || spec.Kind == ObstacleKind.Hurdle)
                     z += (float)(runner.JumpSeconds * conductor.Bpm / 60.0 * runner.MetresPerBeat * 0.5);
-                GameObject go = Instantiate(prefab, new Vector3(x, 0f, z), Quaternion.identity, transform);
+                // The track can bend and slope: place and turn the obstacle along it.
+                GameObject go = Instantiate(prefab, track.Point(z, x, 0f), track.Rotation(z), transform);
                 go.name = $"{e.type} b{e.beat:0.##}" + (spec.AllLanes ? "" : $" lane {e.lane}");
 
                 Obstacle o = go.GetComponent<Obstacle>();
@@ -64,6 +66,9 @@ namespace ShiftShift
                 o.targetBeat = e.beat;
                 o.laneIsOpening = spec.LaneIsOpening;
                 o.openLane = e.RunnerLane;
+                o.hasTrackPosition = true;
+                o.trackDistance = z;
+                o.trackSideways = x;
                 if (spec.LaneIsOpening)
                 {
                     // Day 17: prefabs carry one ready-made layout per open lane (Open0/Open1/Open2): solid slab or
