@@ -143,3 +143,19 @@ Ghost blocks only hit a phased runner, and you have to be phased at the barrier,
 
 Not done from the plan: eighth notes (levels 4-5 "move to eighth notes"). Left on quarter notes because levels 2 and 3 already took John 4 attempts each.
 Track: S-bend 16, left bend 32, hill 48, right bend 64, dip 88, tunnel 102, S-bend 128, rise 148.
+
+## Level 5, "Drumline" (first draft, day 17)
+
+`level05.json`: 135 BPM, 208 beats (92 s), neon palette. New: charge (L R L R quickly) to break the red brick wall. Combines everything. Placeholder audio: `click_135`. Level 5 is the second item in the cut order.
+
+| Beats | What happens |
+|---|---|
+| 8-36 | Walls only, every 4 beats |
+| 44-72 | Walls between a lane change, a slide and a jump, 4 beats apart |
+| 80-108 | Phase section: barriers and ghost blocks between walls |
+| 109-119 | Breather, inside the tunnel |
+| 120-200 | A wall every 8 beats (twice every 4), with two other moves between |
+
+Rules kept: at least 3 free beats before every wall (the four taps take about 1.5 beats on eighth notes at this tempo); the charge taps move the runner sideways, so the lane after a wall is treated as unknown: the next lane obstacle needs one tap at most, and a gate only comes after a wide bar has fixed the lane.
+The plan's "walls on eighths" is the tapping itself (four taps on eighth notes); obstacles stay on quarter notes.
+Track: right bend 16, left bend 32, S-bend 48, hill 64, dip 80, right bend 96, tunnel 110, S-bend 124, rise 140, archways 156, left bend 168, drop 184.
