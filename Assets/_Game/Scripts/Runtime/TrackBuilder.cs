@@ -54,11 +54,17 @@ namespace ShiftShift
         [SerializeField] private GameObject roadsidePrefab;
         [SerializeField, Min(2f)] private float roadsideEveryMetres = 10f;
         [SerializeField, Min(3.6f)] private float roadsideOffset = 5f;
-        [Tooltip("Tall block in the distance, alternating sides, at varied distances and heights.")]
-        [SerializeField] private GameObject backdropPrefab;
+        [Tooltip("Ground beside the road (not under bridges), so the scenery stands on something.")]
+        [SerializeField] private Material groundMaterial;
+        [SerializeField, Min(5f)] private float groundHalfWidth = 45f;
+        [Tooltip("Buildings in the distance: one is picked per spot, alternating sides, at varied distance, size and turn.")]
+        [SerializeField] private List<GameObject> backdropPrefabs = new List<GameObject>();
+        [Tooltip("Trees and shrubs: now and then, between the posts and the buildings.")]
+        [SerializeField] private List<GameObject> plantPrefabs = new List<GameObject>();
+        [SerializeField, Range(0f, 1f)] private float plantChance = 0.45f;
         [SerializeField, Min(5f)] private float backdropEveryMetres = 25f;
-        [SerializeField, Min(8f)] private float backdropNear = 14f;
-        [SerializeField, Min(8f)] private float backdropFar = 30f;
+        [SerializeField, Min(8f)] private float backdropNearMetres = 18f;
+        [SerializeField, Min(8f)] private float backdropFarMetres = 34f;
 
         public float LengthMetres => conductor != null && conductor.Level != null
             ? (float)(conductor.Level.lengthBeats * MetresPerBeat) : lengthMetres;
@@ -110,6 +116,10 @@ namespace ShiftShift
             return Quaternion.LookRotation(forward, Vector3.up);
         }
 
+        /// <summary>Facing along the track but standing straight up (buildings and trees do not lean on slopes).</summary>
+        public Quaternion Upright(double distance) =>
+            Quaternion.Euler(0f, (float)(Path.PoseAt(distance).Yaw * 180.0 / Math.PI), 0f);
+
         [ContextMenu("Build Track (preview)")]
         public void Build()
         {
@@ -153,6 +163,9 @@ namespace ShiftShift
         private bool InTunnel(double s) =>
             _path.TryGetSpan(s, out TrackPath.Span span) && span.Spec.Dressing == TrackPieces.Dressing.Tunnel;
 
+        private bool OnBridge(double s) =>
+            _path.TryGetSpan(s, out TrackPath.Span span) && span.Spec.Dressing == TrackPieces.Dressing.Bridge;
+
         /// <summary>Same "random" value every run for the same index, 0..1 (no System.Random state to carry).</summary>
         private static float Hash(int i, int salt)
         {
@@ -166,24 +179,44 @@ namespace ShiftShift
             if (roadsidePrefab != null)
                 for (double s = _path.Start; s <= _path.End; s += roadsideEveryMetres)
                 {
-                    if (InTunnel(s)) continue;
+                    if (InTunnel(s) || OnBridge(s)) continue; // bridges have rails instead
                     foreach (float side in new[] { -roadsideOffset, roadsideOffset })
                     {
                         Instantiate(roadsidePrefab, Point(s, side, 0f), Rotation(s), transform).name = $"Post @{s:0}m";
                         count++;
                     }
                 }
-            if (backdropPrefab != null)
+            backdropPrefabs.RemoveAll(p => p == null);
+            if (backdropPrefabs.Count > 0)
             {
                 int i = 0;
                 for (double s = _path.Start; s <= _path.End + 80; s += backdropEveryMetres, i++)
                 {
-                    float side = (i % 2 == 0 ? -1f : 1f) * Mathf.Lerp(backdropNear, backdropFar, Hash(i, 1));
-                    // Sunk by a varied amount, so the tops differ; the blocks reach far below the road.
-                    GameObject go = Instantiate(backdropPrefab, Point(s, side, -9f * Hash(i, 2)), Rotation(s), transform);
-                    float w = Mathf.Lerp(0.7f, 1.6f, Hash(i, 3));
-                    go.transform.localScale = new Vector3(w, 1f, Mathf.Lerp(0.7f, 1.6f, Hash(i, 4)));
-                    go.name = $"Block @{s:0}m";
+                    // A different shape each time, at a varied distance, size, sink and quarter-turn.
+                    GameObject prefab = backdropPrefabs[Mathf.Min((int)(Hash(i, 5) * backdropPrefabs.Count), backdropPrefabs.Count - 1)];
+                    float side = (i % 2 == 0 ? -1f : 1f) * Mathf.Lerp(backdropNearMetres, backdropFarMetres, Hash(i, 1));
+                    Quaternion turn = Quaternion.Euler(0f, 90f * (int)(Hash(i, 6) * 4f), 0f);
+                    GameObject go = Instantiate(prefab, Point(s, side, -3f * Hash(i, 2)), Upright(s) * turn, transform);
+                    float w = Mathf.Lerp(0.8f, 1.4f, Hash(i, 3));
+                    go.transform.localScale = new Vector3(w, Mathf.Lerp(0.8f, 1.3f, Hash(i, 4)), w);
+                    go.name = $"{prefab.name} @{s:0}m";
+                    count++;
+                }
+            }
+            plantPrefabs.RemoveAll(p => p == null);
+            if (plantPrefabs.Count > 0)
+            {
+                int i = 0;
+                for (double s = _path.Start + 6; s <= _path.End; s += 12, i++)
+                {
+                    if (Hash(i, 7) > plantChance || InTunnel(s) || OnBridge(s)) continue;
+                    GameObject prefab = plantPrefabs[Mathf.Min((int)(Hash(i, 8) * plantPrefabs.Count), plantPrefabs.Count - 1)];
+                    float side = (Hash(i, 9) < 0.5f ? -1f : 1f) * Mathf.Lerp(6.5f, 11f, Hash(i, 10));
+                    Quaternion turn = Quaternion.Euler(0f, 360f * Hash(i, 11), 0f);
+                    GameObject go = Instantiate(prefab, Point(s, side, -0.05f), Upright(s) * turn, transform);
+                    float size = Mathf.Lerp(0.8f, 1.4f, Hash(i, 12));
+                    go.transform.localScale = new Vector3(size, size, size);
+                    go.name = $"{prefab.name} @{s:0}m";
                     count++;
                 }
             }
@@ -247,6 +280,23 @@ namespace ShiftShift
             Strip(v, tri, centre, right, -1.035f, y, -0.965f, y);          // lane dividers (lanes at -2, 0, 2)
             Strip(v, tri, centre, right, 0.965f, y, 1.035f, y);
             AddMesh($"Lines @{s0:0}m", v, tri, lineMaterial);
+
+            // Ground on both sides, just below the road surface; left out under bridges (open air below).
+            if (groundMaterial == null) return;
+            var skip = new bool[rings - 1];
+            bool any = false;
+            for (int i = 0; i < rings - 1; i++)
+            {
+                skip[i] = OnBridge(Math.Min(s0 + (i + 0.5) * ringMetres, s1));
+                any |= !skip[i];
+            }
+            if (!any) return;
+            v = new List<Vector3>();
+            tri = new List<int>();
+            const float gy = -0.05f;
+            Strip(v, tri, centre, right, -groundHalfWidth, gy, -h, gy, skip);
+            Strip(v, tri, centre, right, h, gy, groundHalfWidth, gy, skip);
+            AddMesh($"Ground @{s0:0}m", v, tri, groundMaterial);
         }
 
         /// <summary>
@@ -254,7 +304,7 @@ namespace ShiftShift
         /// It faces the side given by forward x (b - a): a left of b faces up.
         /// </summary>
         private static void Strip(List<Vector3> v, List<int> tri, Vector3[] centre, Vector3[] right,
-            float ax, float ay, float bx, float by)
+            float ax, float ay, float bx, float by, bool[] skip = null)
         {
             int start = v.Count;
             for (int i = 0; i < centre.Length; i++)
@@ -264,6 +314,7 @@ namespace ShiftShift
             }
             for (int i = 0; i + 1 < centre.Length; i++)
             {
+                if (skip != null && skip[i]) continue;
                 int a0 = start + i * 2, b0 = a0 + 1, a1 = a0 + 2, b1 = a0 + 3;
                 tri.Add(a0); tri.Add(a1); tri.Add(b0);
                 tri.Add(b0); tri.Add(a1); tri.Add(b1);

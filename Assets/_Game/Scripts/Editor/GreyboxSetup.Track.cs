@@ -53,22 +53,93 @@ namespace ShiftShift.EditorTools
                 Box(go, "Post", new Vector3(0, 0.6f, 0), new Vector3(0.18f, 2.2f, 0.18f), "TrackDark"); // from -0.5 to 1.7 m
                 Box(go, "Tip", new Vector3(0, 1.8f, 0), new Vector3(0.22f, 0.22f, 0.22f), "TrackLines");
             });
-            DressingPrefab("BackdropBlock", go =>
+            // Buildings: six shapes (John, day 17: one repeated block looked repetitive). Each stands on the ground and
+            // reaches below it, so it stays grounded where the builder sinks it or the road slopes.
+            DressingPrefab("BackdropTower", go => Tall(go, "Body", 0, 0, 5f, 5f, 14f));
+            DressingPrefab("BackdropSlab", go => Tall(go, "Body", 0, 0, 12f, 6f, 5f));
+            DressingPrefab("BackdropStepped", go =>
             {
-                Box(go, "Body", new Vector3(0, -9f, 0), new Vector3(5f, 42f, 5f), "TrackDark");          // top at 12 m
-                Box(go, "Cap", new Vector3(0, 12.1f, 0), new Vector3(5.2f, 0.2f, 5.2f), "TrackLines");
+                Tall(go, "Base", 0, 0, 8f, 8f, 6f);
+                Tall(go, "Mid", 0, 0, 5.5f, 5.5f, 11f);
+                Tall(go, "Top", 0, 0, 3f, 3f, 15f);
+            });
+            DressingPrefab("BackdropTwin", go =>
+            {
+                Tall(go, "TowerA", -2.5f, 0, 3f, 3f, 10f);
+                Tall(go, "TowerB", 2.5f, 0.5f, 3f, 3f, 13f);
+                Tall(go, "Link", 0, 0, 8f, 2f, 4.5f);
+            });
+            DressingPrefab("BackdropSpire", go =>
+            {
+                Tall(go, "Body", 0, 0, 4f, 4f, 9f);
+                Tall(go, "Spire", 0, 0, 1f, 1f, 17f);
+            });
+            DressingPrefab("BackdropArch", go =>
+            {
+                Tall(go, "LegA", -3.5f, 0, 2f, 2f, 8f);
+                Tall(go, "LegB", 3.5f, 0, 2f, 2f, 8f);
+                Box(go, "Lintel", new Vector3(0, 8.75f, 0), new Vector3(9f, 1.5f, 2f), "TrackDark");
+                Box(go, "Cap", new Vector3(0, 9.6f, 0), new Vector3(9.2f, 0.2f, 2.2f), "TrackLines");
+            });
+
+            // Plants: blocky, to match the rest. "Foliage" is a muted tint of each palette's accent.
+            DressingPrefab("TreeTiered", go =>
+            {
+                Box(go, "Trunk", new Vector3(0, 1f, 0), new Vector3(0.35f, 2.4f, 0.35f), "TrackDark");
+                Box(go, "Crown1", new Vector3(0, 2.6f, 0), new Vector3(2.4f, 1.2f, 2.4f), "Foliage");
+                Box(go, "Crown2", new Vector3(0, 3.7f, 0), new Vector3(1.7f, 1.1f, 1.7f), "Foliage");
+                Box(go, "Crown3", new Vector3(0, 4.7f, 0), new Vector3(1f, 1f, 1f), "Foliage");
+            });
+            DressingPrefab("TreeRound", go =>
+            {
+                Box(go, "Trunk", new Vector3(0, 0.8f, 0), new Vector3(0.4f, 2f, 0.4f), "TrackDark");
+                Box(go, "Crown", new Vector3(0, 2.9f, 0), new Vector3(2.6f, 2.2f, 2.6f), "Foliage");
+                Box(go, "CrownTop", new Vector3(0.3f, 4.3f, -0.2f), new Vector3(1.6f, 1.1f, 1.6f), "Foliage");
+            });
+            DressingPrefab("Shrub", go =>
+            {
+                Box(go, "Low", new Vector3(0, 0.35f, 0), new Vector3(1.5f, 0.9f, 1.2f), "Foliage");
+                Box(go, "High", new Vector3(0.3f, 0.95f, 0.1f), new Vector3(0.9f, 0.6f, 0.8f), "Foliage");
             });
         }
+
+        private static readonly string[] BackdropNames =
+            { "BackdropTower", "BackdropSlab", "BackdropStepped", "BackdropTwin", "BackdropSpire", "BackdropArch" };
+        private static readonly string[] PlantNames = { "TreeTiered", "TreeRound", "Shrub", "Shrub" }; // shrubs twice as often
+
+        /// <summary>A dark box from 30 m below the ground up to <paramref name="top"/>, with a lit cap.</summary>
+        private static void Tall(GameObject go, string name, float x, float z, float width, float depth, float top)
+        {
+            Box(go, name, new Vector3(x, (top - 30f) * 0.5f, z), new Vector3(width, top + 30f, depth), "TrackDark");
+            Box(go, name + "Cap", new Vector3(x, top + 0.1f, z), new Vector3(width + 0.2f, 0.2f, depth + 0.2f), "TrackLines");
+        }
+
+        private static void SetPrefabList(Object target, string field, string[] names)
+        {
+            var so = new SerializedObject(target);
+            SerializedProperty list = so.FindProperty(field);
+            if (list == null) { Debug.LogError($"[Setup] {target.GetType().Name} has no field '{field}'."); return; }
+            list.arraySize = names.Length;
+            for (int i = 0; i < names.Length; i++)
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/{names[i]}.prefab");
+                if (prefab == null) Debug.LogError($"[Setup] Missing {TrackDir}/{names[i]}.prefab.");
+                list.GetArrayElementAtIndex(i).objectReferenceValue = prefab;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private const float BarrierAlpha = 0.5f; // John, day 17: 0.3 was a little too see-through
 
         /// <summary>The phase barrier becomes a see-through panel in a bright frame: you can see the road go on behind it.</summary>
         private static void MakeBarrierSeeThrough(List<string> log)
         {
             Material m = Mats["Barrier"];
             Color c = m.GetColor("_BaseColor");
-            if (c.a > 0.99f || m.renderQueue < 3000)
+            if (Mathf.Abs(c.a - BarrierAlpha) > 0.01f || m.renderQueue < 3000)
             {
                 // URP Lit, transparent surface (what the Inspector's Surface Type = Transparent sets).
-                c.a = 0.3f;
+                c.a = BarrierAlpha;
                 m.SetColor("_BaseColor", c);
                 m.SetFloat("_Surface", 1f);
                 m.SetFloat("_Blend", 0f);
@@ -79,7 +150,7 @@ namespace ShiftShift.EditorTools
                 m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                 m.renderQueue = 3000;
                 EditorUtility.SetDirty(m);
-                log.Add("Barrier material: see-through (30% solid)");
+                log.Add($"Barrier material: see-through ({BarrierAlpha * 100f:0}% solid)");
             }
 
             string path = $"{ObstacleDir}/PhaseBarrier.prefab";
@@ -122,12 +193,14 @@ namespace ShiftShift.EditorTools
             }
             var brickTex = AssetDatabase.LoadAssetAtPath<Texture2D>(BrickPath);
             Material m = Mats["Wall"];
-            if (brickTex != null && m.GetTexture("_BaseMap") != brickTex)
+            if (brickTex != null)
             {
+                // Wall is 7 x 3 m: bricks 2 m long in rows of 0.5 m (John, day 17: the first, smaller bricks only
+                // showed up close).
                 m.SetTexture("_BaseMap", brickTex);
-                m.SetTextureScale("_BaseMap", new Vector2(7f, 8f)); // wall is 7 x 3 m: bricks 1 m long, rows 0.19 m
+                m.SetTextureScale("_BaseMap", new Vector2(3.5f, 3f));
                 EditorUtility.SetDirty(m);
-                log.Add("Wall material: brick pattern");
+                log.Add("Wall material: brick pattern, 2 m x 0.5 m bricks");
             }
         }
 
@@ -155,7 +228,9 @@ namespace ShiftShift.EditorTools
             Set(builder, "bridgePrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/BridgeRails.prefab"));
             Set(builder, "pillarsPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/Pillars.prefab"));
             Set(builder, "roadsidePrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/RoadsidePost.prefab"));
-            Set(builder, "backdropPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/BackdropBlock.prefab"));
+            Set(builder, "groundMaterial", Mats["TrackDark"]);
+            SetPrefabList(builder, "backdropPrefabs", BackdropNames);
+            SetPrefabList(builder, "plantPrefabs", PlantNames);
             if (conductor == null)
             {
                 // Greybox: straight-shaped pieces only (its obstacles are hand-placed in world positions).

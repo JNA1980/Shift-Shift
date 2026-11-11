@@ -466,3 +466,17 @@ Done:
 Tested: compile check and 133 Core tests.
 Not run in Unity: all four. Unverified: transparent material set from script (keywords, sorting against the glow frame and the trail), brick scale, scenery density and frame rate in WebGL, how the lift feels.
 Note: Brick.png is created on John's machine and committed from there (LFS does not work from the cloud session).
+
+## 2026-11-11 — D17: scenery second pass (John's feedback after playing)
+
+John: posts looked like floating lights; buildings repetitive; wants trees or shrubs at times; barrier a little less see-through; bricks only visible up close; camera a tad raised throughout, put it back.
+
+Done:
+- Ground: a 45 m band each side of the road, 5 cm below the surface, in the road-detail colour; left out under bridges. Posts, plants and buildings now stand on it. No posts on bridges.
+- Buildings: six shapes (tower, slab, stepped, twin, spire, arch), picked per spot by a fixed hash, with varied distance (18-34 m), size, sink and quarter-turn. They and the plants stand upright on slopes (yaw only).
+- Plants: two blocky trees and a shrub, at about 45% of the 12 m spots, 6.5-11 m from the centre line, random turn and size. New Foliage material, new PaletteApplier role Scenery (accent mixed 55% toward road-detail; unchanged while phased).
+- Barrier 50% solid (was 30%). Bricks 2 m x 0.5 m (were 1 m x 0.19 m).
+- Camera slope lift off by default (field renamed slopeLiftAmount so the saved 0.6 is dropped). So obstacles on rises poke above the horizon again; John will say if it needs a small value.
+
+Tested: compile check, 133 Core tests. Not run in Unity. Unverified: ground meeting the road edge, the scenery mix by eye, frame rate in WebGL with the extra objects.
+Unused now: BackdropBlock prefab.

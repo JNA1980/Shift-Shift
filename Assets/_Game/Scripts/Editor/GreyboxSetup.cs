@@ -518,6 +518,7 @@ namespace ShiftShift.EditorTools
             Mat("Hole", new Color(0.05f, 0.05f, 0.07f));
             Mat("Hurdle", new Color(1f, 0.45f, 0.75f)); // pink: short wall (orange = obstacles, red = tall wall)
             Mat("TrackLines", new Color(0.75f, 0.75f, 0.75f)); // road edges and lane lines (day 16)
+            Mat("Foliage", new Color(0.2f, 0.3f, 0.25f)); // trees and shrubs (day 17); palettes tint it
         }
 
         private static void Mat(string name, Color color)

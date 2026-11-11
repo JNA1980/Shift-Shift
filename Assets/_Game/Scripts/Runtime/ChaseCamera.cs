@@ -35,14 +35,14 @@ namespace ShiftShift
         /// <summary>Extra camera height when the road ahead climbs (John, day 17: obstacles poked above the horizon).</summary>
         private float SlopeLift(TrackBuilder track, float s)
         {
-            if (feel.slopeLift <= 0f) return 0f;
+            if (feel.slopeLiftAmount <= 0f) return 0f;
             double camS = s + feel.offset.z;
             // Not inside a tunnel: the ceiling is 0.2 m above the camera.
             foreach (double at in new[] { camS, (double)s })
                 if (track.Path.TryGetSpan(at, out ShiftShift.Core.TrackPath.Span span) &&
                     span.Spec.Dressing == ShiftShift.Core.TrackPieces.Dressing.Tunnel) return 0f;
             double gain = track.Path.HeightAt(s + feel.slopeLookMetres) - track.Path.HeightAt(camS);
-            return Mathf.Max(0f, (float)gain) * feel.slopeLift;
+            return Mathf.Max(0f, (float)gain) * feel.slopeLiftAmount;
         }
 
         private void LateUpdate()

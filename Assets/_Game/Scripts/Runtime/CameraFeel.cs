@@ -19,8 +19,9 @@ namespace ShiftShift
         [Tooltip("The camera lifts by the height the road gains between itself and this far ahead of the runner, " +
                  "so obstacles on a rise stay below eye level. Off inside tunnels.")]
         [Min(0f)] public float slopeLookMetres = 30f;
-        [Tooltip("How much of that height gain the camera lifts by (0 = off).")]
-        [Range(0f, 2f)] public float slopeLift = 0.6f;
+        [Tooltip("How much of that height gain the camera lifts by. 0 = off (John, day 17: the camera felt raised; " +
+                 "back to the earlier angle). Try 0.3 if obstacles on rises bother you.")]
+        [Range(0f, 2f)] public float slopeLiftAmount = 0f;
 
         [Header("Field of view")]
         public float baseFov = 60f;

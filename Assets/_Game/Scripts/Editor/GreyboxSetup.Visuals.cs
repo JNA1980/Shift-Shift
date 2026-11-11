@@ -178,6 +178,7 @@ namespace ShiftShift.EditorTools
                 ("Low", PaletteApplier.Role.Slide), ("Gate", PaletteApplier.Role.Sprint),
                 ("Hurdle", PaletteApplier.Role.Jump), ("Barrier", PaletteApplier.Role.Phase),
                 ("Ghost", PaletteApplier.Role.Ghost), ("Wall", PaletteApplier.Role.Charge), ("Hole", PaletteApplier.Role.Hole),
+                ("Foliage", PaletteApplier.Role.Scenery),
             };
             var all = new List<(Material mat, PaletteApplier.Role role, bool glow)>();
             foreach (var r in roles) all.Add((Mats[r.mat], r.role, false));

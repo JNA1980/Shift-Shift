@@ -14,7 +14,7 @@ namespace ShiftShift
     public sealed class PaletteApplier : MonoBehaviour
     {
         // Saved as numbers in scenes: add new roles at the end only.
-        public enum Role { Road, RoadDetail, Lines, Lane, Slide, Sprint, Jump, Phase, Charge, Hole, Ghost }
+        public enum Role { Road, RoadDetail, Lines, Lane, Slide, Sprint, Jump, Phase, Charge, Hole, Ghost, Scenery }
 
         [Serializable]
         public struct MaterialRole
@@ -174,6 +174,8 @@ namespace ShiftShift
                 case Role.Phase: return p.phase;
                 case Role.Ghost: return p.phase;
                 case Role.Charge: return p.charge;
+                // Trees and shrubs: a dark, muted tint of the level's accent, so they never read as an action colour.
+                case Role.Scenery: return Color.Lerp(p.accent, p.roadDetail, 0.55f);
                 default: return Color.black; // Hole
             }
         }
@@ -186,6 +188,7 @@ namespace ShiftShift
                 case Role.RoadDetail:
                 case Role.Lines:
                 case Role.Hole:
+                case Role.Scenery:
                     return normal;
                 case Role.Ghost:
                     return Color.Lerp(p.phase, Color.white, 0.75f); // ghost-layer blocks: the danger while phased
