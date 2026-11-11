@@ -195,7 +195,7 @@ namespace ShiftShift
                             // Earlier bar: "Get ready" stays put (John: pulsing read as showing 4 times); a dot per beat.
                             var style = new GUIStyle(_big) { fontSize = 64 };
                             GUI.Label(new Rect(0, h * 0.3f, w, 120), "Get ready", style);
-                            int lit = whole + 9 - (conductor.CountInBeats - 4); // 1..4 across the bar
+                            int lit = (whole + conductor.CountInBeats) % 4 + 1; // 1..4 across each "Get ready" bar
                             string dots = "";
                             for (int i = 1; i <= 4; i++) dots += i <= lit ? "● " : "○ ";
                             GUI.Label(new Rect(0, h * 0.3f + 110, w, 60), dots.TrimEnd(), _mid);
