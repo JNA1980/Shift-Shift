@@ -409,3 +409,7 @@
 **Not yet run / uncertain**
 - Step 2 (glow, bloom) and step 3 not yet seen in Unity.
 - Sprites/Default for the trail under URP: expected to render (unlit, vertex colours); if it shows pink, switch the Trail material to URP Particles/Unlit.
+
+## 2026-11-11 — D17: steps 2 and 3 verified (John)
+- Glowing edges, bloom, runner trail, FOV widening (sprint/phase) and lane-change roll seen in the editor: "looks good". No tuning changes requested; defaults kept (glow 1.5, bloom 0.8/0.9/0.7, FOV 60/72/78, roll 2 deg).
+- Remaining in playbook 2.2: step 4 phase look (palette inversion + scanlines), step 5 solid wide bar + gate frame.
