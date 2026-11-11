@@ -44,6 +44,7 @@ namespace ShiftShift.EditorTools
             AddGapRims(log);
             AddGlowEdges(log);       // step 2: glowing obstacle edges
             EnableBloomInProfile(log);
+            EnsureCameraFeel(log);   // step 3: camera feel asset
 
             foreach (string scenePath in new[] { RunScenePath, LevelScenePath, ScenePath })
             {
@@ -186,6 +187,7 @@ namespace ShiftShift.EditorTools
             }
             so.ApplyModifiedPropertiesWithoutUndo();
             WirePostProcessing(Camera.main, log, Path.GetFileNameWithoutExtension(scene.path));
+            WireFeelAndTrail(applier, log, Path.GetFileNameWithoutExtension(scene.path));
 
             // Fog on in the scene's own lighting settings, so the fog shader variants are kept in builds.
             RenderSettings.fog = true;

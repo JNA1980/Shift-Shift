@@ -395,3 +395,17 @@
 **Uncertain / not yet run**
 - The look in Unity. The Web build uses the Mobile URP asset: if HDR is off there, glow is capped and bloom weaker than in the editor. Check in a Web build.
 - Bloom on the light skies (dawn, overcast): threshold 0.9 should keep the pale sky from glowing; verify.
+
+## 2026-11-11 — D17: camera feel and runner trail (playbook 2.2 step 3)
+
+**Done**
+- CameraFeel asset (Assets/_Game/Settings/CameraFeel.asset): offset (3.3 m kept), look-ahead, lag, FOV 60 / 72 sprint / 78 phase eased over 150 ms, 2 deg roll into lane changes (proportional to sideways speed, eased 120 ms). On an asset so Play-mode tuning is kept (playbook: visual settings on ScriptableObjects).
+- ChaseCamera reads CameraFeel (its own fields moved into the asset; default instance + warning if unassigned).
+- Runner trail: TrailRenderer (0.25 s, tapering) with a Sprites/Default material; PaletteApplier colours it accent -> transparent.
+- Set Up Visuals now also creates CameraFeel and wires it plus the trail into Run, LevelTest and Greybox.
+
+**Tested**: per-assembly compile check passes.
+
+**Not yet run / uncertain**
+- Step 2 (glow, bloom) and step 3 not yet seen in Unity.
+- Sprites/Default for the trail under URP: expected to render (unlit, vertex colours); if it shows pink, switch the Trail material to URP Particles/Unlit.

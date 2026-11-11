@@ -28,6 +28,8 @@ namespace ShiftShift
         [Tooltip("Used when there is no level (Greybox) or its palette is not in the list.")]
         [SerializeField] private Palette fallback;
         [SerializeField] private Camera cam;
+        [Tooltip("Runner trail: coloured with the palette's accent, fading to transparent.")]
+        [SerializeField] private TrailRenderer trail;
         [SerializeField] private List<MaterialRole> roles = new List<MaterialRole>();
         [SerializeField] private float fogStart = 40f;
         [SerializeField] private float fogEnd = 170f;
@@ -66,6 +68,11 @@ namespace ShiftShift
             {
                 cam.clearFlags = CameraClearFlags.SolidColor;
                 cam.backgroundColor = p.background;
+            }
+            if (trail != null)
+            {
+                trail.startColor = p.accent;
+                trail.endColor = new Color(p.accent.r, p.accent.g, p.accent.b, 0f);
             }
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
