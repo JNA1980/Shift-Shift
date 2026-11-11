@@ -350,7 +350,8 @@ namespace ShiftShift.EditorTools
         // The Run scene plays the first level in GameFlow's list (until the level select, days 21-22).
         private static readonly string[] RunLevelOrder =
         {
-            "Assets/_Game/Levels/level01.json", "Assets/_Game/Levels/test_track.json",
+            // The level being worked on goes first for now (day 18: level 2).
+            "Assets/_Game/Levels/level02.json", "Assets/_Game/Levels/level01.json", "Assets/_Game/Levels/test_track.json",
             "Assets/_Game/Levels/test_gestures.json", "Assets/_Game/Levels/level00.json",
         };
         private const string LongClickPath = "Assets/_Game/Audio/Resources/click_100_long.wav";
@@ -358,12 +359,17 @@ namespace ShiftShift.EditorTools
         /// <summary>Placeholder click for the track test level (112 beats at 100 BPM; 22 kHz keeps the file near 3 MB).</summary>
         private static void EnsureLongClick(List<string> log)
         {
-            if (System.IO.File.Exists(LongClickPath)) return;
             EnsureFolder("Assets/_Game", "Audio");
             EnsureFolder("Assets/_Game/Audio", "Resources");
-            System.IO.File.WriteAllBytes(LongClickPath, ClickTrack.GenerateWav(100, 112, 4, 22050));
-            AssetDatabase.ImportAsset(LongClickPath);
-            log.Add($"Generated {LongClickPath} (100 BPM, 112 beats)");
+            // Placeholder clicks until the audio pass (day 23): one per level tempo, a little longer than the level.
+            foreach ((string path, double bpm, int beats) in new[]
+                     { (LongClickPath, 100.0, 112), ("Assets/_Game/Audio/Resources/click_110.wav", 110.0, 120) })
+            {
+                if (System.IO.File.Exists(path)) continue;
+                System.IO.File.WriteAllBytes(path, ClickTrack.GenerateWav(bpm, beats, 4, 22050));
+                AssetDatabase.ImportAsset(path);
+                log.Add($"Generated {path} ({bpm:0} BPM, {beats} beats)");
+            }
         }
 
         /// <summary>Run scene: GameFlow's levels in RunLevelOrder (level 1 first), then any others already listed.</summary>

@@ -86,3 +86,19 @@ Rules:
 
 Track: right bend 16, left bend 32, hill 48, tunnel 60, S-bend 72, archways 88.
 Checked by script: valid, no warnings in the strict chart check, never more than two taps for one obstacle, never less than one beat per tap.
+
+## Level 2, "Low ceiling" (first draft, day 17)
+
+`level02.json`: 110 BPM, 112 beats (61 s), overcast palette. New: slide (hold Left under a yellow low bar) and sprint (hold Right through a cyan gate). Placeholder audio: `click_110`.
+
+| Beats | What happens |
+|---|---|
+| 8-20 | Slide only, every 4 beats, inside a tunnel |
+| 26-38 | Sprint only, every 4 beats; the gate's opening is straight ahead |
+| 42-54 | Slide and sprint in turn |
+| 60-80 | Lane changes join in, 4 beats apart |
+| 81-87 | Breather, inside the second tunnel |
+| 88-108 | Something every 2 beats: a lane change between each slide and sprint |
+
+Rules kept: a gate's opening is always the lane the player is already in (never a lane change and a sprint for the same obstacle); slides and sprints are never closer than 4 beats to each other; nothing is closer than 2 beats.
+Track: tunnel 8, left bend 24, dip 40, S-bend 56, right bend 72, tunnel 80, archways 96.

@@ -1,0 +1,159 @@
+{
+  "name": "Low ceiling",
+  "bpm": 110.0,
+  "audioClip": "click_110",
+  "offsetMs": 0.0,
+  "palette": "overcast",
+  "lengthBeats": 112.0,
+  "events": [
+    {
+      "beat": 8.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 12.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 16.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 20.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 26.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 30.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 34.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 38.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 42.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 46.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 50.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 54.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 60.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 64.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 68.0,
+      "lane": 0,
+      "type": "gate"
+    },
+    {
+      "beat": 72.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 76.0,
+      "lane": 2,
+      "type": "gate"
+    },
+    {
+      "beat": 80.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 88.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 90.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 92.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 94.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 96.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 98.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 100.0,
+      "lane": 1,
+      "type": "gate"
+    },
+    {
+      "beat": 102.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 104.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 108.0,
+      "lane": 2,
+      "type": "gate"
+    }
+  ],
+  "track": [
+    { "beat": 8.0, "piece": "tunnel" },
+    { "beat": 24.0, "piece": "bendLeft" },
+    { "beat": 40.0, "piece": "dip" },
+    { "beat": 56.0, "piece": "sRight" },
+    { "beat": 72.0, "piece": "bendRight" },
+    { "beat": 80.0, "piece": "tunnel" },
+    { "beat": 96.0, "piece": "pillars" }
+  ]
+}

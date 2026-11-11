@@ -602,3 +602,12 @@ Still not known: the Web build's size (limit 20 MB compressed). Not done: Edge c
 Level 1 "Warm-up" drafted a day early (plan: day 18): Assets/_Game/Levels/level01.json, see Docs/LEVELS.md. Lane changes only, quarter notes, first 8 bars one tap each, 2-bar breather before the fastest section (plan's authoring rules). Set Up Visuals now orders the Run scene's levels: level01, test_track, test_gestures, level00.
 Tested: level validates, strict chart check has no warnings, a scripted walk-through needs at most two taps per obstacle with at least one beat per tap, file round-trips through the chart writer. Compile check passes.
 Not run in Unity. Whether it is fun, readable and the right difficulty is John's call after playing (rule of thumb: clear within 5 attempts).
+
+## 2026-11-11 — D17: level 1 played; level 2 drafted
+
+John: cleared level 1 on the first attempt; visuals "look good, realistic with lighting". Asked if level 1 should have only one type of obstacle: yes by the plan (level 1 = Tap L and Tap R only; bar and wide are both lane changes, same orange).
+Build folder size (development Web build): 59.4 MB uncompressed on disk. Not comparable with the 20 MB compressed limit: needs a Release profile build to measure. Flagged as a risk to check before day 24, not day 28.
+Noticed, not changed: his clean run scored 50 with best streak 1 and 0% perfect. By design a dodge made away from the obstacle's beat grades "Ok" (no points, streak reset); only moves within 120 ms of the beat score. On a lane-change level that makes a clean run look like a bad one. This is the open M1 question "when should the click land"; needs John's decision.
+
+Level 2 "Low ceiling" drafted: Assets/_Game/Levels/level02.json (Docs/LEVELS.md). Set Up Visuals generates click_110.wav and puts level02 first in the Run scene's list.
+Tested: validates, strict chart check clean, scripted walk (gate openings always in the player's lane, holds at least 4 beats apart, nothing under 2 beats), round-trips through the chart writer. Compile check passes. Not played.
