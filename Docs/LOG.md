@@ -444,3 +444,11 @@ Not run: nothing in Unity. Unverified: the generated road mesh (facing, shading,
 Uncertain: obstacles on a rise may poke above the horizon (the 3.2 m rule assumed a flat road); the camera may see under the road on a crest; fog distance on bends.
 Unused now, left in place: TrackPiece.cs and the Straight/Tunnel/Bridge/Gap prefabs (old scenes still reference the script until Set Up Visuals is run).
 Flagged, not built: editing track pieces in the chart editor.
+
+## 2026-11-11 — D17: track kit played by John (Run scene, test_track, dusk)
+
+Works: the level plays to the end on the bent and sloped track ("overall the game is good"); no underside of the road seen at the crest; the road and lines render.
+Found:
+- The blue phase barrier (beat 60, on the crest) reads as "the end of the game": a full-width opaque wall with nothing visible behind or beside it. John's guess: no surroundings to give depth.
+- Obstacles poke above the horizon on slopes (expected; the 3.2 m rule assumed a flat road).
+Open, waiting for John's choice: see-through barrier, roadside scenery (not in SCOPE.md as written), what to do about the horizon on slopes.
