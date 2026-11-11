@@ -380,3 +380,4 @@
 - Count-in read as "counting twice" (two bars of 1-2-3-4). Now: first bar "Get ready" with a pulse per beat, last bar 4-3-2-1, "GO" fading over beat 0.
 - Gap "fidgety": z-fighting. The gap's black patch and the new lane lines were at the same height (0-0.02 m). Patch lifted to 0.02-0.04 m and pink (jump colour) rims added at its front and back edges. GapMarker prefab file edited for the height; rims are added by Shift+Shift > Set Up Visuals (re-runnable) and by the tool for new projects.
 - Per-assembly compile check passes. Not yet seen in Unity.
+- Gap rims and the new count-in confirmed in the editor (John: "all good"). "Get ready" pulsed on each beat and read as appearing 4 times: now it stays steady with four dots lighting one per beat; 4-3-2-1 still pulse.

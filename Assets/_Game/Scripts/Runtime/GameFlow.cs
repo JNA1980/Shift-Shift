@@ -184,11 +184,22 @@ namespace ShiftShift
                     {
                         int whole = (int)System.Math.Floor(beat);   // -8 .. -1
                         float frac = (float)(beat - whole);
-                        int pulse = Mathf.RoundToInt(70 * (1f - frac)); // pulse on each beat
-                        string text = whole >= -4 ? (-whole).ToString() : "Get ready";
-                        int size = (whole >= -4 ? 90 : 50) + pulse;
-                        var style = new GUIStyle(_big) { fontSize = size };
-                        GUI.Label(new Rect(0, h * 0.3f, w, 200), text, style);
+                        if (whole >= -4)
+                        {
+                            // Last bar: 4-3-2-1, each number pulsing on its beat.
+                            var style = new GUIStyle(_big) { fontSize = 90 + Mathf.RoundToInt(70 * (1f - frac)) };
+                            GUI.Label(new Rect(0, h * 0.3f, w, 200), (-whole).ToString(), style);
+                        }
+                        else
+                        {
+                            // Earlier bar: "Get ready" stays put (John: pulsing read as showing 4 times); a dot per beat.
+                            var style = new GUIStyle(_big) { fontSize = 64 };
+                            GUI.Label(new Rect(0, h * 0.3f, w, 120), "Get ready", style);
+                            int lit = whole + 9 - (conductor.CountInBeats - 4); // 1..4 across the bar
+                            string dots = "";
+                            for (int i = 1; i <= 4; i++) dots += i <= lit ? "● " : "○ ";
+                            GUI.Label(new Rect(0, h * 0.3f + 110, w, 60), dots.TrimEnd(), _mid);
+                        }
                     }
                     DrawScore(w);
                     break;
