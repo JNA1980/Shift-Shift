@@ -4238,8 +4238,8 @@ MonoBehaviour:
   armSwingDegrees: 50
   runLeanDegrees: 8
   sprintLeanDegrees: 22
-  bendLean: 3
-  maxBendLeanDegrees: 16
+  bendLeanFactor: 1
+  bendLeanMaxDegrees: 5
   dust: {fileID: 956675917}
   puffsPerStep: 4
   footOffset: {x: 0.14, y: 0.05, z: -0.25}
