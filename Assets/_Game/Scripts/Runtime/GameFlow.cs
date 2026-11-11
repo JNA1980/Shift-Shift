@@ -18,7 +18,8 @@ namespace ShiftShift
     {
         public enum Phase { Ready, CountIn, Playing, Failed, Results }
 
-        public const string BestKeyPrefix = "ShiftShift.Best.";
+        // V2: point values changed on day 17 (50 / 20 / 5); bests saved under the old values are left behind.
+        public const string BestKeyPrefix = "ShiftShift.BestV2.";
 
         [SerializeField] private List<TextAsset> levels = new List<TextAsset>();
         [SerializeField] private Conductor conductor;

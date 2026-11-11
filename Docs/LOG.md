@@ -611,3 +611,9 @@ Noticed, not changed: his clean run scored 50 with best streak 1 and 0% perfect.
 
 Level 2 "Low ceiling" drafted: Assets/_Game/Levels/level02.json (Docs/LEVELS.md). Set Up Visuals generates click_110.wav and puts level02 first in the Run scene's list.
 Tested: validates, strict chart check clean, scripted walk (gate openings always in the player's lane, holds at least 4 beats apart, nothing under 2 beats), round-trips through the chart writer. Compile check passes. Not played.
+
+## 2026-11-11 — D17: scoring: every obstacle passed scores
+
+John's decision: points for every obstacle passed, Ok 5, Good 20, Perfect 50, the on-beat grades being the bonus.
+Done: ScoreKeeper values 50 / 20 / 5 (were 100 / 50 / 0), all times the streak multiplier. An OK no longer resets the streak; it neither adds to it nor breaks it (my choice, so the streak and multiplier stay a reward for on-beat play; one line to change if John wants passes to build the streak too). Best-score keys moved to ShiftShift.BestV2.* so bests under the old values are not compared with new ones. Docs/SCORING.md updated.
+Tested: 136 Core tests pass (3 scoring tests rewritten, 2 added: a clean off-beat run of 27 scores 135; an OK uses the multiplier). Compile check passes. Not run in Unity.

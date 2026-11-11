@@ -18,15 +18,19 @@ Each obstacle is graded once, by the **key-down time** of the gesture that answe
 
 | Grade | When | Points | Streak |
 |---|---|---|---|
-| Perfect | within 50 ms | 100 x multiplier | +1 |
-| Good | within 120 ms | 50 x multiplier | +1 |
-| OK | passed, answer outside 120 ms (e.g. dodged two seconds early, sprint held from far back) | 0 | reset |
+| Perfect | within 50 ms | 50 x multiplier | +1 |
+| Good | within 120 ms | 20 x multiplier | +1 |
+| OK | passed, answer outside 120 ms (e.g. dodged two seconds early, sprint held from far back) | 5 x multiplier | unchanged |
 | (none) | no action was needed (bar in another lane) | 0 | unchanged |
 | Miss | collision; the run ends | 0 | reset |
 
 Multiplier by streak: x2 from 10, x3 from 25, x4 from 50 (the 10th hit already scores x2).
 Results: score, best streak, perfect % (perfects / graded obstacles), best score per level in PlayerPrefs
-(`ShiftShift.Best.<level asset>`).
+(`ShiftShift.BestV2.<level asset>`).
+
+Changed on day 17 (John): every obstacle passed scores (was: only on-beat answers scored, 100 / 50, and an OK reset
+the streak). A clean run made off the beat used to score almost nothing. The streak now counts on-beat answers in a
+row; an OK neither adds to it nor breaks it. Best scores saved under the old values are not carried over.
 
 ## Run loop (Run scene)
 

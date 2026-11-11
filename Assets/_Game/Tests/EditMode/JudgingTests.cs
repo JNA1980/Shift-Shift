@@ -147,7 +147,7 @@ namespace ShiftShift.Tests
             var s = new ScoreKeeper();
             s.Add(Grade.Perfect);
             s.Add(Grade.Good);
-            Assert.AreEqual(150, s.Points);
+            Assert.AreEqual(70, s.Points); // 50 + 20
             Assert.AreEqual(2, s.Streak);
         }
 
@@ -156,9 +156,9 @@ namespace ShiftShift.Tests
         {
             var s = new ScoreKeeper();
             for (int i = 0; i < 9; i++) s.Add(Grade.Perfect);
-            Assert.AreEqual(900, s.Points);
+            Assert.AreEqual(450, s.Points);
             s.Add(Grade.Perfect); // 10th: x2
-            Assert.AreEqual(1100, s.Points);
+            Assert.AreEqual(550, s.Points);
             Assert.AreEqual(2, s.Multiplier);
         }
 
@@ -173,18 +173,39 @@ namespace ShiftShift.Tests
         }
 
         [Test]
-        public void Score_OkAndMissResetStreak_NoneDoesNot()
+        public void Score_OkScoresFiveAndKeepsStreak_MissResets_NoneDoesNothing()
         {
             var s = new ScoreKeeper();
             s.Add(Grade.Perfect);
             s.Add(Grade.None);
             Assert.AreEqual(1, s.Streak);
+            Assert.AreEqual(50, s.Points);
             s.Add(Grade.Ok);
-            Assert.AreEqual(0, s.Streak);
-            s.Add(Grade.Perfect);
+            Assert.AreEqual(1, s.Streak, "an OK neither adds to the streak nor breaks it");
+            Assert.AreEqual(55, s.Points);
             s.Add(Grade.Miss);
             Assert.AreEqual(0, s.Streak);
             Assert.AreEqual(1, s.BestStreak);
+        }
+
+        [Test]
+        public void Score_CleanRunOffTheBeat_StillScores()
+        {
+            // John's level 1 run on day 17: 27 obstacles dodged early. Was 0-50 points; now every pass counts.
+            var s = new ScoreKeeper();
+            for (int i = 0; i < 27; i++) s.Add(Grade.Ok);
+            Assert.AreEqual(135, s.Points);
+            Assert.AreEqual(0, s.BestStreak);
+        }
+
+        [Test]
+        public void Score_OkUsesTheMultiplierEarnedOnTheBeat()
+        {
+            var s = new ScoreKeeper();
+            for (int i = 0; i < 10; i++) s.Add(Grade.Good);
+            long before = s.Points;
+            s.Add(Grade.Ok);
+            Assert.AreEqual(before + 10, s.Points); // 5 x2
         }
 
         [Test]

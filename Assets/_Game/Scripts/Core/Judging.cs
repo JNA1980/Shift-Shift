@@ -8,7 +8,7 @@ namespace ShiftShift.Core
         None,    // no action was needed (e.g. a bar in another lane): no points, streak unaffected
         Perfect, // within the perfect window of the obstacle's beat
         Good,    // within the good window
-        Ok,      // passed, but the answer was outside the good window: no points, streak resets
+        Ok,      // passed, but the answer was outside the good window: a few points, streak unchanged
         Miss,    // collided: the run ends
     }
 
@@ -26,11 +26,16 @@ namespace ShiftShift.Core
         }
     }
 
-    /// <summary>Score for one run: perfects x 100 + goods x 50, times a streak multiplier (x2 at 10, x3 at 25, x4 at 50).</summary>
+    /// <summary>
+    /// Score for one run (John, day 17): every obstacle passed scores, more for passing it on the beat:
+    /// Perfect 50, Good 20, OK 5, each times the streak multiplier (x2 at 10, x3 at 25, x4 at 50).
+    /// The streak counts on-beat answers (Perfect, Good) in a row; an OK neither adds to it nor breaks it.
+    /// </summary>
     public sealed class ScoreKeeper
     {
-        public const int PerfectPoints = 100;
-        public const int GoodPoints = 50;
+        public const int PerfectPoints = 50;
+        public const int GoodPoints = 20;
+        public const int OkPoints = 5;
 
         public long Points { get; private set; }
         public int Streak { get; private set; }
@@ -50,7 +55,7 @@ namespace ShiftShift.Core
             {
                 case Grade.Perfect: Hit(PerfectPoints); Perfects++; break;
                 case Grade.Good: Hit(GoodPoints); Goods++; break;
-                case Grade.Ok: Oks++; Streak = 0; break;
+                case Grade.Ok: Oks++; Points += OkPoints * Multiplier; break; // passed off the beat: streak kept
                 case Grade.Miss: Misses++; Streak = 0; break;
             }
         }
