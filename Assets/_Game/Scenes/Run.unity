@@ -3986,6 +3986,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.GameFlow
   levels:
+  - {fileID: 4900000, guid: 8b87835cc36444d8ae54f68afd2f2249, type: 3}
   - {fileID: 4900000, guid: c9ccb154c4054a7fb0d81fe49c17aa1c, type: 3}
   - {fileID: 4900000, guid: 08c94e3244464131957020d3deef803f, type: 3}
   - {fileID: 4900000, guid: b251f4bfe8c346988af30bbb5e62b578, type: 3}
@@ -4281,8 +4282,13 @@ MonoBehaviour:
     prefab: {fileID: 5794791623636052627, guid: cefbb8d63165ab640914283a2f418f6c, type: 3}
   - type: ghost
     prefab: {fileID: 6615260983697364595, guid: 1f0ca8e43756cf74b9a91ac867958c9c, type: 3}
+  - type: ghostbar
+    prefab: {fileID: 6615260983697364595, guid: 1f0ca8e43756cf74b9a91ac867958c9c, type: 3}
+  - type: ghostwide
+    prefab: {fileID: 6615260983697364595, guid: 1f0ca8e43756cf74b9a91ac867958c9c, type: 3}
   - type: wall
     prefab: {fileID: 3923062355429472892, guid: 5acc8efc77ddb81489b45fadad274e64, type: 3}
+  ghostCorePrefab: {fileID: 1745092374250710670, guid: 26294a5e94a9f1a47ae419d7ec5e319f, type: 3}
 --- !u!4 &2036659120
 Transform:
   m_ObjectHideFlags: 0
