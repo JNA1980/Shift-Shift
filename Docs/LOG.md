@@ -573,3 +573,17 @@ Also: bend lean reduced to 1 degree per degree of turn, at most 5 (was 3 and 16)
 Added tools/shift-key-test.html: a page that lists the browser's raw Shift key events (code, repeat, shiftKey) for four short tests, to replace guesses about the Windows behaviour with facts.
 Tested: compile check; the key script simulated in Node (second Shift flagged repeat counts, true auto-repeat ignored). Not run in a browser.
 Uncertain: everything about what Windows and Chrome really send for two Shift keys until John's test page results are in. In particular, tapping one Shift while holding the other (lane change during a slide) may leave the tapped key marked down.
+
+## 2026-11-11 — D17: Web input verified; what Chrome on Windows really reports for two Shift keys
+
+John (Chrome build): "works well now"; test_track completed in the browser with jumps, phase and taps registering.
+
+Facts from tools/shift-key-test.html on his machine (Chrome, Windows):
+1. Both together: keydown ShiftRight (repeat false), keydown ShiftLeft 4 ms later with repeat TRUE, then auto-repeat of ShiftLeft, then ONE keyup (ShiftRight, shiftKey false). No keyup for ShiftLeft.
+2. Hold Left, tap Right, release Left: keydown ShiftLeft, its auto-repeats, keydown ShiftRight (repeat true), then nothing until ONE keyup (ShiftLeft, shiftKey false) when Left is released. The Right tap's release is never reported.
+4. Hold both, release Left, wait, release Right: no event at Left's release; ONE keyup (ShiftRight, shiftKey false) at the end.
+(Screenshot 3 was a copy of 2.)
+
+So: the second Shift's key-down is always flagged repeat (confirms the last fix); only the LAST Shift released produces a key-up; the first release is silent. Auto-repeat moves to the most recently pressed key.
+
+Consequence still open: tapping one Shift while holding the other (e.g. changing lane during a slide) cannot be seen as a tap in the browser: the tapped key stays marked down until the held key is released, so it is read as a hold (and both down). Proposed to John, not built: in Web builds, a second Shift pressed more than the both-window (80 ms) after the first counts as a tap straight away. Windows desktop builds are not affected.
