@@ -83,11 +83,11 @@ namespace ShiftShift.Tests
             Assert.IsFalse(bar.AllLanes);
             Assert.IsTrue(ObstacleTypes.TryGet("ghostbar", out var ghostBar));
             Assert.AreEqual(ObstacleKind.Barrier, ghostBar.Kind);
-            Assert.AreEqual(ObstacleTypes.Cores.EventLane, ghostBar.Cores);
+            Assert.AreEqual(ObstacleTypes.GhostBlocks.EventLane, ghostBar.GhostBlocks);
             Assert.IsTrue(ObstacleTypes.TryGet("ghostwide", out var ghostWide));
-            Assert.AreEqual(ObstacleTypes.Cores.OtherLanes, ghostWide.Cores);
+            Assert.AreEqual(ObstacleTypes.GhostBlocks.OtherLanes, ghostWide.GhostBlocks);
             Assert.IsTrue(ObstacleTypes.TryGet("ghost", out var ghost));
-            Assert.AreEqual(ObstacleTypes.Cores.None, ghost.Cores);
+            Assert.AreEqual(ObstacleTypes.GhostBlocks.None, ghost.GhostBlocks);
             Assert.IsTrue(ghost.AllLanes, "ghost = barrier that needs phase");
             Assert.AreEqual(ObstacleKind.Barrier, ghost.Kind);
             Assert.IsTrue(ObstacleTypes.TryGet("low", out var low));

@@ -23,8 +23,8 @@ namespace ShiftShift
         [SerializeField] private Conductor conductor;
         [SerializeField] private Runner runner;
         [SerializeField] private List<TypePrefab> prefabs = new List<TypePrefab>();
-        [Tooltip("Ghost-layer block placed inside a barrier for the ghostbar / ghostwide types (only hits while phased).")]
-        [SerializeField] private GameObject ghostCorePrefab;
+        [Tooltip("Ghost-layer block placed inside a barrier for the ghostbar / ghostwide types (only hits while phased). Called a ghost block.")]
+        [SerializeField] private GameObject ghostBlockPrefab;
 
         private void Awake()
         {
@@ -50,8 +50,8 @@ namespace ShiftShift
                 }
 
                 // Opening types are built across the whole track; their open lane's panel is hidden below.
-                bool hasCores = spec.Cores != ObstacleTypes.Cores.None;
-                float x = spec.AllLanes || spec.LaneIsOpening || hasCores ? 0f : e.RunnerLane * runner.LaneWidth;
+                bool hasGhostBlocks = spec.GhostBlocks != ObstacleTypes.GhostBlocks.None;
+                float x = spec.AllLanes || spec.LaneIsOpening || hasGhostBlocks ? 0f : e.RunnerLane * runner.LaneWidth;
                 float z = (float)(e.beat * runner.MetresPerBeat);
                 // A gap's or hurdle's beat is the take-off: place it half a jump later so jumping on the click clears it.
                 if (spec.Kind == ObstacleKind.Gap || spec.Kind == ObstacleKind.Hurdle)
@@ -59,7 +59,7 @@ namespace ShiftShift
                 // The track can bend and slope: place and turn the obstacle along it.
                 GameObject go = Instantiate(prefab, track.Point(z, x, 0f), track.Rotation(z), transform);
                 go.name = $"{e.type} b{e.beat:0.##}" + (spec.AllLanes ? "" : $" lane {e.lane}");
-                bool allLanes = spec.AllLanes || hasCores; // a barrier with cores still blocks every lane
+                bool allLanes = spec.AllLanes || hasGhostBlocks; // a barrier with ghost blocks still blocks every lane
 
                 Obstacle o = go.GetComponent<Obstacle>();
                 if (o == null) o = go.AddComponent<Obstacle>();
@@ -101,20 +101,20 @@ namespace ShiftShift
                 }
                 spawned++;
 
-                if (!hasCores) continue;
-                if (ghostCorePrefab == null)
+                if (!hasGhostBlocks) continue;
+                if (ghostBlockPrefab == null)
                 {
-                    Debug.LogError($"[Spawner] '{e.type}' needs the Ghost Core Prefab (run Shift+Shift > Set Up Visuals).", this);
+                    Debug.LogError($"[Spawner] '{e.type}' needs the Ghost Block Prefab (run Shift+Shift > Set Up Visuals).", this);
                     continue;
                 }
-                // The second layer: a solid core in the event's lane, or in the other two. Judged on their own.
+                // The second layer: a ghost block in the event's lane, or in the other two. Judged on their own.
                 for (int lane = -1; lane <= 1; lane++)
                 {
-                    bool core = spec.Cores == ObstacleTypes.Cores.EventLane ? lane == e.RunnerLane : lane != e.RunnerLane;
-                    if (!core) continue;
+                    bool ghostBlock = spec.GhostBlocks == ObstacleTypes.GhostBlocks.EventLane ? lane == e.RunnerLane : lane != e.RunnerLane;
+                    if (!ghostBlock) continue;
                     float cx = lane * runner.LaneWidth;
-                    GameObject cg = Instantiate(ghostCorePrefab, track.Point(z, cx, 0f), track.Rotation(z), transform);
-                    cg.name = $"{e.type} b{e.beat:0.##} core lane {lane + 1}";
+                    GameObject cg = Instantiate(ghostBlockPrefab, track.Point(z, cx, 0f), track.Rotation(z), transform);
+                    cg.name = $"{e.type} b{e.beat:0.##} ghost block lane {lane + 1}";
                     Obstacle co = cg.GetComponent<Obstacle>();
                     if (co == null) co = cg.AddComponent<Obstacle>();
                     co.kind = ObstacleKind.Block;

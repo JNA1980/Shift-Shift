@@ -160,6 +160,8 @@ namespace ShiftShift
             }
         }
 
+        private static readonly Color GhostBlockPink = new Color(1f, 0.71f, 0.85f); // #FFB5D9
+
         private static Color ColourFor(Role role, Palette p)
         {
             switch (role)
@@ -172,8 +174,9 @@ namespace ShiftShift
                 case Role.Sprint: return p.sprint;
                 case Role.Jump: return p.jump;
                 case Role.Phase: return p.phase;
-                // Ghost-layer cores: lighter than the barrier they sit in, so they can be seen before phasing.
-                case Role.Ghost: return Color.Lerp(p.phase, Color.white, 0.45f);
+                // Ghost blocks (inside a blue barrier): light pink on every level (John, day 17), so they stand out
+                // from the barrier before you phase. Paler than the jump pink.
+                case Role.Ghost: return GhostBlockPink;
                 case Role.Charge: return p.charge;
                 // Trees and shrubs: a dark, muted tint of the level's accent, so they never read as an action colour.
                 case Role.Scenery: return Color.Lerp(p.accent, p.roadDetail, 0.55f);
@@ -192,7 +195,7 @@ namespace ShiftShift
                 case Role.Scenery:
                     return normal;
                 case Role.Ghost:
-                    return Color.Lerp(p.phase, Color.white, 0.75f); // ghost-layer blocks: the danger while phased
+                    return Color.Lerp(GhostBlockPink, Color.white, 0.5f); // ghost blocks: the danger while phased
                 default:
                     Color d = normal * p.phaseDim;
                     d.a = normal.a;

@@ -283,7 +283,7 @@ namespace ShiftShift.EditorTools
                 e.FindPropertyRelative("prefab").objectReferenceValue = map[i].prefab;
                 if (map[i].prefab == null) Debug.LogError($"[LevelTest] No prefab for type '{map[i].type}'.");
             }
-            so.FindProperty("ghostCorePrefab").objectReferenceValue =
+            so.FindProperty("ghostBlockPrefab").objectReferenceValue =
                 AssetDatabase.LoadAssetAtPath<GameObject>($"{ObstacleDir}/GhostBlock.prefab");
             so.ApplyModifiedPropertiesWithoutUndo();
         }

@@ -346,12 +346,12 @@ namespace ShiftShift.EditorTools
                 ObstacleTypes.TryGet(e.type, out ObstacleTypes.Spec spec);
                 for (int lane = 0; lane < 3; lane++)
                 {
-                    // Barrier with cores: the barrier fills the beat; the core lanes are drawn lighter.
-                    bool cores = spec.Cores != ObstacleTypes.Cores.None;
-                    bool core = cores && (spec.Cores == ObstacleTypes.Cores.EventLane ? lane == e.lane : lane != e.lane);
-                    bool covered = spec.AllLanes || cores || (spec.LaneIsOpening ? lane != e.lane : lane == e.lane);
+                    // Barrier with ghost blocks: the barrier fills the beat; the ghost blocks' lanes are drawn light pink.
+                    bool ghostBlocks = spec.GhostBlocks != ObstacleTypes.GhostBlocks.None;
+                    bool ghostBlock = ghostBlocks && (spec.GhostBlocks == ObstacleTypes.GhostBlocks.EventLane ? lane == e.lane : lane != e.lane);
+                    bool covered = spec.AllLanes || ghostBlocks || (spec.LaneIsOpening ? lane != e.lane : lane == e.lane);
                     var cell = new Rect(x, lanes.y + lane * LaneH + 3, w, LaneH - 7);
-                    if (covered) EditorGUI.DrawRect(cell, e == _dragging ? Color.white : core ? new Color(0.7f, 0.8f, 1f) : c);
+                    if (covered) EditorGUI.DrawRect(cell, e == _dragging ? Color.white : ghostBlock ? new Color(1f, 0.71f, 0.85f) : c);
                     else if (spec.LaneIsOpening) EditorGUI.DrawRect(new Rect(cell.x, cell.y + cell.height * 0.45f, cell.width, 2), c);
                 }
                 GUI.Label(new Rect(x, lanes.y + (spec.AllLanes || spec.LaneIsOpening ? 0 : e.lane * LaneH), 60, 16),

@@ -124,19 +124,19 @@ Track: left bend 16, right bend 32, bridge 48, hill 64, dip 84, tunnel 102, S-be
 | Type | What is spawned | Answer |
 |---|---|---|
 | ghost | Blue barrier across all lanes | Phase (hold both) |
-| ghostbar | Barrier, plus a light solid core in the event's lane | Phase, and do not be in that lane |
-| ghostwide | Barrier, plus cores in the other two lanes | Phase, in the event's lane |
+| ghostbar | Barrier, plus a light pink ghost block in the event's lane | Phase, and do not be in that lane |
+| ghostwide | Barrier, plus ghost blocks in the other two lanes | Phase, in the event's lane |
 
-Cores are ghost-layer blocks: they only hit a phased runner, and you have to be phased at the barrier, so a core in your lane always hits. You cannot change lane while holding both keys, so the move comes first, then the hold.
+Ghost blocks only hit a phased runner, and you have to be phased at the barrier, so a ghost block in your lane always hits. They are light pink on every level. You cannot change lane while holding both keys, so the move comes first, then the hold.
 
 ## Level 4, "Ghost layer" (first draft, day 17)
 
-`level04.json`: 125 BPM, 160 beats (77 s), night palette. New: phase (hold both through the blue barrier), then the second layer (cores). Combines everything so far. Placeholder audio: `click_125`.
+`level04.json`: 125 BPM, 160 beats (77 s), night palette. New: phase (hold both through the blue barrier), then the second layer (ghost blocks). Combines everything so far. Placeholder audio: `click_125`.
 
 | Beats | What happens |
 |---|---|
 | 8-36 | Phase only, every 4 beats; twice, two barriers one beat apart (keep holding) |
-| 40-68 | Cores: first one you are already clear of, then ones that make you change lane before phasing |
+| 40-68 | Ghost blocks: first one you are already clear of, then ones that make you change lane before phasing |
 | 72-100 | Mixed with slide, jump, a sprint gate and a hurdle, 4 beats apart |
 | 101-111 | Breather, inside the tunnel |
 | 112-152 | Something every 2 beats; a lane change plus phase always gets 4 beats |

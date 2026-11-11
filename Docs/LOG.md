@@ -651,3 +651,10 @@ Level 4 "Ghost layer" drafted: Assets/_Game/Levels/level04.json (Docs/LEVELS.md)
 
 Tested: 137 Core tests (new: type specs, chart placement of a barrier with cores). Level validates, strict check clean, scripted walk over every lane the player could be in (gate lanes certain, at most two taps, a lane change before a phase always has 4 beats), round-trips. Compile check passes. Not played.
 Uncertain: how a light core reads inside the 65%-solid barrier, in the night palette, before and during phase; each core scoring as its own obstacle (extra points per barrier); difficulty.
+
+## 2026-11-11 — D17: "ghost block", light pink
+
+John asked what "cores" were; chose the name "ghost block" and light pink for them.
+Done: renamed in code (ObstacleTypes.GhostBlocks, spawner field ghostBlockPrefab), comments, chart editor and Docs/LEVELS.md. Ghost blocks are light pink (#FFB5D9) on every level, not palette-driven; brighter (half-way to white) while phased; the chart editor draws their lanes in the same pink.
+Flagged to John: pink is the jump colour (hurdle, gap rims) under the "colour = what you press" rule; the ghost block is a paler pink inside a blue wall. To watch when playing.
+Tested: compile check, 137 Core tests. Not run in Unity. The spawner's prefab field was renamed, so Set Up Visuals must be run before level 4 plays.

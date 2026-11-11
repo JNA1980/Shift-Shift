@@ -58,7 +58,7 @@ namespace ShiftShift.Core
         public int lane;
         /// <summary>
         /// bar | wide | low | gate | gap | hurdle | ghost | ghostbar | ghostwide | wall.
-        /// For wide, gate and ghostwide, lane = the free lane. For ghostbar, lane = the lane with the solid core.
+        /// For wide, gate and ghostwide, lane = the free lane. For ghostbar, lane = the lane with the ghost block.
         /// </summary>
         public string type;
 
@@ -69,8 +69,8 @@ namespace ShiftShift.Core
     /// <summary>How a chart "type" maps to obstacle rules. One place to change if the meaning of a type changes.</summary>
     public static class ObstacleTypes
     {
-        /// <summary>Solid cores inside a phase barrier (the ghost layer, level 4): they only hit while phased.</summary>
-        public enum Cores { None, EventLane, OtherLanes }
+        /// <summary>Ghost blocks inside a phase barrier (the ghost layer, level 4): they only hit while phased.</summary>
+        public enum GhostBlocks { None, EventLane, OtherLanes }
 
         public readonly struct Spec
         {
@@ -80,15 +80,15 @@ namespace ShiftShift.Core
             /// <summary>Blocks every lane except the event's lane (gate opening, wide bar's free lane).</summary>
             public readonly bool LaneIsOpening;
             /// <summary>
-            /// A barrier across all lanes with ghost-layer cores: in the event's lane, or in the other two.
-            /// The player must phase AND not be in a core's lane.
+            /// A barrier across all lanes with ghost blocks: in the event's lane, or in the other two.
+            /// The player must phase AND not be in a ghost block's lane.
             /// </summary>
-            public readonly Cores Cores;
+            public readonly GhostBlocks GhostBlocks;
 
             public Spec(ObstacleKind kind, ObstacleLayer layer, bool allLanes, bool laneIsOpening = false,
-                Cores cores = Cores.None)
+                GhostBlocks ghostBlocks = GhostBlocks.None)
             {
-                Cores = cores;
+                GhostBlocks = ghostBlocks;
                 Kind = kind;
                 Layer = layer;
                 AllLanes = allLanes;
@@ -108,8 +108,8 @@ namespace ShiftShift.Core
             { "ghost", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, true) },
             // Two overlapping layers (plan, level 4). The barrier is spawned across all lanes; "allLanes" is false
             // here only so the chart keeps the event's lane.
-            { "ghostbar", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, false, false, Cores.EventLane) },   // phase, but not in this lane
-            { "ghostwide", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, false, false, Cores.OtherLanes) }, // phase in this lane
+            { "ghostbar", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, false, false, GhostBlocks.EventLane) },   // phase, but not in this lane
+            { "ghostwide", new Spec(ObstacleKind.Barrier, ObstacleLayer.Solid, false, false, GhostBlocks.OtherLanes) }, // phase in this lane
             { "wall", new Spec(ObstacleKind.Wall, ObstacleLayer.Solid, true) },  // charge
         };
 
