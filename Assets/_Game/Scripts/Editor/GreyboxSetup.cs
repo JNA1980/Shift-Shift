@@ -90,8 +90,13 @@ namespace ShiftShift.EditorTools
             k.Barrier = ObstaclePrefab("PhaseBarrier", ObstacleKind.Barrier, ObstacleLayer.Solid, true, 0.3f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.3f), "Barrier"));
 
-            k.GapMarker = ObstaclePrefab("GapMarker", ObstacleKind.Gap, ObstacleLayer.Solid, true, 2.5f,
-                go => Box(go, "Hole", new Vector3(0, 0.01f, 0), new Vector3(TrackWidth, 0.02f, 2.5f), "Hole"));
+            // Hole sits just above the lane lines (y 0-0.02) to avoid z-fighting; pink (jump) rims mark its edges.
+            k.GapMarker = ObstaclePrefab("GapMarker", ObstacleKind.Gap, ObstacleLayer.Solid, true, 2.5f, go =>
+            {
+                Box(go, "Hole", new Vector3(0, 0.03f, 0), new Vector3(TrackWidth, 0.02f, 2.5f), "Hole");
+                Box(go, "RimFront", new Vector3(0, 0.05f, -1.25f), new Vector3(TrackWidth, 0.03f, 0.15f), "Hurdle");
+                Box(go, "RimBack", new Vector3(0, 0.05f, 1.25f), new Vector3(TrackWidth, 0.03f, 0.15f), "Hurdle");
+            });
 
             // Day 13 (John): gate with a one-lane opening, wide bar with one free lane, short pink hurdle.
             // Opening types have one panel per lane (Panel0/1/2 = chart lanes left/middle/right); the spawner hides

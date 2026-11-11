@@ -41,6 +41,7 @@ namespace ShiftShift.EditorTools
             List<Palette> palettes = EnsurePalettes(log);
             EnsureAssets();                 // materials (incl. TrackLines) and prefabs exist
             AddTrackLines(log);
+            AddGapRims(log);
 
             foreach (string scenePath in new[] { RunScenePath, LevelScenePath, ScenePath })
             {
@@ -112,6 +113,33 @@ namespace ShiftShift.EditorTools
                 }
                 PrefabUtility.UnloadPrefabContents(root);
             }
+        }
+
+        /// <summary>Pink (jump colour) rims on the existing GapMarker prefab, and the hole lifted above the lane lines.</summary>
+        private static void AddGapRims(List<string> log)
+        {
+            string path = $"{ObstacleDir}/GapMarker.prefab";
+            if (!File.Exists(path)) return;
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            bool changed = false;
+            Transform hole = root.transform.Find("Hole");
+            if (hole != null && hole.localPosition.y < 0.025f)
+            {
+                hole.localPosition = new Vector3(0, 0.03f, 0);
+                changed = true;
+            }
+            if (root.transform.Find("RimFront") == null)
+            {
+                Box(root, "RimFront", new Vector3(0, 0.05f, -1.25f), new Vector3(TrackWidth, 0.03f, 0.15f), "Hurdle");
+                Box(root, "RimBack", new Vector3(0, 0.05f, 1.25f), new Vector3(TrackWidth, 0.03f, 0.15f), "Hurdle");
+                changed = true;
+            }
+            if (changed)
+            {
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+                log.Add("GapMarker: hole lifted above the lane lines, pink rims added");
+            }
+            PrefabUtility.UnloadPrefabContents(root);
         }
 
         private static void WireScene(UnityEngine.SceneManagement.Scene scene, List<Palette> palettes, List<string> log)

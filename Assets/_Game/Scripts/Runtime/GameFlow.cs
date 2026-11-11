@@ -177,21 +177,33 @@ namespace ShiftShift
 
                 case Phase.CountIn:
                 {
+                    // Last bar counts down 4-3-2-1; any earlier count-in beats show "Get ready" (John, day 17: two
+                    // bars of 1-2-3-4 read as counting twice).
                     double beat = conductor.CurrentBeat;
                     if (beat >= -conductor.CountInBeats)
                     {
-                        int whole = (int)System.Math.Floor(beat);
+                        int whole = (int)System.Math.Floor(beat);   // -8 .. -1
                         float frac = (float)(beat - whole);
-                        int count = ((whole % 4) + 4) % 4 + 1;
-                        int size = Mathf.RoundToInt(90 + 70 * (1f - frac)); // pulse on each beat
+                        int pulse = Mathf.RoundToInt(70 * (1f - frac)); // pulse on each beat
+                        string text = whole >= -4 ? (-whole).ToString() : "Get ready";
+                        int size = (whole >= -4 ? 90 : 50) + pulse;
                         var style = new GUIStyle(_big) { fontSize = size };
-                        GUI.Label(new Rect(0, h * 0.3f, w, 200), count.ToString(), style);
+                        GUI.Label(new Rect(0, h * 0.3f, w, 200), text, style);
                     }
                     DrawScore(w);
                     break;
                 }
 
                 case Phase.Playing:
+                    if (conductor.CurrentBeat < 1.0)
+                    {
+                        float fade = 1f - (float)conductor.CurrentBeat;   // "GO" for the first beat
+                        var go = new GUIStyle(_big) { fontSize = 140 };
+                        Color old = GUI.color;
+                        GUI.color = new Color(1f, 1f, 1f, fade);
+                        GUI.Label(new Rect(0, h * 0.3f, w, 200), "GO", go);
+                        GUI.color = old;
+                    }
                     DrawScore(w);
                     break;
 

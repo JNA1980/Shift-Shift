@@ -373,3 +373,10 @@
 - To keep every obstacle below eye level (the palette decision relies on it), both gate prefabs lowered from 3.5-3.7 m to 3.2 m (prefab files and the tool). Tunnel ceiling now passes overhead.
 - Per-assembly compile check passes. Not yet seen in Unity.
 - Note: a jump raises the camera by half the jump height (0.75 m); inside a tunnel it would clip the ceiling. Avoid gaps/hurdles in tunnels.
+
+## 2026-11-11 — D17: tunnel question, count-in, gap flicker (John)
+
+- "Tunnel gone": the Run scene's track has always been straight pieces only (tunnel exists in the Greybox track). Per-level track pieces come with playbook 2.3 (modular kit). Flagged, not built: automatic tunnel around low bars.
+- Count-in read as "counting twice" (two bars of 1-2-3-4). Now: first bar "Get ready" with a pulse per beat, last bar 4-3-2-1, "GO" fading over beat 0.
+- Gap "fidgety": z-fighting. The gap's black patch and the new lane lines were at the same height (0-0.02 m). Patch lifted to 0.02-0.04 m and pink (jump colour) rims added at its front and back edges. GapMarker prefab file edited for the height; rims are added by Shift+Shift > Set Up Visuals (re-runnable) and by the tool for new projects.
+- Per-assembly compile check passes. Not yet seen in Unity.
