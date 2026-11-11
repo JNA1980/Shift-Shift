@@ -42,6 +42,8 @@ namespace ShiftShift.EditorTools
             EnsureAssets();                 // materials (incl. TrackLines) and prefabs exist
             AddTrackLines(log);
             AddGapRims(log);
+            AddGlowEdges(log);       // step 2: glowing obstacle edges
+            EnableBloomInProfile(log);
 
             foreach (string scenePath in new[] { RunScenePath, LevelScenePath, ScenePath })
             {
@@ -50,6 +52,7 @@ namespace ShiftShift.EditorTools
                 // Load assets AFTER opening the scene (NewScene/OpenScene can unload earlier references).
                 palettes = LoadPalettes();
                 EnsureAssets();
+                CreateGlowMaterials();
                 WireScene(scene, palettes, log);
             }
             if (File.Exists(RunScenePath)) EditorSceneManager.OpenScene(RunScenePath, OpenSceneMode.Single);
@@ -169,15 +172,20 @@ namespace ShiftShift.EditorTools
                 ("Hurdle", PaletteApplier.Role.Jump), ("Barrier", PaletteApplier.Role.Phase),
                 ("Ghost", PaletteApplier.Role.Phase), ("Wall", PaletteApplier.Role.Charge), ("Hole", PaletteApplier.Role.Hole),
             };
+            var all = new List<(Material mat, PaletteApplier.Role role, bool glow)>();
+            foreach (var r in roles) all.Add((Mats[r.mat], r.role, false));
+            all.AddRange(GlowRoles());
             SerializedProperty rp = so.FindProperty("roles");
-            rp.arraySize = roles.Length;
-            for (int i = 0; i < roles.Length; i++)
+            rp.arraySize = all.Count;
+            for (int i = 0; i < all.Count; i++)
             {
                 SerializedProperty e = rp.GetArrayElementAtIndex(i);
-                e.FindPropertyRelative("material").objectReferenceValue = Mats[roles[i].mat];
-                e.FindPropertyRelative("role").enumValueIndex = (int)roles[i].role;
+                e.FindPropertyRelative("material").objectReferenceValue = all[i].mat;
+                e.FindPropertyRelative("role").enumValueIndex = (int)all[i].role;
+                e.FindPropertyRelative("glow").boolValue = all[i].glow;
             }
             so.ApplyModifiedPropertiesWithoutUndo();
+            WirePostProcessing(Camera.main, log, Path.GetFileNameWithoutExtension(scene.path));
 
             // Fog on in the scene's own lighting settings, so the fog shader variants are kept in builds.
             RenderSettings.fog = true;

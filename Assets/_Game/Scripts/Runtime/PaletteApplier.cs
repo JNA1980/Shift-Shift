@@ -18,6 +18,8 @@ namespace ShiftShift
         {
             public Material material;
             public Role role;
+            [Tooltip("Glow material (edge strips): also sets its emission to the role colour x the palette's glow.")]
+            public bool glow;
         }
 
         [Tooltip("Optional: takes the palette name from the playing level.")]
@@ -72,8 +74,13 @@ namespace ShiftShift
             RenderSettings.fogEndDistance = fogEnd;
 
             var map = new Dictionary<Material, Role>();
+            var glows = new HashSet<Material>();
             foreach (MaterialRole r in roles)
-                if (r.material != null) map[r.material] = r.role;
+            {
+                if (r.material == null) continue;
+                map[r.material] = r.role;
+                if (r.glow) glows.Add(r.material);
+            }
 
             var copies = new Dictionary<Material, Material>();
             int recoloured = 0;
@@ -91,6 +98,9 @@ namespace ShiftShift
                         Color c = ColourFor(role, p);
                         copy.color = c;
                         if (copy.HasProperty("_BaseColor")) copy.SetColor("_BaseColor", c);
+                        // The _EMISSION keyword is already on in the glow material asset (so builds keep the variant).
+                        if (glows.Contains(m) && copy.HasProperty("_EmissionColor"))
+                            copy.SetColor("_EmissionColor", c * p.glowIntensity);
                         copies[m] = copy;
                     }
                     mats[i] = copy;

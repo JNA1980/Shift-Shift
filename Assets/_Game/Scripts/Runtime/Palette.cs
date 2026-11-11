@@ -25,6 +25,10 @@ namespace ShiftShift
         public Color phase = new Color(0.055f, 0.475f, 0.945f);   // barrier, ghost-layer blocks
         public Color charge = new Color(0.949f, 0.118f, 0.239f);  // wall
 
+        [Header("Glow (playbook 2.2 step 2)")]
+        [Tooltip("Emission strength of the obstacles' glowing edges; bloom picks it up. Lower it on light skies if it washes out.")]
+        [Range(0f, 6f)] public float glowIntensity = 1.5f;
+
         public static double Contrast(Color a, Color b) => ColorContrast.Ratio(a.r, a.g, a.b, b.r, b.g, b.b);
 
         private void OnValidate()

@@ -381,3 +381,17 @@
 - Gap "fidgety": z-fighting. The gap's black patch and the new lane lines were at the same height (0-0.02 m). Patch lifted to 0.02-0.04 m and pink (jump colour) rims added at its front and back edges. GapMarker prefab file edited for the height; rims are added by Shift+Shift > Set Up Visuals (re-runnable) and by the tool for new projects.
 - Per-assembly compile check passes. Not yet seen in Unity.
 - Gap rims and the new count-in confirmed in the editor (John: "all good"). "Get ready" pulsed on each beat and read as appearing 4 times: now it stays steady with four dots lighting one per beat; 4-3-2-1 still pulse.
+
+## 2026-11-11 — D17: glowing edges and bloom (playbook 2.2 step 2)
+
+**Done**
+- Six glow materials (LaneGlow … ChargeGlow), emission keyword on in the assets so Web builds keep the emission shader variant.
+- Shift+Shift > Set Up Visuals now also: adds a thin glowing top-edge strip to every obstacle block (all obstacle prefabs; slightly wider than the block so no faces coincide), makes the gap rims glow, turns bloom on in PostProcessProfile (0.8 / threshold 0.9 / scatter 0.7, only if still 0), adds a global Volume and enables camera post-processing in Run, LevelTest and Greybox.
+- Palette: Glow Intensity (default 1.5) per palette; PaletteApplier sets glow copies' emission = action colour x glow.
+
+**Tested**
+- Per-assembly compile check passes (stand-ins extended with Volume, Bloom, camera data, emission).
+
+**Uncertain / not yet run**
+- The look in Unity. The Web build uses the Mobile URP asset: if HDR is off there, glow is capped and bloom weaker than in the editor. Check in a Web build.
+- Bloom on the light skies (dawn, overcast): threshold 0.9 should keep the pale sky from glowing; verify.
