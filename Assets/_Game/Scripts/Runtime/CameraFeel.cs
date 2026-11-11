@@ -23,6 +23,10 @@ namespace ShiftShift
                  "back to the earlier angle). Try 0.3 if obstacles on rises bother you.")]
         [Range(0f, 2f)] public float slopeLiftAmount = 0f;
 
+        [Tooltip("The camera drops by this much inside a tunnel (John, day 17: at 3.3 m it sat right under the 3.5 m " +
+                 "ceiling). Gate tops (3.1 m) are then above the camera while in the tunnel.")]
+        [Range(0f, 1.5f)] public float tunnelDrop = 0.5f;
+
         [Header("Field of view")]
         public float baseFov = 60f;
         public float sprintFov = 72f;

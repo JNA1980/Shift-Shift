@@ -129,7 +129,7 @@ namespace ShiftShift.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private const float BarrierAlpha = 0.5f; // John, day 17: 0.3 was a little too see-through
+        private const float BarrierAlpha = 0.65f; // John, day 17: 0.3, then 0.5, were too see-through
 
         /// <summary>The phase barrier becomes a see-through panel in a bright frame: you can see the road go on behind it.</summary>
         private static void MakeBarrierSeeThrough(List<string> log)
@@ -171,10 +171,12 @@ namespace ShiftShift.EditorTools
         /// <summary>Brick pattern (generated here, grey on white) on the charge wall; the palette's red tints it.</summary>
         private static void MakeWallBrick(List<string> log)
         {
-            if (!System.IO.File.Exists(BrickPath))
+            // 256 x 128 with smooth filtering (John, day 17: the first 64 x 32 version shimmered as the wall came closer).
+            const int w = 256, h = 128, mortar = 8;
+            var current = AssetDatabase.LoadAssetAtPath<Texture2D>(BrickPath);
+            if (current == null || current.width != w)
             {
                 // One tile = one brick wide, two rows high, the second row shifted half a brick.
-                const int w = 64, h = 32, mortar = 2;
                 var tex = new Texture2D(w, h, TextureFormat.RGB24, false);
                 var brick = new Color(1f, 1f, 1f);
                 var joint = new Color(0.35f, 0.35f, 0.35f);
@@ -189,7 +191,16 @@ namespace ShiftShift.EditorTools
                 System.IO.File.WriteAllBytes(BrickPath, tex.EncodeToPNG());
                 Object.DestroyImmediate(tex);
                 AssetDatabase.ImportAsset(BrickPath);
-                log.Add($"Generated {BrickPath}");
+                log.Add($"Generated {BrickPath} ({w} x {h})");
+            }
+            if (AssetImporter.GetAtPath(BrickPath) is TextureImporter importer &&
+                (importer.filterMode != FilterMode.Trilinear || importer.anisoLevel != 8 || !importer.mipmapEnabled))
+            {
+                importer.mipmapEnabled = true;
+                importer.filterMode = FilterMode.Trilinear;
+                importer.anisoLevel = 8;
+                importer.SaveAndReimport();
+                log.Add("Brick texture: smooth filtering (mipmaps, trilinear, anisotropic 8)");
             }
             var brickTex = AssetDatabase.LoadAssetAtPath<Texture2D>(BrickPath);
             Material m = Mats["Wall"];

@@ -480,3 +480,12 @@ Done:
 
 Tested: compile check, 133 Core tests. Not run in Unity. Unverified: ground meeting the road edge, the scenery mix by eye, frame rate in WebGL with the extra objects.
 Unused now: BackdropBlock prefab.
+
+## 2026-11-11 — D17: scenery third pass
+
+John after playing: posts look planted; buildings varied but not realistic (asked if cosmetics come later); barrier to 65%; red wall "kinda jittery"; camera should lower slightly under the first bridge (read as: the tunnel, the first structure passed under; the pillars archway is fine).
+
+Done: barrier 65% solid. Brick texture regenerated at 256 x 128 with mipmaps, trilinear and anisotropic 8 (guess at the cause: shimmer from thin high-contrast joints). Camera drops CameraFeel.tunnelDrop (0.5 m) while camera or runner is in a tunnel.
+Tested: compile check only. Not run in Unity.
+Uncertain: whether the jitter was texture shimmer at all (could be the edge strip against the wall face); whether "first bridge" meant the tunnel. In a tunnel the camera (2.8 m) is now below gate tops (3.1 m).
+Flagged, not built: realistic buildings and trees would need imported 3D models (not in SCOPE.md; the plan's art direction is abstract shapes).
