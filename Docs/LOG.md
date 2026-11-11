@@ -514,3 +514,11 @@ Done (TrackBuilder scenery placement rewritten; posts unchanged):
 
 Tested: compile check, 133 Core tests. Not run in Unity.
 Uncertain: wall colour against the ground (#333 on #2A2A2A may be too close); walls on bends; object count (about 20 buildings and 200 plants on the test level) in WebGL.
+
+## 2026-11-11 — D17: plot walls second pass
+
+John: plots look good. Walls only along the road, not around the plot; lit top edge; closed gates instead of openings; no marker posts in front of gates.
+
+Done (TrackBuilder): back and end walls removed. Each plot's road-side wall has a lit strip on top (line material), a closed gate in the middle (4 m, thinner, ground-dark, lit bar on top) between two gate posts 0.5 m taller than the wall, and closed ends. Marker posts are skipped within 3.5 m of a gate's centre.
+Tested: compile check only. Not run in Unity.
+Uncertain: the lit wall edges run parallel to the road's edge lines 4 m away; they may compete with the lane lines for attention. Both use the same line material, so shared-face seams between wall and end faces rely on RecalculateNormals (possible soft shading at wall ends).

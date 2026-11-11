@@ -185,7 +185,7 @@ namespace ShiftShift
             if (roadsidePrefab != null)
                 for (double s = _path.Start; s <= _path.End; s += roadsideEveryMetres)
                 {
-                    if (InTunnel(s) || OnBridge(s)) continue; // bridges have rails instead
+                    if (InTunnel(s) || OnBridge(s) || AtGate(s)) continue; // bridges have rails; gates stay clear
                     foreach (float side in new[] { -roadsideOffset, roadsideOffset })
                     {
                         Instantiate(roadsidePrefab, Point(s, side, 0f), Rotation(s), transform).name = $"Post @{s:0}m";
@@ -248,24 +248,53 @@ namespace ShiftShift
         }
 
         /// <summary>
-        /// Low compound wall around one plot: front (with a gateway in the middle) and back follow the road, the two
-        /// ends run straight out from it. One mesh per plot.
+        /// Compound wall along the road side of one plot (John, day 17: not around it), with a lit top edge and a
+        /// closed gate in the middle between two taller gate posts.
         /// </summary>
         private void BuildPlotWall(double s0, double s1, float side)
         {
-            var v = new List<Vector3>();
-            var tri = new List<int>();
             double mid = (s0 + s1) * 0.5;
-            const double gate = 2.0; // half the gateway's width
-            WallAlong(v, tri, s0, mid - gate, side * plotFront);
-            WallAlong(v, tri, mid + gate, s1, side * plotFront);
-            WallAlong(v, tri, s0, s1, side * plotBack);
-            WallAcross(v, tri, s0, side);
-            WallAcross(v, tri, s1, side);
-            AddMesh($"Plot wall @{s0:0}m", v, tri, wallMaterial);
+            float x = side * plotFront, h = plotWallHeight;
+            const double gate = GateHalfWidth, post = 0.5;
+            const float t = 0.2f, lit = 0.06f;
+
+            var wall = new List<Vector3>(); var wallTri = new List<int>();
+            var cap = new List<Vector3>(); var capTri = new List<int>();
+            var door = new List<Vector3>(); var doorTri = new List<int>();
+
+            // Wall either side of the gate, gate posts 0.5 m taller, each with a lit strip on top.
+            WallAlong(wall, wallTri, s0, mid - gate - post, x, t, -0.1f, h);
+            WallAlong(wall, wallTri, mid + gate + post, s1, x, t, -0.1f, h);
+            WallAlong(cap, capTri, s0, mid - gate - post, x, t + 0.03f, h, h + lit);
+            WallAlong(cap, capTri, mid + gate + post, s1, x, t + 0.03f, h, h + lit);
+            foreach (double at in new[] { mid - gate - post, mid + gate })
+            {
+                WallAlong(wall, wallTri, at, at + post, x, t + 0.08f, -0.1f, h + 0.5f);
+                WallAlong(cap, capTri, at, at + post, x, t + 0.11f, h + 0.5f, h + 0.5f + lit);
+            }
+            // The gate itself: closed, thinner and darker than the wall, with a lit bar across the top.
+            WallAlong(door, doorTri, mid - gate, mid + gate, x, 0.07f, 0.05f, h + 0.2f);
+            WallAlong(cap, capTri, mid - gate, mid + gate, x, 0.09f, h + 0.2f, h + 0.2f + lit);
+
+            AddMesh($"Plot wall @{s0:0}m", wall, wallTri, wallMaterial);
+            AddMesh($"Plot wall edge @{s0:0}m", cap, capTri, lineMaterial);
+            AddMesh($"Plot gate @{s0:0}m", door, doorTri, groundMaterial != null ? groundMaterial : wallMaterial);
         }
 
-        private void WallAlong(List<Vector3> v, List<int> tri, double sA, double sB, float sideways)
+        private const double GateHalfWidth = 2.0;
+
+        /// <summary>True where a plot's gate faces the road (no marker post there).</summary>
+        private bool AtGate(double s)
+        {
+            double pitch = plotMetres + plotGapMetres;
+            double along = (s - (_path.Start + 2)) % pitch;
+            if (along < 0) along += pitch;
+            return wallMaterial != null && Math.Abs(along - plotMetres * 0.5) < GateHalfWidth + 1.5;
+        }
+
+        /// <summary>A wall section along the road at a sideways offset: both faces and the top, between two heights.</summary>
+        private void WallAlong(List<Vector3> v, List<int> tri, double sA, double sB, float sideways,
+            float halfThickness, float low, float high)
         {
             int rings = Mathf.Max(2, Mathf.CeilToInt((float)(sB - sA) / ringMetres) + 1);
             var centre = new Vector3[rings];
@@ -276,27 +305,24 @@ namespace ShiftShift
                 centre[i] = Point(s, sideways, 0f);
                 across[i] = Point(s, sideways + 1f, 0f) - centre[i];
             }
-            WallBox(v, tri, centre, across);
-        }
-
-        private void WallAcross(List<Vector3> v, List<int> tri, double s, float side)
-        {
-            var centre = new[] { Point(s, side * plotFront, 0f), Point(s, side * plotBack, 0f) };
-            Vector3 along = Point(s + 0.5, side * plotFront, 0f) - Point(s - 0.5, side * plotFront, 0f);
-            WallBox(v, tri, centre, new[] { along, along });
-        }
-
-        /// <summary>Two faces and a top along a line of points; drawn from both sides, so the winding cannot be wrong.</summary>
-        private void WallBox(List<Vector3> v, List<int> tri, Vector3[] centre, Vector3[] across)
-        {
-            const float t = 0.2f, low = -0.1f; // half thickness; starts just under the ground
-            float h = plotWallHeight;
-            Strip(v, tri, centre, across, -t, low, -t, h);
-            Strip(v, tri, centre, across, -t, h, -t, low);
-            Strip(v, tri, centre, across, t, low, t, h);
-            Strip(v, tri, centre, across, t, h, t, low);
-            Strip(v, tri, centre, across, -t, h, t, h);
-            Strip(v, tri, centre, across, t, h, -t, h);
+            // Drawn from both sides, so the winding cannot be wrong.
+            float t = halfThickness;
+            Strip(v, tri, centre, across, -t, low, -t, high);
+            Strip(v, tri, centre, across, -t, high, -t, low);
+            Strip(v, tri, centre, across, t, low, t, high);
+            Strip(v, tri, centre, across, t, high, t, low);
+            Strip(v, tri, centre, across, -t, high, t, high);
+            Strip(v, tri, centre, across, t, high, -t, high);
+            // Close both ends (the camera looks along the walls, so open ends would show).
+            foreach (int i in new[] { 0, rings - 1 })
+            {
+                int n = v.Count;
+                v.Add(centre[i] + across[i] * -t + Vector3.up * low);
+                v.Add(centre[i] + across[i] * -t + Vector3.up * high);
+                v.Add(centre[i] + across[i] * t + Vector3.up * high);
+                v.Add(centre[i] + across[i] * t + Vector3.up * low);
+                foreach (int k in new[] { 0, 1, 2, 0, 2, 3, 0, 2, 1, 0, 3, 2 }) tri.Add(n + k);
+            }
         }
 
         private void Clear()
