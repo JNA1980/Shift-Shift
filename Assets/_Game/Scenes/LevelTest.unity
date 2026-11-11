@@ -4007,7 +4007,7 @@ MonoBehaviour:
     prefab: {fileID: 6615260983697364595, guid: 1f0ca8e43756cf74b9a91ac867958c9c, type: 3}
   - type: wall
     prefab: {fileID: 3923062355429472892, guid: 5acc8efc77ddb81489b45fadad274e64, type: 3}
-  ghostCorePrefab: {fileID: 1745092374250710670, guid: 26294a5e94a9f1a47ae419d7ec5e319f, type: 3}
+  ghostBlockPrefab: {fileID: 1745092374250710670, guid: 26294a5e94a9f1a47ae419d7ec5e319f, type: 3}
 --- !u!4 &1762773143
 Transform:
   m_ObjectHideFlags: 0
