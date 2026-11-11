@@ -46,3 +46,16 @@ All times are **song time** in seconds from `ShiftInput.Clock` (`IClock`). Until
 3. ~~Eighth-note charges~~: no longer applies (charge has no beat requirement since day 13).
 4. Key timestamps are frame-quantised (~16 ms at 60 fps), and dspTime moves in audio-buffer steps.
    Measure on day 13.
+
+## Web builds: two Shift keys in the browser (day 17)
+
+Measured on John's machine (Chrome, Windows) with `tools/shift-key-test.html`:
+- The second Shift's key-down is flagged "repeat" even on its first press.
+- Only the last Shift released produces a key-up. The first release is silent.
+
+So in Web builds ShiftInput reads the keys from the browser itself (`Assets/Plugins/WebGL/ShiftKeys.jslib`, `ShiftKeys.cs`) with these rules:
+- A key-up with no Shift left down clears both keys.
+- A repeat is ignored only when that same key is already marked down.
+- A Shift pressed while the other has been held longer than the both-window (80 ms) counts as a tap at once, because its release cannot be seen.
+
+What a Web build therefore cannot do: start a second hold while the first is still held (e.g. sprint without letting go of a slide), or notice that one of two held keys was let go before the other. Jump and phase are not affected (their presses land together). Windows desktop builds and the editor use the Input System and have neither limit.

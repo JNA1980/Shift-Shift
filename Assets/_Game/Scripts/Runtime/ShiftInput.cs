@@ -86,8 +86,8 @@ namespace ShiftShift
                 // Web build: the browser's own view of the keys (see ShiftKeys: Unity's can stick on Windows).
                 ShiftKeys.Read(out bool leftDown, out bool rightDown, out bool leftHit, out bool rightHit,
                     out bool leftAgain, out bool rightAgain);
-                Poll(leftDown, leftHit, leftAgain, Side.Left, now);
-                Poll(rightDown, rightHit, rightAgain, Side.Right, now);
+                Poll(leftDown, leftHit, leftAgain, Side.Left, Side.Right, now);
+                Poll(rightDown, rightHit, rightAgain, Side.Right, Side.Left, now);
             }
             else
             {
@@ -101,11 +101,39 @@ namespace ShiftShift
             _classifier.Update(now);
         }
 
-        private void Poll(bool down, bool hit, bool again, Side side, double now)
+        // Web build only. Index 0 = left, 1 = right.
+        private readonly double[] _downAt = new double[2];
+        private readonly bool[] _countedAsTap = new bool[2];
+
+        private void Poll(bool down, bool hit, bool again, Side side, Side other, double now)
         {
-            // Pressed while we still had it down: the browser never told us it was let go. Let it go now.
-            if (again && _classifier.IsDown(side)) _classifier.Release(side, now);
-            if (hit && !_classifier.IsDown(side)) _classifier.Press(side, now);
+            int i = side == Side.Left ? 0 : 1, o = 1 - i;
+            if (!down) _countedAsTap[i] = false;
+
+            if (hit)
+            {
+                // A Shift pressed while the other has been held for longer than the both-window: the browser will
+                // not report its release until BOTH are up (measured on John's machine, day 17: Docs/LOG.md), so
+                // it cannot be told from a hold. Count it as a tap now (lane change during a slide or sprint).
+                // Cost: in Web builds a second HOLD cannot start while the first is still held.
+                bool otherHeld = _classifier.IsDown(other) && now - _downAt[o] > settings.bothWindowMs / 1000.0;
+                if (otherHeld)
+                {
+                    if (_classifier.IsDown(side)) _classifier.Release(side, now);
+                    _classifier.Press(side, now);
+                    _classifier.Release(side, now);
+                    _countedAsTap[i] = true;
+                    return;
+                }
+                // Pressed while we still had it down: the browser never told us it was let go. Let it go now.
+                if (again && _classifier.IsDown(side)) _classifier.Release(side, now);
+                if (!_classifier.IsDown(side))
+                {
+                    _classifier.Press(side, now);
+                    _downAt[i] = now;
+                }
+            }
+            // While counted as a tap the browser still shows the key down; the classifier already let it go.
             if (!down && _classifier.IsDown(side)) _classifier.Release(side, now);
         }
 

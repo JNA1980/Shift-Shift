@@ -369,6 +369,27 @@ namespace ShiftShift.Tests
         }
 
         [Test]
+        public void ZeroLengthTap_WhileOtherKeyIsHeld_IsATap_AndTheHoldGoesOn()
+        {
+            // What the Web build feeds in for "tap right during a slide" (the browser hides the right key's release,
+            // so ShiftInput presses and releases it at the same moment).
+            _c.Press(Side.Left, 0.0);
+            _c.Update(0.3); // HoldLeft has started
+            _c.Press(Side.Right, 1.0);
+            _c.Release(Side.Right, 1.0);
+            _c.Update(1.2);
+            Assert.IsTrue(_log.Exists(r => r.Kind == Kind.Fired && r.Type == GestureType.TapRight && r.Time == 1.0), "tap right");
+            Assert.IsFalse(_log.Exists(r => r.Type == GestureType.BothTap || r.Type == GestureType.BothHold), "no both gesture");
+            Assert.IsTrue(_c.IsDown(Side.Left), "the slide goes on");
+            Assert.IsFalse(_c.IsDown(Side.Right));
+
+            // A second tap during the same hold counts too.
+            _c.Press(Side.Right, 1.5);
+            _c.Release(Side.Right, 1.5);
+            Assert.AreEqual(2, _log.FindAll(r => r.Kind == Kind.Fired && r.Type == GestureType.TapRight).Count);
+        }
+
+        [Test]
         public void InvalidThresholds_Throw()
         {
             Assert.Throws<System.ArgumentException>(() => new GestureClassifier(

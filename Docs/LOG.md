@@ -587,3 +587,9 @@ Facts from tools/shift-key-test.html on his machine (Chrome, Windows):
 So: the second Shift's key-down is always flagged repeat (confirms the last fix); only the LAST Shift released produces a key-up; the first release is silent. Auto-repeat moves to the most recently pressed key.
 
 Consequence still open: tapping one Shift while holding the other (e.g. changing lane during a slide) cannot be seen as a tap in the browser: the tapped key stays marked down until the held key is released, so it is read as a hold (and both down). Proposed to John, not built: in Web builds, a second Shift pressed more than the both-window (80 ms) after the first counts as a tap straight away. Windows desktop builds are not affected.
+
+## 2026-11-11 — D17: Web tap-during-hold workaround
+
+John agreed to the workaround. Browser felt smooth with all scenery (his words); build size still not known. The red Console error (UnityConnectWebRequestException: Token Exchange failed) is the editor's own Unity account service, not project code.
+Done: in the Web path of ShiftInput, a Shift pressed while the other has been held longer than bothWindowMs is fed to the classifier as press + release at once (a tap) and ignored until the browser shows it up. Documented in Docs/INPUT.md with the limits.
+Tested: compile check for both variants; new Core test (zero-length tap during a hold fires the tap, no both gesture, the hold goes on); 134 Core tests pass. Not run in a browser.
