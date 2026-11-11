@@ -1477,11 +1477,13 @@ MonoBehaviour:
   - {fileID: 2097488578142908853, guid: 05350263d9773f74b944303ef4876cae, type: 3}
   - {fileID: 2279333937312249830, guid: c91350894d6cde843ab8110c346c3e30, type: 3}
   - {fileID: 2279333937312249830, guid: c91350894d6cde843ab8110c346c3e30, type: 3}
-  plantEveryMetres: 7
-  plantChancePerSpot: 0.7
-  backdropEveryMetres: 25
-  backdropNearMetres: 18
-  backdropFarMetres: 34
+  wallMaterial: {fileID: 2100000, guid: 3ec1bd3de1d78e544b1909dd5eea3e0c, type: 2}
+  plotMetres: 30
+  plotGapMetres: 4
+  plotFront: 7.5
+  plotBack: 40
+  plotWallHeight: 1.1
+  buildingPlotShare: 0.55
 --- !u!4 &1734165038
 Transform:
   m_ObjectHideFlags: 0
