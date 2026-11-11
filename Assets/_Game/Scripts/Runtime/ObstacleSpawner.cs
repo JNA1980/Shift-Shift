@@ -52,7 +52,7 @@ namespace ShiftShift
                 float z = (float)(e.beat * runner.MetresPerBeat);
                 // A gap's or hurdle's beat is the take-off: place it half a jump later so jumping on the click clears it.
                 if (spec.Kind == ObstacleKind.Gap || spec.Kind == ObstacleKind.Hurdle)
-                    z += (float)(runner.JumpSeconds * conductor.Bpm / 60.0 * runner.MetresPerBeat * 0.5);
+                    z += (float)track.JumpShiftMetres(conductor.Bpm);
                 // The track can bend and slope: place and turn the obstacle along it.
                 GameObject go = Instantiate(prefab, track.Point(z, x, 0f), track.Rotation(z), transform);
                 go.name = $"{e.type} b{e.beat:0.##}" + (spec.AllLanes ? "" : $" lane {e.lane}");
@@ -69,6 +69,15 @@ namespace ShiftShift
                 o.hasTrackPosition = true;
                 o.trackDistance = z;
                 o.trackSideways = x;
+                if (spec.Kind == ObstacleKind.Gap)
+                {
+                    // The road is really cut here (TrackBuilder): hide the flat black stand-in; the prefab's pit
+                    // (walls and water) shows through the hole. On a bridge there is only open air below.
+                    Transform flat = go.transform.Find("Hole");
+                    if (flat != null && track.InHole(z)) flat.gameObject.SetActive(false);
+                    Transform pit = go.transform.Find("Pit");
+                    if (pit != null && track.IsBridge(z)) pit.gameObject.SetActive(false);
+                }
                 if (spec.LaneIsOpening)
                 {
                     // Day 17: prefabs carry one ready-made layout per open lane (Open0/Open1/Open2): solid slab or

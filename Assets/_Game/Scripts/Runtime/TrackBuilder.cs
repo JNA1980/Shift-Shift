@@ -42,6 +42,8 @@ namespace ShiftShift
         [SerializeField, Min(1f)] private float roadWidth = 7f;
         [SerializeField, Min(0.05f)] private float roadThickness = 0.5f;
         [SerializeField, Min(0.25f)] private float ringMetres = 1f;
+        [Tooltip("Length of the hole cut in the road for a gap. Must match the GapMarker prefab's depth.")]
+        [SerializeField, Min(0.5f)] private float gapMetres = 2.5f;
 
         [Header("Dressing prefabs (each one covers Dressing Metres along +Z from its origin)")]
         [SerializeField] private GameObject tunnelPrefab;
@@ -88,6 +90,7 @@ namespace ShiftShift
 
         private TrackPath _path;
         private readonly List<Mesh> _meshes = new List<Mesh>();
+        private readonly List<Vector2> _holes = new List<Vector2>(); // x = start, y = end, in metres along the track
 
         private void Awake() => Build();
 
@@ -131,6 +134,7 @@ namespace ShiftShift
         {
             Clear();
             _path = CreatePath();
+            FindHoles();
             transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity); // track positions are world positions
             if (roadMaterial == null || lineMaterial == null)
             {
@@ -164,6 +168,36 @@ namespace ShiftShift
             int scenery = BuildScenery();
             Debug.Log($"[Track] {scenery} scenery objects.");
             Debug.Log($"[Track] Built {_path.End - _path.Start:0} m in {chunks} chunks, {_path.Spans.Count} pieces, {dressed} dressing parts.");
+        }
+
+        /// <summary>True where the road is cut for a gap.</summary>
+        public bool InHole(double s)
+        {
+            foreach (Vector2 hole in _holes)
+                if (s > hole.x && s < hole.y) return true;
+            return false;
+        }
+
+        /// <summary>True on a bridge piece (no ground beside or below the road).</summary>
+        public bool IsBridge(double s) => OnBridge(s);
+
+        /// <summary>
+        /// How far past its beat a gap or hurdle sits: half a jump, so jumping on the click clears it. One place,
+        /// used by the spawner (where the obstacle goes) and here (where the road is cut).
+        /// </summary>
+        public double JumpShiftMetres(double bpm) =>
+            runner != null ? runner.JumpSeconds * bpm / 60.0 * MetresPerBeat * 0.5 : 0.0;
+
+        private void FindHoles()
+        {
+            _holes.Clear();
+            if (conductor == null || conductor.Level == null || conductor.Level.events == null) return;
+            foreach (LevelEvent e in conductor.Level.events)
+            {
+                if (!ObstacleTypes.TryGet(e.type, out ObstacleTypes.Spec spec) || spec.Kind != ObstacleKind.Gap) continue;
+                double centre = e.beat * MetresPerBeat + JumpShiftMetres(conductor.Bpm);
+                _holes.Add(new Vector2((float)(centre - gapMetres * 0.5), (float)(centre + gapMetres * 0.5)));
+            }
         }
 
         private bool InTunnel(double s) =>
@@ -358,33 +392,64 @@ namespace ShiftShift
 
         private void BuildChunk(double s0, double s1)
         {
-            int rings = Mathf.Max(2, Mathf.CeilToInt((float)(s1 - s0) / ringMetres) + 1);
+            // Cross-sections every ringMetres, plus one exactly at each gap edge inside this chunk, so the road can be
+            // cut cleanly there (John, day 17: gaps are real holes with a pit below).
+            var at = new List<double>();
+            int regular = Mathf.Max(2, Mathf.CeilToInt((float)(s1 - s0) / ringMetres) + 1);
+            for (int i = 0; i < regular; i++) at.Add(Math.Min(s0 + i * (double)ringMetres, s1));
+            foreach (Vector2 hole in _holes)
+                foreach (double edge in new[] { (double)hole.x, (double)hole.y })
+                    if (edge > s0 + 0.01 && edge < s1 - 0.01) at.Add(edge);
+            at.Sort();
+            for (int i = at.Count - 1; i > 0; i--)
+                if (at[i] - at[i - 1] < 0.01) at.RemoveAt(i);
+
+            int rings = at.Count;
             var centre = new Vector3[rings];
             var right = new Vector3[rings];
             for (int i = 0; i < rings; i++)
             {
-                double s = Math.Min(s0 + i * (double)ringMetres, s1);
-                centre[i] = Point(s, 0f, 0f);
-                right[i] = Point(s, 1f, 0f) - centre[i];
+                centre[i] = Point(at[i], 0f, 0f);
+                right[i] = Point(at[i], 1f, 0f) - centre[i];
             }
+            var inHole = new bool[rings - 1];
+            for (int i = 0; i < rings - 1; i++) inHole[i] = InHole((at[i] + at[i + 1]) * 0.5);
 
             float h = roadWidth * 0.5f, t = roadThickness;
             var v = new List<Vector3>();
             var tri = new List<int>();
-            Strip(v, tri, centre, right, -h, 0f, h, 0f);     // top
-            Strip(v, tri, centre, right, -h, -t, -h, 0f);    // left side
-            Strip(v, tri, centre, right, h, 0f, h, -t);      // right side
-            Strip(v, tri, centre, right, h, -t, -h, -t);     // underside
+            Strip(v, tri, centre, right, -h, 0f, h, 0f, inHole);     // top
+            Strip(v, tri, centre, right, -h, -t, -h, 0f, inHole);    // left side
+            Strip(v, tri, centre, right, h, 0f, h, -t, inHole);      // right side
+            Strip(v, tri, centre, right, h, -t, -h, -t, inHole);     // underside
+            // Close the slab where it is cut. Each face has its own corners, one set per side (shared corners
+            // facing both ways caused the day-17 white screen).
+            for (int i = 0; i < rings; i++)
+            {
+                // At the chunk's own ends, look just outside it: a gap may run across two chunks.
+                bool before = i > 0 ? inHole[i - 1] : InHole(at[i] - 0.005);
+                bool after = i < rings - 1 ? inHole[i] : InHole(at[i] + 0.005);
+                if (before == after) continue;
+                foreach (bool flip in new[] { false, true })
+                {
+                    int n = v.Count;
+                    v.Add(centre[i] + right[i] * -h);
+                    v.Add(centre[i] + right[i] * h);
+                    v.Add(centre[i] + right[i] * h + Vector3.up * -t);
+                    v.Add(centre[i] + right[i] * -h + Vector3.up * -t);
+                    foreach (int k in flip ? new[] { 0, 2, 1, 0, 3, 2 } : new[] { 0, 1, 2, 0, 2, 3 }) tri.Add(n + k);
+                }
+            }
             AddMesh($"Road @{s0:0}m", v, tri, roadMaterial);
 
             // Lines sit just above the road (the gap hole sits above them, at 0.03).
             v = new List<Vector3>();
             tri = new List<int>();
             const float y = 0.02f;
-            Strip(v, tri, centre, right, -h + 0.075f, y, -h + 0.225f, y);  // left edge
-            Strip(v, tri, centre, right, h - 0.225f, y, h - 0.075f, y);    // right edge
-            Strip(v, tri, centre, right, -1.035f, y, -0.965f, y);          // lane dividers (lanes at -2, 0, 2)
-            Strip(v, tri, centre, right, 0.965f, y, 1.035f, y);
+            Strip(v, tri, centre, right, -h + 0.075f, y, -h + 0.225f, y, inHole);  // left edge
+            Strip(v, tri, centre, right, h - 0.225f, y, h - 0.075f, y, inHole);    // right edge
+            Strip(v, tri, centre, right, -1.035f, y, -0.965f, y, inHole);          // lane dividers (lanes at -2, 0, 2)
+            Strip(v, tri, centre, right, 0.965f, y, 1.035f, y, inHole);
             AddMesh($"Lines @{s0:0}m", v, tri, lineMaterial);
 
             // Ground on both sides, just below the road surface; left out under bridges (open air below).
@@ -393,7 +458,7 @@ namespace ShiftShift
             bool any = false;
             for (int i = 0; i < rings - 1; i++)
             {
-                skip[i] = OnBridge(Math.Min(s0 + (i + 0.5) * ringMetres, s1));
+                skip[i] = OnBridge((at[i] + at[i + 1]) * 0.5);
                 any |= !skip[i];
             }
             if (!any) return;

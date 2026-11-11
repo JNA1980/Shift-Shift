@@ -142,10 +142,24 @@ namespace ShiftShift.EditorTools
                 Box(root, "RimBack", new Vector3(0, 0.05f, 1.25f), new Vector3(TrackWidth, 0.03f, 0.15f), "Hurdle");
                 changed = true;
             }
+            if (root.transform.Find("Pit") == null)
+            {
+                // Day 17 (John): depth for the gap. The road is cut at play time; this pit shows through the cut.
+                // Wall tops sit just under the ground level (-0.05) so nothing lies in the same plane as it.
+                var pit = new GameObject("Pit");
+                pit.transform.SetParent(root.transform, false);
+                Box(pit, "WallFront", new Vector3(0, -1.56f, -1.4f), new Vector3(TrackWidth + 0.6f, 3f, 0.3f), "TrackDark");
+                Box(pit, "WallBack", new Vector3(0, -1.56f, 1.4f), new Vector3(TrackWidth + 0.6f, 3f, 0.3f), "TrackDark");
+                Box(pit, "WallL", new Vector3(-3.65f, -1.56f, 0), new Vector3(0.3f, 3f, 2.5f), "TrackDark");
+                Box(pit, "WallR", new Vector3(3.65f, -1.56f, 0), new Vector3(0.3f, 3f, 2.5f), "TrackDark");
+                Box(pit, "Water", new Vector3(0, -1.2f, 0), new Vector3(TrackWidth, 0.05f, 2.5f), "Water");
+                changed = true;
+                log.Add("GapMarker: pit with water added");
+            }
             if (changed)
             {
                 PrefabUtility.SaveAsPrefabAsset(root, path);
-                log.Add("GapMarker: hole lifted above the lane lines, pink rims added");
+                log.Add("GapMarker: saved (hole above the lane lines, pink rims, pit)");
             }
             PrefabUtility.UnloadPrefabContents(root);
         }

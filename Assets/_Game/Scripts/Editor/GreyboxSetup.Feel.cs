@@ -65,6 +65,7 @@ namespace ShiftShift.EditorTools
             }
             if (applier != null && trail != null) Set(applier, "trail", trail);
             if (applier != null && runner != null) Set(applier, "runner", runner); // step 4: phase look
+            WireFigure(runner, log, label); // day 17: running figure instead of the capsule
             log.Add($"{label}: CameraFeel on the chase camera, runner trail ({(trail != null ? "ok" : "no runner")})");
         }
     }

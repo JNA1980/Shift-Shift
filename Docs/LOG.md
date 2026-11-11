@@ -534,3 +534,18 @@ Lesson for the mesh code: never let one vertex belong to triangles facing opposi
 ## 2026-11-11 — D17: walls, gates and white-screen fix verified in the editor
 
 John: "now it looks good" (Run scene, test_track): walls along the road with lit edges, closed gates with taller posts, plots with buildings and trees; the white screen is gone. Next: browser Build And Run to check frame rate, glow and the see-through barrier in WebGL (not done yet).
+
+## 2026-11-11 — D17: first browser build with scenery; gap pit, gate fix, running figure
+
+John ran Build And Run (Chrome, development build): the track test level plays in the browser with scenery, bricks and the tunnel. No frame-rate complaint; build size not reported yet. Feedback:
+- Screen "shakes" on quick left-right: that is the step-3 camera roll (2 degrees) and sideways lag; explained, not changed (CameraFeel > Roll Degrees).
+- Gap needs depth, maybe water. Gate ("green wall") looks jittery. Wants a running character instead of the capsule, with white smoke from the heels.
+
+Done:
+- Gap: TrackBuilder cuts the road (surface, sides, underside, lines) at each gap, with cross-sections exactly at the edges and closed slab ends; the cut matches the spawner through one shared JumpShiftMetres(). GapMarker prefab gets a "Pit" (four dark walls 3 m deep, water surface 1.2 m down, fixed dark blue-green "Water" material). The spawner hides the flat black "Hole" where the road is cut and hides the pit on a bridge (open air). Greybox (no level, no cut) still shows the flat hole.
+- Gate: layout v2 (prefabs rebuilt once, marker child "LayoutV2"): walls 2.8 m, posts 3.0 m, beam top 3.15 m, each deeper than the last, so no faces or glow strips share a plane. Guess at the cause of the jitter (coplanar glow strips), not confirmed.
+- Runner: RunnerFigure, a figure of boxes (legs, arms on pivots, torso, head) built by the tool. Stride from distance along the track: one stride per beat, feet land with the music. Knees tuck in a jump, upper body leans more in a sprint, all parts take the phase material. Dust: a ParticleSystem set up by the tool, a puff of white squares per footfall. The capsule stays in the scene, switched off; Runner.body points at the figure (slide still squashes it).
+
+Tested: compile check (stand-ins added for ParticleSystem and its modules), 133 Core tests. Not run in Unity.
+Uncertain: the cut road and pit by eye, especially on slopes and where a gap crosses a 40 m chunk boundary; the particle setup from script (module properties) and its look in WebGL; limb swing directions; how the squashed figure reads as a slide.
+Scope note: the figure and dust were asked for by John; particles were already on the day-27 juice list.
