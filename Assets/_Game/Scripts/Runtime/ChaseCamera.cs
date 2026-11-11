@@ -36,10 +36,18 @@ namespace ShiftShift
         private float SlopeLift(TrackBuilder track, float s)
         {
             double camS = s + feel.offset.z;
-            // Inside a tunnel (camera or runner): no lift, and drop a little so the ceiling is not right overhead.
-            foreach (double at in new[] { camS, (double)s })
-                if (track.Path.TryGetSpan(at, out ShiftShift.Core.TrackPath.Span span) &&
-                    span.Spec.Dressing == ShiftShift.Core.TrackPieces.Dressing.Tunnel) return -feel.tunnelDrop;
+            // Tunnels: drop a little so the ceiling is not right overhead; eased in before the tunnel and out after
+            // it, measured at the runner (the camera, 7 m behind, is always back up before the ease-out matters).
+            float inTunnel = 0f;
+            foreach (ShiftShift.Core.TrackPath.Span span in track.Path.Spans)
+            {
+                if (span.Spec.Dressing != ShiftShift.Core.TrackPieces.Dressing.Tunnel) continue;
+                float before = Mathf.Clamp01((float)(s - (span.Start - feel.tunnelEaseMetres)) / feel.tunnelEaseMetres);
+                float after = Mathf.Clamp01((float)(span.End + feel.tunnelEaseMetres - s) / feel.tunnelEaseMetres);
+                float k = Mathf.Min(before, after);
+                inTunnel = Mathf.Max(inTunnel, k * k * (3f - 2f * k));
+            }
+            if (inTunnel > 0f) return -feel.tunnelDrop * inTunnel;
             if (feel.slopeLiftAmount <= 0f) return 0f;
             double gain = track.Path.HeightAt(s + feel.slopeLookMetres) - track.Path.HeightAt(camS);
             return Mathf.Max(0f, (float)gain) * feel.slopeLiftAmount;
@@ -55,7 +63,7 @@ namespace ShiftShift
             float s = target.Distance;
             var t = new Vector3(target.Sideways, target.Height, 0f);
             _x = Mathf.SmoothDamp(_x, t.x + feel.offset.x, ref _vx, feel.lateralLagSeconds);
-            _y = Mathf.SmoothDamp(_y, feel.offset.y + t.y * 0.5f + SlopeLift(track, s), ref _vy, feel.lateralLagSeconds);
+            _y = Mathf.SmoothDamp(_y, feel.offset.y + t.y * feel.jumpFollow + SlopeLift(track, s), ref _vy, feel.lateralLagSeconds);
             transform.position = track.Point(s + feel.offset.z, _x, _y);
             transform.LookAt(track.Point(s + feel.lookAhead, _x, 1f));
 

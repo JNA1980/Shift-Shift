@@ -489,3 +489,15 @@ Done: barrier 65% solid. Brick texture regenerated at 256 x 128 with mipmaps, tr
 Tested: compile check only. Not run in Unity.
 Uncertain: whether the jitter was texture shimmer at all (could be the edge strip against the wall face); whether "first bridge" meant the tunnel. In a tunnel the camera (2.8 m) is now below gate tops (3.1 m).
 Flagged, not built: realistic buildings and trees would need imported 3D models (not in SCOPE.md; the plan's art direction is abstract shapes).
+
+## 2026-11-11 — D17: scenery fourth pass
+
+John: the camera rises at the pink wall (hurdle, beat 44, just after the tunnel) and should not; buildings still look alike, make 10 more; more trees, conifers.
+
+Done:
+- Camera: jump-follow is now a CameraFeel setting, 0 by default (was a fixed 0.5), so the camera stays level on every jump. The tunnel drop eases in over 12 m before a tunnel and out over 12 m after it (it used to snap back at the exit, about 13 m before the hurdle). Not known which of the two John saw; both changed.
+- Buildings: 10 more shapes (L, pyramid, needle, cluster, frame, T, wall, stairs, crown, linked towers): 16 in total.
+- Plants: four conifers (tiers narrowing to a point, alternate tiers turned 45 degrees); conifers are 6 of the 10 entries the builder picks from. A plant spot every 7 m with a 70% chance (was every 12 m, 45%).
+
+Tested: compile check only. Not run in Unity.
+Uncertain: wide buildings at the near distance can reach the plant band (6.5-11 m), so a tree may stand inside a building now and then; frame rate with roughly twice the plants.
