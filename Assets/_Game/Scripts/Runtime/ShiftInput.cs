@@ -81,13 +81,32 @@ namespace ShiftShift
             if (settings.Version != _settingsVersion) Rebuild(); // threshold tuned in the Inspector
 
             double now = Clock.SongTime;
-            Keyboard kb = Keyboard.current;
-            if (kb != null)
+            if (ShiftKeys.FromBrowser)
             {
-                Poll(kb.leftShiftKey, Side.Left, now);
-                Poll(kb.rightShiftKey, Side.Right, now);
+                // Web build: the browser's own view of the keys (see ShiftKeys: Unity's can stick on Windows).
+                ShiftKeys.Read(out bool leftDown, out bool rightDown, out bool leftHit, out bool rightHit,
+                    out bool leftAgain, out bool rightAgain);
+                Poll(leftDown, leftHit, leftAgain, Side.Left, now);
+                Poll(rightDown, rightHit, rightAgain, Side.Right, now);
+            }
+            else
+            {
+                Keyboard kb = Keyboard.current;
+                if (kb != null)
+                {
+                    Poll(kb.leftShiftKey, Side.Left, now);
+                    Poll(kb.rightShiftKey, Side.Right, now);
+                }
             }
             _classifier.Update(now);
+        }
+
+        private void Poll(bool down, bool hit, bool again, Side side, double now)
+        {
+            // Pressed while we still had it down: the browser never told us it was let go. Let it go now.
+            if (again && _classifier.IsDown(side)) _classifier.Release(side, now);
+            if (hit && !_classifier.IsDown(side)) _classifier.Press(side, now);
+            if (!down && _classifier.IsDown(side)) _classifier.Release(side, now);
         }
 
         private void Poll(KeyControl key, Side side, double now)

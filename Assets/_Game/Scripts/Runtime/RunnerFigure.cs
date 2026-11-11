@@ -32,6 +32,10 @@ namespace ShiftShift
         [SerializeField, Range(0f, 45f)] private float runLeanDegrees = 8f;
         [SerializeField, Range(0f, 45f)] private float sprintLeanDegrees = 22f;
 
+        [Tooltip("Lean into bends (John, day 17): degrees of lean per degree the track turns over the next few metres.")]
+        [SerializeField, Range(0f, 8f)] private float bendLean = 3f;
+        [SerializeField, Range(0f, 30f)] private float maxBendLeanDegrees = 16f;
+
         [Header("Dust from the heels")]
         [SerializeField] private ParticleSystem dust;
         [SerializeField, Range(0, 12)] private int puffsPerStep = 4;
@@ -67,6 +71,15 @@ namespace ShiftShift
             float wantedLean = !running ? 0f : runner.IsSprinting ? sprintLeanDegrees : runLeanDegrees;
             _lean = Mathf.MoveTowards(_lean, wantedLean, 120f * Time.deltaTime); // look only, not rhythm timing
             if (upperBody != null) upperBody.localRotation = Quaternion.Euler(_lean, 0f, 0f);
+
+            // Lean into the bend: how much the track's heading changes from 3 m behind to 3 m ahead.
+            if (runner.Track != null)
+            {
+                double s = runner.Distance;
+                float turn = (float)((runner.Track.Path.YawAt(s + 3) - runner.Track.Path.YawAt(s - 3)) * 180.0 / System.Math.PI);
+                float lean = running ? Mathf.Clamp(turn * bendLean, -maxBendLeanDegrees, maxBendLeanDegrees) : 0f;
+                transform.localRotation = Quaternion.Euler(0f, 0f, -lean); // right bend: lean right
+            }
 
             // A puff each time a foot lands (every half stride), on the ground only.
             int step = Mathf.FloorToInt(half);

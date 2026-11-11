@@ -64,6 +64,12 @@ namespace ShiftShift.EditorTools
                 else trail = existing.GetComponent<TrailRenderer>();
             }
             if (applier != null && trail != null) Set(applier, "trail", trail);
+            // John, day 17: with the running figure and its dust the yellow trail is not needed. Kept, switched off.
+            if (trail != null && trail.gameObject.activeSelf)
+            {
+                trail.gameObject.SetActive(false);
+                log.Add($"{label}: runner trail switched off (tick 'Trail' under Runner to bring it back)");
+            }
             if (applier != null && runner != null) Set(applier, "runner", runner); // step 4: phase look
             WireFigure(runner, log, label); // day 17: running figure instead of the capsule
             log.Add($"{label}: CameraFeel on the chase camera, runner trail ({(trail != null ? "ok" : "no runner")})");

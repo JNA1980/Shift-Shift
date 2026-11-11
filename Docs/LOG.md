@@ -549,3 +549,18 @@ Done:
 Tested: compile check (stand-ins added for ParticleSystem and its modules), 133 Core tests. Not run in Unity.
 Uncertain: the cut road and pit by eye, especially on slopes and where a gap crosses a 40 m chunk boundary; the particle setup from script (module properties) and its look in WebGL; limb swing directions; how the squashed figure reads as a slide.
 Scope note: the figure and dust were asked for by John; particles were already on the day-27 juice list.
+
+## 2026-11-11 — D17: stuck Shift key in the browser, bend lean, trail off
+
+John (Chrome build): figure and gate look good. Asked if the yellow trail is needed; thought he pressed on time at the gap (beat 68) but failed; wants the runner to lean into bends; sometimes left taps do nothing, "especially in the open stretch".
+
+Finding (from his screenshots, not reproduced here): at the gap failure the debug log's newest entry is the phase hold ending at beat 61: no gesture at all was registered near beat 68. An earlier screenshot shows "R-Shift: DOWN" at beat 54.9 with no gesture logged since the jump at beat 43.8, i.e. a key shown as held for 6 s after a both-press. Reading: on Windows, when both Shift keys are down and one is released, the browser gets no key-up for it; Unity's keyboard state keeps that key down, so its next press has no down edge and is lost. This follows every jump and phase, which matches both complaints. The editor reads the keyboard differently and was not affected.
+
+Done:
+- Assets/Plugins/WebGL/ShiftKeys.jslib + Runtime/ShiftKeys.cs: in Web builds ShiftInput reads the two Shift keys from the browser's own key events. On any Shift key-up with no Shift left down, both are cleared. A fresh key-down for a key still marked down counts as release + press. Presses are latched between frames (a tap shorter than a frame still counts). Editor and Windows builds keep the Input System path.
+- RunnerFigure leans into bends: 3 degrees of lean per degree the track turns over 6 m, at most 16.
+- Runner trail switched off by the tool (object kept).
+
+Tested: compile check for both variants (normal and with UNITY_WEBGL defined); the key script simulated in Node for the lost key-up, re-press, quick tap and blur cases; 133 Core tests. Not run in Unity or a browser.
+Uncertain: whether the stuck key is the whole cause; the .jslib meta is minimal (Unity should fill in the importer and include it for Web only). Conductor start, GameFlow restart and the calibration scene still read the Input System directly; a stuck key there only costs one press.
+Remaining limit: releasing one Shift while the other stays held is not seen until both are up or that key is pressed again (e.g. going from phase straight into a slide).
