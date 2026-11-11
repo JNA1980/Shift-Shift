@@ -635,3 +635,9 @@ Tested: compile check only. These are first guesses by geometry, not by eye; Joh
 John: "camera feels right now" (2.8 m up, 5.5 m behind, aiming 6 m ahead). Asked for level 3 or the build; doing both: he runs Shift+Shift > Build WebGL (release, Brotli, prints the size against the 20 MB budget) while level 3 is drafted. Level 2 attempts not reported yet.
 Level 3 "Gaps" drafted: Assets/_Game/Levels/level03.json (Docs/LEVELS.md). Set Up Visuals generates click_120.wav and puts level03 first in the Run scene's list.
 Tested: validates, strict chart check clean (no gap-on-slope warning), scripted walk (jumps at least 4 beats apart, nothing under 2 beats, two-tap moves have 4 beats), round-trips through the chart writer. Compile check passes. Not played.
+
+## 2026-11-11 — D17: release Web build size measured
+
+John ran Shift+Shift > Build WebGL (release, Brotli + decompression fallback): "[Build] WebGL OK in 03:54 -> Builds/WebGL, 9.6 MB on disk (plan budget: under 20 MB)". About 10 MB of headroom. Contents at the time: levels 1-2 with placeholder clicks, all scenery, no music yet. The earlier 59.4 MB was the development build, uncompressed.
+Budget note for day 23: six music tracks have to fit in roughly 10 MB together (about 1.5 MB each after Unity's compression), or fewer tracks get reused (cut order item 4).
+Not yet done by John: Set Up Visuals + play for level 3 (his pull shows the level arrived; nothing to commit yet).
