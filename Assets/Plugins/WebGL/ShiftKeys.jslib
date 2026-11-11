@@ -10,9 +10,15 @@ mergeInto(LibraryManager.library, {
     if (Module.shiftKeys) return;
     var s = Module.shiftKeys = { left: false, right: false, leftHit: false, rightHit: false, leftAgain: false, rightAgain: false };
     window.addEventListener('keydown', function (e) {
-      if (e.repeat) return;
-      if (e.code === 'ShiftLeft') { if (s.left) s.leftAgain = true; s.left = true; s.leftHit = true; }
-      else if (e.code === 'ShiftRight') { if (s.right) s.rightAgain = true; s.right = true; s.rightHit = true; }
+      // "repeat" cannot be trusted on its own: with one Shift held, Windows flags the FIRST press of the other
+      // Shift as a repeat too (day 17: every both-press lost its second key). It only means auto-repeat when
+      // this very key is already marked down.
+      var isLeft = e.code === 'ShiftLeft', isRight = e.code === 'ShiftRight';
+      if (!isLeft && !isRight) return;
+      var marked = isLeft ? s.left : s.right;
+      if (e.repeat && marked) return;
+      if (isLeft) { if (marked) s.leftAgain = true; s.left = true; s.leftHit = true; }
+      else { if (marked) s.rightAgain = true; s.right = true; s.rightHit = true; }
     }, true);
     window.addEventListener('keyup', function (e) {
       if (e.code === 'ShiftLeft') s.left = false;

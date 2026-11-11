@@ -33,8 +33,9 @@ namespace ShiftShift
         [SerializeField, Range(0f, 45f)] private float sprintLeanDegrees = 22f;
 
         [Tooltip("Lean into bends (John, day 17): degrees of lean per degree the track turns over the next few metres.")]
-        [SerializeField, Range(0f, 8f)] private float bendLean = 3f;
-        [SerializeField, Range(0f, 30f)] private float maxBendLeanDegrees = 16f;
+        [SerializeField, Range(0f, 8f)] private float bendLeanFactor = 1f;
+        [Tooltip("Kept slight (John, day 17): a big lean reads as a lane change.")]
+        [SerializeField, Range(0f, 30f)] private float bendLeanMaxDegrees = 5f;
 
         [Header("Dust from the heels")]
         [SerializeField] private ParticleSystem dust;
@@ -77,7 +78,7 @@ namespace ShiftShift
             {
                 double s = runner.Distance;
                 float turn = (float)((runner.Track.Path.YawAt(s + 3) - runner.Track.Path.YawAt(s - 3)) * 180.0 / System.Math.PI);
-                float lean = running ? Mathf.Clamp(turn * bendLean, -maxBendLeanDegrees, maxBendLeanDegrees) : 0f;
+                float lean = running ? Mathf.Clamp(turn * bendLeanFactor, -bendLeanMaxDegrees, bendLeanMaxDegrees) : 0f;
                 transform.localRotation = Quaternion.Euler(0f, 0f, -lean); // right bend: lean right
             }
 

@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Shift key test</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 24px; max-width: 900px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  th, td { border: 1px solid #999; padding: 4px 10px; text-align: left; font-family: Consolas, monospace; }
+  .up { color: #a00; } .down { color: #060; }
+  button { font-size: 16px; padding: 6px 14px; }
+</style>
+<h1>Shift key test</h1>
+<p>This page lists exactly what the browser reports for the two Shift keys. Click the page once, then do the four
+tests below in order, pressing <b>Clear</b> before each one. Take a screenshot of the table after each test.</p>
+<ol>
+  <li>Press and release <b>both Shift keys together</b>, once.</li>
+  <li>Hold Left Shift, tap Right Shift once, then release Left Shift.</li>
+  <li>Hold Right Shift, tap Left Shift once, then release Right Shift.</li>
+  <li>Hold both, release Left first, wait a second, release Right.</li>
+</ol>
+<button id="clear">Clear</button>
+<table><thead><tr><th>#</th><th>ms</th><th>event</th><th>code</th><th>repeat</th><th>shiftKey</th></tr></thead>
+<tbody id="rows"></tbody></table>
+<script>
+  var rows = document.getElementById('rows'), n = 0, t0 = 0;
+  function log(e) {
+    if (e.key !== 'Shift') return;
+    if (!n) t0 = performance.now();
+    var tr = document.createElement('tr');
+    tr.className = e.type === 'keydown' ? 'down' : 'up';
+    [++n, Math.round(performance.now() - t0), e.type, e.code, e.repeat, e.shiftKey].forEach(function (v) {
+      var td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
+    });
+    rows.appendChild(tr);
+  }
+  window.addEventListener('keydown', log, true);
+  window.addEventListener('keyup', log, true);
+  document.getElementById('clear').onclick = function () { rows.textContent = ''; n = 0; this.blur(); };
+</script>

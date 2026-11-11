@@ -564,3 +564,12 @@ Done:
 Tested: compile check for both variants (normal and with UNITY_WEBGL defined); the key script simulated in Node for the lost key-up, re-press, quick tap and blur cases; 133 Core tests. Not run in Unity or a browser.
 Uncertain: whether the stuck key is the whole cause; the .jslib meta is minimal (Unity should fill in the importer and include it for Web only). Conductor start, GameFlow restart and the calibration scene still read the Input System directly; a stuck key there only costs one press.
 Remaining limit: releasing one Shift while the other stays held is not seen until both are up or that key is pressed again (e.g. going from phase straight into a slide).
+
+## 2026-11-11 — D17: both-press lost in the Web build (my regression), lean reduced
+
+John (Chrome): pressing both Shifts did not jump, three tries. His screenshot at the hurdle (beat 44) logs only "TapRight": the left key's press was never registered. Before the browser key reader, the same spot logged BothTap, so the reader introduced this.
+Likely cause (not confirmed on his machine): the reader skipped key-down events flagged "repeat"; with one Shift already down, Windows flags the first press of the other Shift as a repeat. Fix: a repeat is ignored only when that same key is already marked down.
+Also: bend lean reduced to 1 degree per degree of turn, at most 5 (was 3 and 16): John found the big lean read like a lane change. Fields renamed so the saved values are dropped.
+Added tools/shift-key-test.html: a page that lists the browser's raw Shift key events (code, repeat, shiftKey) for four short tests, to replace guesses about the Windows behaviour with facts.
+Tested: compile check; the key script simulated in Node (second Shift flagged repeat counts, true auto-repeat ignored). Not run in a browser.
+Uncertain: everything about what Windows and Chrome really send for two Shift keys until John's test page results are in. In particular, tapping one Shift while holding the other (lane change during a slide) may leave the tapped key marked down.
