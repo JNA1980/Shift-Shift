@@ -1,0 +1,221 @@
+{
+  "name": "Gaps",
+  "bpm": 120.0,
+  "audioClip": "click_120",
+  "offsetMs": 0.0,
+  "palette": "dusk",
+  "lengthBeats": 152.0,
+  "events": [
+    {
+      "beat": 8.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 12.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 16.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 20.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 24.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 28.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 32.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 36.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 40.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 44.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 48.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 52.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 56.0,
+      "lane": 2,
+      "type": "bar"
+    },
+    {
+      "beat": 60.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 64.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 68.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 72.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 76.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 80.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 84.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 88.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 92.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 96.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 100.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 112.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 114.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 116.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 118.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 120.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 122.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 124.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 126.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 128.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 130.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 132.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 134.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 136.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 138.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 140.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 144.0,
+      "lane": 1,
+      "type": "hurdle"
+    }
+  ],
+  "track": [
+    { "beat": 16.0, "piece": "bendLeft" },
+    { "beat": 32.0, "piece": "bendRight" },
+    { "beat": 48.0, "piece": "bridge" },
+    { "beat": 64.0, "piece": "crest" },
+    { "beat": 84.0, "piece": "dip" },
+    { "beat": 102.0, "piece": "tunnel" },
+    { "beat": 116.0, "piece": "sLeft" },
+    { "beat": 132.0, "piece": "pillars" },
+    { "beat": 144.0, "piece": "rise" }
+  ]
+}

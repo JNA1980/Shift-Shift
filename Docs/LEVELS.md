@@ -102,3 +102,19 @@ Checked by script: valid, no warnings in the strict chart check, never more than
 
 Rules kept: a gate's opening is always the lane the player is already in (never a lane change and a sprint for the same obstacle); slides and sprints are never closer than 4 beats to each other; nothing is closer than 2 beats.
 Track: tunnel 8, left bend 24, dip 40, S-bend 56, right bend 72, tunnel 80, archways 96.
+
+## Level 3, "Gaps" (first draft, day 17)
+
+`level03.json`: 120 BPM, 152 beats (76 s), dusk palette. New: jump (both Shifts together) over gaps and pink hurdles. Combines lanes, slides and jumps; no sprint gates. Placeholder audio: `click_120`.
+
+| Beats | What happens |
+|---|---|
+| 8-36 | Jump only, every 4 beats: gaps and hurdles in turn |
+| 40-72 | Jumps and lane changes in turn, 4 beats apart (the bridge is at 48-56, the hill at 64-72) |
+| 76-100 | Slides come back, between jumps |
+| 101-111 | Breather, inside the tunnel |
+| 112-144 | Something every 2 beats: jump, lane change, slide |
+| 144-152 | Last hurdle, then a run-out up a rise |
+
+Rules kept: jumps are never closer than 4 beats to each other; nothing is closer than 2 beats; a two-tap lane move always has 4 beats; no gap sits on a slope or on the bridge (so every gap shows its pit and water).
+Track: left bend 16, right bend 32, bridge 48, hill 64, dip 84, tunnel 102, S-bend 116, archways 132, rise 144.

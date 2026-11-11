@@ -629,3 +629,9 @@ Tested: compile check only. Not run in Unity.
 John (level 2, editor, camera at 2.8 m): the gate beam now passes overhead, but the runner "looks a little far ahead", so judging the distance to an obstacle is tricky. (The earlier ArgumentNullException "clock" was scripts reloading during Play mode after a pull, not a game bug; advised Recompile After Finished Playing.)
 Done: CameraFeel offset z -7 -> -5.5 (closer behind the runner) and lookAhead 8 -> 6 (aims nearer, so the view tilts down about 3 degrees more and shows more road around the runner). Asset and code defaults.
 Tested: compile check only. These are first guesses by geometry, not by eye; John can tune Offset Z and Look Ahead in the CameraFeel asset while playing.
+
+## 2026-11-11 — D17: camera settled; level 3 drafted; release build requested
+
+John: "camera feels right now" (2.8 m up, 5.5 m behind, aiming 6 m ahead). Asked for level 3 or the build; doing both: he runs Shift+Shift > Build WebGL (release, Brotli, prints the size against the 20 MB budget) while level 3 is drafted. Level 2 attempts not reported yet.
+Level 3 "Gaps" drafted: Assets/_Game/Levels/level03.json (Docs/LEVELS.md). Set Up Visuals generates click_120.wav and puts level03 first in the Run scene's list.
+Tested: validates, strict chart check clean (no gap-on-slope warning), scripted walk (jumps at least 4 beats apart, nothing under 2 beats, two-tap moves have 4 beats), round-trips through the chart writer. Compile check passes. Not played.
