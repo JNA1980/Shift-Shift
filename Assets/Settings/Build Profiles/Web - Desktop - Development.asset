@@ -970,4 +970,4 @@ MonoBehaviour:
         m_CodeOptimization: 0
         m_WebGLClientBrowserPath: C:/Program Files/Google/Chrome/Application/chrome.exe
         m_WebGLClientBrowserType: 4
-        m_WebGLTextureSubtarget: 1
+        m_WebGLTextureSubtarget: 0
