@@ -360,3 +360,16 @@
 - 120/120 core tests. Per-assembly compile check passes (stand-ins extended: RenderSettings, fog, camera clear, prefab contents).
 
 **Not yet run** in Unity: the menu, the applier, fog, how it looks. Steps 2-5 (bloom/emissive edges, camera FOV/roll + trail, phase look, solid wide bar + gate frame) not started.
+
+## 2026-11-11 — D17: first look at the palettes; camera lowered
+
+**Seen (John)**
+- Run scene, dawn: pale sky, charcoal road, edge/lane lines; loop, grades and results work.
+- The "black" run without Shift prompt, count-in or scores was the **Greybox** scene (night fallback palette, no conductor/game loop, by design), not the Run scene; the neon edit to test_gestures.json only shows in Run.
+- Unity closed abnormally once (scene backup prompt). Cause unknown; kept backups. `/Assets/_Recovery/` is now git-ignored.
+
+**Changed (John: camera too high, the overhang hides the view)**
+- The camera sat at 4 m, inside the tunnel ceiling slab (3.5-4.0 m). Lowered to 3.3 m (ChaseCamera default and the three scenes' serialized offset).
+- To keep every obstacle below eye level (the palette decision relies on it), both gate prefabs lowered from 3.5-3.7 m to 3.2 m (prefab files and the tool). Tunnel ceiling now passes overhead.
+- Per-assembly compile check passes. Not yet seen in Unity.
+- Note: a jump raises the camera by half the jump height (0.75 m); inside a tunnel it would clip the ceiling. Avoid gaps/hurdles in tunnels.

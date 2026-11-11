@@ -79,9 +79,9 @@ namespace ShiftShift.EditorTools
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 0.4f, 0.4f), "Low"));
             k.Gate = ObstaclePrefab("Gate", ObstacleKind.Gate, ObstacleLayer.Solid, true, 0.4f, go =>
             {
-                Box(go, "PostL", new Vector3(-3.3f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.3f), "Gate");
-                Box(go, "PostR", new Vector3(3.3f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.3f), "Gate");
-                Box(go, "Beam", new Vector3(0, 3.4f, 0), new Vector3(6.9f, 0.25f, 0.3f), "Gate");
+                Box(go, "PostL", new Vector3(-3.3f, 1.5f, 0), new Vector3(0.3f, 3f, 0.3f), "Gate");
+                Box(go, "PostR", new Vector3(3.3f, 1.5f, 0), new Vector3(0.3f, 3f, 0.3f), "Gate");
+                Box(go, "Beam", new Vector3(0, 3.1f, 0), new Vector3(6.9f, 0.2f, 0.3f), "Gate");
             });
             k.Wall = ObstaclePrefab("Wall", ObstacleKind.Wall, ObstacleLayer.Solid, true, 0.6f,
                 go => Box(go, "Mesh", new Vector3(0, 1.5f, 0), new Vector3(TrackWidth, 3f, 0.6f), "Wall"));
@@ -99,8 +99,8 @@ namespace ShiftShift.EditorTools
             k.GateOpening = ObstaclePrefab("GateOpening", ObstacleKind.Gate, ObstacleLayer.Solid, false, 0.4f, go =>
             {
                 for (int lane = 0; lane < 3; lane++)
-                    Box(go, "Panel" + lane, new Vector3((lane - 1) * 2f, 1.75f, 0), new Vector3(1.95f, 3.5f, 0.3f), "Gate");
-                Box(go, "Beam", new Vector3(0, 3.6f, 0), new Vector3(TrackWidth, 0.25f, 0.3f), "Gate");
+                    Box(go, "Panel" + lane, new Vector3((lane - 1) * 2f, 1.5f, 0), new Vector3(1.95f, 3f, 0.3f), "Gate");
+                Box(go, "Beam", new Vector3(0, 3.1f, 0), new Vector3(TrackWidth, 0.2f, 0.3f), "Gate");
             }, laneIsOpening: true);
             k.WideBar = ObstaclePrefab("WideBar", ObstacleKind.Block, ObstacleLayer.Solid, false, 0.6f, go =>
             {
@@ -183,7 +183,7 @@ namespace ShiftShift.EditorTools
 
             var chase = cam.gameObject.AddComponent<ChaseCamera>();
             Set(chase, "target", runner);
-            cam.transform.position = new Vector3(0, 4, -7);
+            cam.transform.position = new Vector3(0, 3.3f, -7);
             return runner;
         }
 

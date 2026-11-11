@@ -11913,7 +11913,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.ChaseCamera
   target: {fileID: 808588598}
-  offset: {x: 0, y: 4, z: -7}
+  offset: {x: 0, y: 3.3, z: -7}
   lookAhead: 8
   lateralLagSeconds: 0.12
   baseFov: 60

@@ -53,3 +53,7 @@ crashlytics-build.properties
 
 # itch.io upload config (holds your itch username; keep it local)
 /tools/itch.env
+
+# Unity scene backups after a crash (keep locally, never commit)
+/Assets/_Recovery/
+/Assets/_Recovery.meta
