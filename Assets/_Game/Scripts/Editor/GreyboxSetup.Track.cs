@@ -332,6 +332,7 @@ namespace ShiftShift.EditorTools
             Set(builder, "pillarsPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/Pillars.prefab"));
             Set(builder, "roadsidePrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/RoadsidePost.prefab"));
             Set(builder, "groundMaterial", Mats["TrackDark"]);
+            Set(builder, "wallMaterial", Mats["Track"]); // compound walls: road grey, a shade lighter than the ground
             SetPrefabList(builder, "backdropPrefabs", BackdropNames);
             SetPrefabList(builder, "plantPrefabs", PlantNames);
             if (conductor == null)

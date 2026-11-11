@@ -57,15 +57,20 @@ namespace ShiftShift
         [Tooltip("Ground beside the road (not under bridges), so the scenery stands on something.")]
         [SerializeField] private Material groundMaterial;
         [SerializeField, Min(5f)] private float groundHalfWidth = 45f;
-        [Tooltip("Buildings in the distance: one is picked per spot, alternating sides, at varied distance, size and turn.")]
+        [Header("Plots (John, day 17): walled plots along both sides, each with a building and trees, or trees only")]
         [SerializeField] private List<GameObject> backdropPrefabs = new List<GameObject>();
-        [Tooltip("Trees and shrubs: now and then, between the posts and the buildings.")]
         [SerializeField] private List<GameObject> plantPrefabs = new List<GameObject>();
-        [SerializeField, Min(2f)] private float plantEveryMetres = 7f;
-        [SerializeField, Range(0f, 1f)] private float plantChancePerSpot = 0.7f;
-        [SerializeField, Min(5f)] private float backdropEveryMetres = 25f;
-        [SerializeField, Min(8f)] private float backdropNearMetres = 18f;
-        [SerializeField, Min(8f)] private float backdropFarMetres = 34f;
+        [Tooltip("Compound wall around each plot. Empty = no walls.")]
+        [SerializeField] private Material wallMaterial;
+        [SerializeField, Min(10f)] private float plotMetres = 30f;
+        [Tooltip("Lane between two plots.")]
+        [SerializeField, Min(0f)] private float plotGapMetres = 4f;
+        [Tooltip("Distance from the road's centre to the plot's front wall and to its back wall.")]
+        [SerializeField, Min(6f)] private float plotFront = 7.5f;
+        [SerializeField, Min(20f)] private float plotBack = 40f;
+        [SerializeField, Min(0.2f)] private float plotWallHeight = 1.1f;
+        [Tooltip("Share of plots that get a building (the rest are trees only).")]
+        [SerializeField, Range(0f, 1f)] private float buildingPlotShare = 0.55f;
 
         public float LengthMetres => conductor != null && conductor.Level != null
             ? (float)(conductor.Level.lengthBeats * MetresPerBeat) : lengthMetres;
@@ -188,40 +193,110 @@ namespace ShiftShift
                     }
                 }
             backdropPrefabs.RemoveAll(p => p == null);
-            if (backdropPrefabs.Count > 0)
+            plantPrefabs.RemoveAll(p => p == null);
+            float pitch = plotMetres + plotGapMetres;
+            int index = 0;
+            for (double s0 = _path.Start + 2; s0 + plotMetres <= _path.End; s0 += pitch, index++)
+            for (int sideIndex = 0; sideIndex < 2; sideIndex++)
             {
-                int i = 0;
-                for (double s = _path.Start; s <= _path.End + 80; s += backdropEveryMetres, i++)
+                float side = sideIndex == 0 ? -1f : 1f;
+                int id = index * 2 + sideIndex + 1;
+                double s1 = s0 + plotMetres, mid = (s0 + s1) * 0.5;
+                if (OnBridge(s0) || OnBridge(mid) || OnBridge(s1)) continue; // no ground there
+                if (wallMaterial != null) BuildPlotWall(s0, s1, side);
+
+                // Building plots: one building, set back from the front wall, with a few trees in the space around
+                // it. Tree plots: more trees, nothing else.
+                bool hasBuilding = backdropPrefabs.Count > 0 && Hash(id, 20) < buildingPlotShare;
+                double buildingS = 0;
+                float buildingSide = 0f, keepClear = 0f;
+                if (hasBuilding)
                 {
-                    // A different shape each time, at a varied distance, size, sink and quarter-turn.
-                    GameObject prefab = backdropPrefabs[Mathf.Min((int)(Hash(i, 5) * backdropPrefabs.Count), backdropPrefabs.Count - 1)];
-                    float side = (i % 2 == 0 ? -1f : 1f) * Mathf.Lerp(backdropNearMetres, backdropFarMetres, Hash(i, 1));
-                    Quaternion turn = Quaternion.Euler(0f, 90f * (int)(Hash(i, 6) * 4f), 0f);
-                    GameObject go = Instantiate(prefab, Point(s, side, -3f * Hash(i, 2)), Upright(s) * turn, transform);
-                    float w = Mathf.Lerp(0.8f, 1.4f, Hash(i, 3));
-                    go.transform.localScale = new Vector3(w, Mathf.Lerp(0.8f, 1.3f, Hash(i, 4)), w);
-                    go.name = $"{prefab.name} @{s:0}m";
+                    GameObject prefab = backdropPrefabs[Mathf.Min((int)(Hash(id, 5) * backdropPrefabs.Count), backdropPrefabs.Count - 1)];
+                    float w = Mathf.Lerp(0.75f, 1.15f, Hash(id, 3));
+                    buildingS = mid + (Hash(id, 1) - 0.5f) * 4f;
+                    buildingSide = Mathf.Lerp(plotFront + 12f, plotBack - 12f, Hash(id, 2));
+                    keepClear = 9f * w + 1.5f;
+                    Quaternion turn = Quaternion.Euler(0f, 90f * (int)(Hash(id, 6) * 4f), 0f);
+                    GameObject go = Instantiate(prefab, Point(buildingS, side * buildingSide, -2f * Hash(id, 4)),
+                        Upright(buildingS) * turn, transform);
+                    go.transform.localScale = new Vector3(w, Mathf.Lerp(0.8f, 1.3f, Hash(id, 7)), w);
+                    go.name = $"{prefab.name} @{s0:0}m";
                     count++;
                 }
-            }
-            plantPrefabs.RemoveAll(p => p == null);
-            if (plantPrefabs.Count > 0)
-            {
-                int i = 0;
-                for (double s = _path.Start + 3; s <= _path.End; s += plantEveryMetres, i++)
+                if (plantPrefabs.Count == 0) continue;
+                int plants = hasBuilding ? 2 + (int)(Hash(id, 8) * 4f) : 5 + (int)(Hash(id, 8) * 5f);
+                for (int k = 0; k < plants; k++)
+                for (int attempt = 0; attempt < 6; attempt++)
                 {
-                    if (Hash(i, 7) > plantChancePerSpot || InTunnel(s) || OnBridge(s)) continue;
-                    GameObject prefab = plantPrefabs[Mathf.Min((int)(Hash(i, 8) * plantPrefabs.Count), plantPrefabs.Count - 1)];
-                    float side = (Hash(i, 9) < 0.5f ? -1f : 1f) * Mathf.Lerp(6.5f, 11f, Hash(i, 10));
-                    Quaternion turn = Quaternion.Euler(0f, 360f * Hash(i, 11), 0f);
-                    GameObject go = Instantiate(prefab, Point(s, side, -0.05f), Upright(s) * turn, transform);
-                    float size = Mathf.Lerp(0.8f, 1.4f, Hash(i, 12));
+                    int seed = id * 131 + k * 17 + attempt;
+                    double ps = s0 + 3 + (plotMetres - 6) * Hash(seed, 9);
+                    float pl = Mathf.Lerp(plotFront + 2f, plotBack - 3f, Hash(seed, 10));
+                    if (hasBuilding && Math.Abs(ps - buildingS) < keepClear && Mathf.Abs(pl - buildingSide) < keepClear)
+                        continue; // inside the building: try another spot
+                    GameObject prefab = plantPrefabs[Mathf.Min((int)(Hash(seed, 11) * plantPrefabs.Count), plantPrefabs.Count - 1)];
+                    Quaternion turn = Quaternion.Euler(0f, 360f * Hash(seed, 12), 0f);
+                    GameObject go = Instantiate(prefab, Point(ps, side * pl, -0.05f), Upright(ps) * turn, transform);
+                    float size = Mathf.Lerp(0.8f, 1.4f, Hash(seed, 13));
                     go.transform.localScale = new Vector3(size, size, size);
-                    go.name = $"{prefab.name} @{s:0}m";
+                    go.name = $"{prefab.name} @{ps:0}m";
                     count++;
+                    break;
                 }
             }
             return count;
+        }
+
+        /// <summary>
+        /// Low compound wall around one plot: front (with a gateway in the middle) and back follow the road, the two
+        /// ends run straight out from it. One mesh per plot.
+        /// </summary>
+        private void BuildPlotWall(double s0, double s1, float side)
+        {
+            var v = new List<Vector3>();
+            var tri = new List<int>();
+            double mid = (s0 + s1) * 0.5;
+            const double gate = 2.0; // half the gateway's width
+            WallAlong(v, tri, s0, mid - gate, side * plotFront);
+            WallAlong(v, tri, mid + gate, s1, side * plotFront);
+            WallAlong(v, tri, s0, s1, side * plotBack);
+            WallAcross(v, tri, s0, side);
+            WallAcross(v, tri, s1, side);
+            AddMesh($"Plot wall @{s0:0}m", v, tri, wallMaterial);
+        }
+
+        private void WallAlong(List<Vector3> v, List<int> tri, double sA, double sB, float sideways)
+        {
+            int rings = Mathf.Max(2, Mathf.CeilToInt((float)(sB - sA) / ringMetres) + 1);
+            var centre = new Vector3[rings];
+            var across = new Vector3[rings];
+            for (int i = 0; i < rings; i++)
+            {
+                double s = Math.Min(sA + i * (double)ringMetres, sB);
+                centre[i] = Point(s, sideways, 0f);
+                across[i] = Point(s, sideways + 1f, 0f) - centre[i];
+            }
+            WallBox(v, tri, centre, across);
+        }
+
+        private void WallAcross(List<Vector3> v, List<int> tri, double s, float side)
+        {
+            var centre = new[] { Point(s, side * plotFront, 0f), Point(s, side * plotBack, 0f) };
+            Vector3 along = Point(s + 0.5, side * plotFront, 0f) - Point(s - 0.5, side * plotFront, 0f);
+            WallBox(v, tri, centre, new[] { along, along });
+        }
+
+        /// <summary>Two faces and a top along a line of points; drawn from both sides, so the winding cannot be wrong.</summary>
+        private void WallBox(List<Vector3> v, List<int> tri, Vector3[] centre, Vector3[] across)
+        {
+            const float t = 0.2f, low = -0.1f; // half thickness; starts just under the ground
+            float h = plotWallHeight;
+            Strip(v, tri, centre, across, -t, low, -t, h);
+            Strip(v, tri, centre, across, -t, h, -t, low);
+            Strip(v, tri, centre, across, t, low, t, h);
+            Strip(v, tri, centre, across, t, h, t, low);
+            Strip(v, tri, centre, across, -t, h, t, h);
+            Strip(v, tri, centre, across, t, h, -t, h);
         }
 
         private void Clear()

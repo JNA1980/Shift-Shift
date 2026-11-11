@@ -501,3 +501,16 @@ Done:
 
 Tested: compile check only. Not run in Unity.
 Uncertain: wide buildings at the near distance can reach the plant band (6.5-11 m), so a tree may stand inside a building now and then; frame rate with roughly twice the plants.
+
+## 2026-11-11 — D17: plots and compound walls
+
+John: fourth pass "looks good". Asked for trees beside the buildings or in empty spaces, so it reads as plots (building + trees, or trees only), and a compound wall to tell plots apart.
+
+Done (TrackBuilder scenery placement rewritten; posts unchanged):
+- Both sides of the road are divided into plots 30 m long with a 4 m lane between them, from 7.5 m to 40 m out. None where a plot would touch a bridge.
+- 55% of plots get one building (same 16 shapes, slightly smaller: 0.75-1.15) set back from the front wall, plus 2-5 plants placed only where the building is not. The rest get 5-9 plants and no building.
+- Compound wall per plot: 1.1 m high, generated as a mesh. Front wall (with a 4 m gateway in the middle) and back wall follow the road through bends and slopes; the two end walls run straight out. Road-grey material, one shade lighter than the ground. Faces drawn from both sides.
+- The loose band of trees between posts and buildings is gone (all plants are inside plots now).
+
+Tested: compile check, 133 Core tests. Not run in Unity.
+Uncertain: wall colour against the ground (#333 on #2A2A2A may be too close); walls on bends; object count (about 20 buildings and 200 plants on the test level) in WebGL.
