@@ -67,6 +67,19 @@ namespace ShiftShift.Tests
         }
 
         [Test]
+        public void Place_BarrierWithCores_KeepsItsLane_AndFillsTheBeat()
+        {
+            var c = new Chart(Level(E(8, 2, "bar")));
+            LevelEvent g = c.Place(8, 0, "ghostbar");
+            Assert.AreEqual(1, c.Events.Count, "the barrier replaces the bar on its beat");
+            Assert.AreEqual(0, g.lane, "clicked lane = the core's lane");
+            Assert.AreSame(g, c.At(8, 2), "the barrier covers every lane of its beat");
+            LevelEvent w = c.Place(12, 2, "ghostwide");
+            Assert.AreEqual(2, w.lane, "clicked lane = the free lane");
+            CollectionAssert.IsEmpty(c.Check(true).Errors);
+        }
+
+        [Test]
         public void Place_ClampsToLevel()
         {
             var c = new Chart(Level());

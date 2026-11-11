@@ -118,3 +118,28 @@ Track: tunnel 8, left bend 24, dip 40, S-bend 56, right bend 72, tunnel 80, arch
 
 Rules kept: jumps are never closer than 4 beats to each other; nothing is closer than 2 beats; a two-tap lane move always has 4 beats; no gap sits on a slope or on the bridge (so every gap shows its pit and water).
 Track: left bend 16, right bend 32, bridge 48, hill 64, dip 84, tunnel 102, S-bend 116, archways 132, rise 144.
+
+## Chart types for the ghost layer (day 17)
+
+| Type | What is spawned | Answer |
+|---|---|---|
+| ghost | Blue barrier across all lanes | Phase (hold both) |
+| ghostbar | Barrier, plus a light solid core in the event's lane | Phase, and do not be in that lane |
+| ghostwide | Barrier, plus cores in the other two lanes | Phase, in the event's lane |
+
+Cores are ghost-layer blocks: they only hit a phased runner, and you have to be phased at the barrier, so a core in your lane always hits. You cannot change lane while holding both keys, so the move comes first, then the hold.
+
+## Level 4, "Ghost layer" (first draft, day 17)
+
+`level04.json`: 125 BPM, 160 beats (77 s), night palette. New: phase (hold both through the blue barrier), then the second layer (cores). Combines everything so far. Placeholder audio: `click_125`.
+
+| Beats | What happens |
+|---|---|
+| 8-36 | Phase only, every 4 beats; twice, two barriers one beat apart (keep holding) |
+| 40-68 | Cores: first one you are already clear of, then ones that make you change lane before phasing |
+| 72-100 | Mixed with slide, jump, a sprint gate and a hurdle, 4 beats apart |
+| 101-111 | Breather, inside the tunnel |
+| 112-152 | Something every 2 beats; a lane change plus phase always gets 4 beats |
+
+Not done from the plan: eighth notes (levels 4-5 "move to eighth notes"). Left on quarter notes because levels 2 and 3 already took John 4 attempts each.
+Track: S-bend 16, left bend 32, hill 48, right bend 64, dip 88, tunnel 102, S-bend 128, rise 148.

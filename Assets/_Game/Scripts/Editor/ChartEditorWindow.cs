@@ -346,9 +346,12 @@ namespace ShiftShift.EditorTools
                 ObstacleTypes.TryGet(e.type, out ObstacleTypes.Spec spec);
                 for (int lane = 0; lane < 3; lane++)
                 {
-                    bool covered = spec.AllLanes || (spec.LaneIsOpening ? lane != e.lane : lane == e.lane);
+                    // Barrier with cores: the barrier fills the beat; the core lanes are drawn lighter.
+                    bool cores = spec.Cores != ObstacleTypes.Cores.None;
+                    bool core = cores && (spec.Cores == ObstacleTypes.Cores.EventLane ? lane == e.lane : lane != e.lane);
+                    bool covered = spec.AllLanes || cores || (spec.LaneIsOpening ? lane != e.lane : lane == e.lane);
                     var cell = new Rect(x, lanes.y + lane * LaneH + 3, w, LaneH - 7);
-                    if (covered) EditorGUI.DrawRect(cell, e == _dragging ? Color.white : c);
+                    if (covered) EditorGUI.DrawRect(cell, e == _dragging ? Color.white : core ? new Color(0.7f, 0.8f, 1f) : c);
                     else if (spec.LaneIsOpening) EditorGUI.DrawRect(new Rect(cell.x, cell.y + cell.height * 0.45f, cell.width, 2), c);
                 }
                 GUI.Label(new Rect(x, lanes.y + (spec.AllLanes || spec.LaneIsOpening ? 0 : e.lane * LaneH), 60, 16),
@@ -373,7 +376,9 @@ namespace ShiftShift.EditorTools
                 case "gate": return new Color(0.95f, 0.95f, 0.2f);
                 case "gap": return new Color(0.1f, 0.1f, 0.12f);
                 case "hurdle": return new Color(1f, 0.45f, 0.75f);
-                case "ghost": return new Color(0.25f, 0.35f, 0.9f);
+                case "ghost":
+                case "ghostbar":
+                case "ghostwide": return new Color(0.25f, 0.35f, 0.9f);
                 case "wall": return new Color(0.85f, 0.15f, 0.2f);
                 default: return Color.gray;
             }

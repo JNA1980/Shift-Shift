@@ -350,8 +350,9 @@ namespace ShiftShift.EditorTools
         // The Run scene plays the first level in GameFlow's list (until the level select, days 21-22).
         private static readonly string[] RunLevelOrder =
         {
-            // The level being worked on goes first for now (level 3).
-            "Assets/_Game/Levels/level03.json", "Assets/_Game/Levels/level02.json", "Assets/_Game/Levels/level01.json",
+            // The level being worked on goes first for now (level 4).
+            "Assets/_Game/Levels/level04.json", "Assets/_Game/Levels/level03.json", "Assets/_Game/Levels/level02.json",
+            "Assets/_Game/Levels/level01.json",
             "Assets/_Game/Levels/test_track.json",
             "Assets/_Game/Levels/test_gestures.json", "Assets/_Game/Levels/level00.json",
         };
@@ -367,6 +368,7 @@ namespace ShiftShift.EditorTools
                      {
                          (LongClickPath, 100.0, 112), ("Assets/_Game/Audio/Resources/click_110.wav", 110.0, 120),
                          ("Assets/_Game/Audio/Resources/click_120.wav", 120.0, 160),
+                         ("Assets/_Game/Audio/Resources/click_125.wav", 125.0, 168),
                      })
             {
                 if (System.IO.File.Exists(path)) continue;

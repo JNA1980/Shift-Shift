@@ -210,6 +210,9 @@ namespace ShiftShift.EditorTools
             WirePostProcessing(Camera.main, log, Path.GetFileNameWithoutExtension(scene.path));
             WireFeelAndTrail(applier, log, Path.GetFileNameWithoutExtension(scene.path));
             if (scene.path == RunScenePath) PutTrackTestLevelFirst(log);
+            // Keep the spawner's chart types up to date here too (new types: ghostbar, ghostwide), so one menu item is enough.
+            var spawner = Object.FindAnyObjectByType<ObstacleSpawner>();
+            if (spawner != null) SetTypePrefabs(spawner, TypeMap(EnsureAssets()));
 
             // Fog on in the scene's own lighting settings, so the fog shader variants are kept in builds.
             RenderSettings.fog = true;

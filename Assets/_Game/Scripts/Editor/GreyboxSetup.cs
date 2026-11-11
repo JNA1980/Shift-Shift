@@ -268,7 +268,7 @@ namespace ShiftShift.EditorTools
         private static (string type, GameObject prefab)[] TypeMap(Kit k) => new[]
         {
             ("bar", k.Block), ("wide", k.WideBar), ("low", k.Low), ("gate", k.GateOpening), ("gap", k.GapMarker),
-            ("hurdle", k.Hurdle), ("ghost", k.Barrier), ("wall", k.Wall),
+            ("hurdle", k.Hurdle), ("ghost", k.Barrier), ("ghostbar", k.Barrier), ("ghostwide", k.Barrier), ("wall", k.Wall),
         };
 
         private static void SetTypePrefabs(ObstacleSpawner spawner, (string type, GameObject prefab)[] map)
@@ -283,6 +283,8 @@ namespace ShiftShift.EditorTools
                 e.FindPropertyRelative("prefab").objectReferenceValue = map[i].prefab;
                 if (map[i].prefab == null) Debug.LogError($"[LevelTest] No prefab for type '{map[i].type}'.");
             }
+            so.FindProperty("ghostCorePrefab").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<GameObject>($"{ObstacleDir}/GhostBlock.prefab");
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

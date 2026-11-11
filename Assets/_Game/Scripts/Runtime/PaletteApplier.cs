@@ -172,7 +172,8 @@ namespace ShiftShift
                 case Role.Sprint: return p.sprint;
                 case Role.Jump: return p.jump;
                 case Role.Phase: return p.phase;
-                case Role.Ghost: return p.phase;
+                // Ghost-layer cores: lighter than the barrier they sit in, so they can be seen before phasing.
+                case Role.Ghost: return Color.Lerp(p.phase, Color.white, 0.45f);
                 case Role.Charge: return p.charge;
                 // Trees and shrubs: a dark, muted tint of the level's accent, so they never read as an action colour.
                 case Role.Scenery: return Color.Lerp(p.accent, p.roadDetail, 0.55f);

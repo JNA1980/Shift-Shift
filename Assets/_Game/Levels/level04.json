@@ -1,0 +1,245 @@
+{
+  "name": "Ghost layer",
+  "bpm": 125.0,
+  "audioClip": "click_125",
+  "offsetMs": 0.0,
+  "palette": "night",
+  "lengthBeats": 160.0,
+  "events": [
+    {
+      "beat": 8.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 12.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 16.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 20.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 24.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 25.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 28.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 29.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 32.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 36.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 40.0,
+      "lane": 0,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 44.0,
+      "lane": 1,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 48.0,
+      "lane": 2,
+      "type": "ghostwide"
+    },
+    {
+      "beat": 52.0,
+      "lane": 1,
+      "type": "ghostwide"
+    },
+    {
+      "beat": 56.0,
+      "lane": 1,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 60.0,
+      "lane": 1,
+      "type": "ghostwide"
+    },
+    {
+      "beat": 64.0,
+      "lane": 1,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 68.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 72.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 76.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 80.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 84.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 88.0,
+      "lane": 2,
+      "type": "gate"
+    },
+    {
+      "beat": 92.0,
+      "lane": 2,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 96.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 100.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 112.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 114.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 116.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 118.0,
+      "lane": 1,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 120.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 122.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 124.0,
+      "lane": 1,
+      "type": "ghostwide"
+    },
+    {
+      "beat": 126.0,
+      "lane": 1,
+      "type": "hurdle"
+    },
+    {
+      "beat": 128.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 132.0,
+      "lane": 2,
+      "type": "ghostbar"
+    },
+    {
+      "beat": 134.0,
+      "lane": 1,
+      "type": "low"
+    },
+    {
+      "beat": 136.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 138.0,
+      "lane": 0,
+      "type": "gate"
+    },
+    {
+      "beat": 140.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 141.0,
+      "lane": 1,
+      "type": "ghost"
+    },
+    {
+      "beat": 144.0,
+      "lane": 1,
+      "type": "gap"
+    },
+    {
+      "beat": 146.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 148.0,
+      "lane": 1,
+      "type": "ghostwide"
+    },
+    {
+      "beat": 152.0,
+      "lane": 1,
+      "type": "ghost"
+    }
+  ],
+  "track": [
+    { "beat": 16.0, "piece": "sRight" },
+    { "beat": 32.0, "piece": "bendLeft" },
+    { "beat": 48.0, "piece": "crest" },
+    { "beat": 64.0, "piece": "bendRight" },
+    { "beat": 88.0, "piece": "dip" },
+    { "beat": 102.0, "piece": "tunnel" },
+    { "beat": 128.0, "piece": "sLeft" },
+    { "beat": 148.0, "piece": "rise" }
+  ]
+}

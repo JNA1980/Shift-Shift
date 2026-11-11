@@ -33,9 +33,9 @@ namespace ShiftShift.Core
 
         public static bool IsAllLanes(string type) => ObstacleTypes.TryGet(type, out var s) && s.AllLanes;
 
-        /// <summary>Occupies its whole beat: all-lane types and opening types (gate, wide bar block two lanes).</summary>
+        /// <summary>Occupies its whole beat: all-lane types, opening types (gate, wide bar) and barriers with cores.</summary>
         public static bool SpansBeat(string type) =>
-            ObstacleTypes.TryGet(type, out var s) && (s.AllLanes || s.LaneIsOpening);
+            ObstacleTypes.TryGet(type, out var s) && (s.AllLanes || s.LaneIsOpening || s.Cores != ObstacleTypes.Cores.None);
 
         /// <summary>The event drawn in this cell (an all-lane event covers every lane of its beat), or null.</summary>
         public LevelEvent At(double beat, int lane)
