@@ -773,12 +773,29 @@ MonoBehaviour:
   - {fileID: 5307722197451186642, guid: 44c0bcc0328b9b44aada13a04b1531c1, type: 3}
   - {fileID: 3154877725688003065, guid: ab711b801985d4f45947dce8ceeb7b7b, type: 3}
   - {fileID: 1442545618727574867, guid: 216dc533f55730c49bd1e6cd44ded807, type: 3}
+  - {fileID: 7998637448964185439, guid: 660cb624ee597954bb36916a9a683878, type: 3}
+  - {fileID: 4910051536992728576, guid: 98cfc8da8741bc046b78fbec8dd98c24, type: 3}
+  - {fileID: 3110457339469896836, guid: f9b97e211e7373a478e1eb3e590d0cbb, type: 3}
+  - {fileID: 6935553745752099799, guid: a1c4bc1ae30c6924b9fe323ef2033879, type: 3}
+  - {fileID: 8457128865774622670, guid: 322427c5ab985d8418d253a838c74a19, type: 3}
+  - {fileID: 2978531468090505379, guid: ed5889f609efbcb45b877b08f0d0dc7c, type: 3}
+  - {fileID: 1808057587068082338, guid: 71bdaad169338264f9d1705a09690316, type: 3}
+  - {fileID: 1255786809301636845, guid: 53aaba212035fab45a9ad2c99668cb24, type: 3}
+  - {fileID: 3883217129952188910, guid: 62f913ad320349146869ee979ed1f99f, type: 3}
+  - {fileID: 4006768207871934362, guid: 8c631dfe768fe2142915b4d4c52c3cc7, type: 3}
   plantPrefabs:
+  - {fileID: 5748862078084711452, guid: 74eb6d614688f47479cf4bc72eb7d31a, type: 3}
+  - {fileID: 4114465771423361139, guid: 0a53cdf05865c4f41a52b71a41b7f7bc, type: 3}
+  - {fileID: 2389411025595617833, guid: 996f3dc738862c649be2669601fd4b74, type: 3}
+  - {fileID: 1407803904004721994, guid: 94d9d4cae8d80894b91882a56729f721, type: 3}
+  - {fileID: 5748862078084711452, guid: 74eb6d614688f47479cf4bc72eb7d31a, type: 3}
+  - {fileID: 4114465771423361139, guid: 0a53cdf05865c4f41a52b71a41b7f7bc, type: 3}
   - {fileID: 6900928439402554368, guid: bef0d4d4ec52b894b8e5a6fdb16814a0, type: 3}
   - {fileID: 2097488578142908853, guid: 05350263d9773f74b944303ef4876cae, type: 3}
   - {fileID: 2279333937312249830, guid: c91350894d6cde843ab8110c346c3e30, type: 3}
   - {fileID: 2279333937312249830, guid: c91350894d6cde843ab8110c346c3e30, type: 3}
-  plantChance: 0.45
+  plantEveryMetres: 7
+  plantChancePerSpot: 0.7
   backdropEveryMetres: 25
   backdropNearMetres: 18
   backdropFarMetres: 34
