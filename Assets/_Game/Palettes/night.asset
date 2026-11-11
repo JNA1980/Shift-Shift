@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd5d845b7c804107b995322476d66089, type: 3}
+  m_Name: night
+  m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.Palette
+  background: {r: 0.043137256, g: 0.0627451, b: 0.14901961, a: 1}
+  road: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  roadDetail: {r: 0.16470589, g: 0.16470589, b: 0.16470589, a: 1}
+  lines: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
+  accent: {r: 0.36078432, g: 0.88235295, b: 0.9019608, a: 1}
+  lane: {r: 0.9490196, g: 0.4392157, b: 0.09019608, a: 1}
+  slide: {r: 0.9882353, g: 0.76862746, b: 0.11764706, a: 1}
+  sprint: {r: 0, g: 0.9882353, b: 0.9764706, a: 1}
+  jump: {r: 0.95686275, g: 0.05490196, b: 0.6156863, a: 1}
+  phase: {r: 0.05490196, g: 0.4745098, b: 0.94509804, a: 1}
+  charge: {r: 0.9490196, g: 0.11764706, b: 0.23921569, a: 1}
