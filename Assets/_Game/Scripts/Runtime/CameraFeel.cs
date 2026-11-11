@@ -27,6 +27,12 @@ namespace ShiftShift
                  "ceiling). Gate tops (3.1 m) are then above the camera while in the tunnel.")]
         [Range(0f, 1.5f)] public float tunnelDrop = 0.5f;
 
+        [Tooltip("The drop eases in over this distance before a tunnel and out over it after (no sudden rise at the exit).")]
+        [Min(0.5f)] public float tunnelEaseMetres = 12f;
+        [Tooltip("How much of the runner's jump height the camera follows. 0 = stays level (John, day 17: the camera " +
+                 "should not rise at the pink wall). It was 0.5 before.")]
+        [Range(0f, 1f)] public float jumpFollow = 0f;
+
         [Header("Field of view")]
         public float baseFov = 60f;
         public float sprintFov = 72f;

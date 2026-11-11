@@ -82,6 +82,75 @@ namespace ShiftShift.EditorTools
                 Box(go, "Cap", new Vector3(0, 9.6f, 0), new Vector3(9.2f, 0.2f, 2.2f), "TrackLines");
             });
 
+            // Ten more shapes (John, day 17: six still looked alike).
+            DressingPrefab("BackdropL", go =>
+            {
+                Tall(go, "Wing", -2f, 0, 4f, 10f, 9f);
+                Tall(go, "Foot", 3f, -3f, 6f, 4f, 6f);
+            });
+            DressingPrefab("BackdropPyramid", go =>
+            {
+                Tall(go, "Tier1", 0, 0, 10f, 10f, 3f);
+                Tall(go, "Tier2", 0, 0, 7.5f, 7.5f, 6f);
+                Tall(go, "Tier3", 0, 0, 5f, 5f, 9f);
+                Tall(go, "Tier4", 0, 0, 2.5f, 2.5f, 12f);
+            });
+            DressingPrefab("BackdropNeedle", go =>
+            {
+                Tall(go, "Base", 0, 0, 6f, 6f, 3f);
+                Tall(go, "Needle", 0, 0, 2f, 2f, 20f);
+            });
+            DressingPrefab("BackdropCluster", go =>
+            {
+                Tall(go, "A", -3f, 0, 4f, 4f, 4f);
+                Tall(go, "B", 2f, 1f, 3f, 5f, 7f);
+                Tall(go, "C", 1f, -4f, 5f, 3f, 2.5f);
+            });
+            DressingPrefab("BackdropFrame", go =>
+            {
+                Tall(go, "LegA", -5f, 0, 1.5f, 1.5f, 12f);
+                Tall(go, "LegB", 5f, 0, 1.5f, 1.5f, 12f);
+                Box(go, "Top", new Vector3(0, 12.6f, 0), new Vector3(11.5f, 1.2f, 1.5f), "TrackDark");
+                Box(go, "TopCap", new Vector3(0, 13.3f, 0), new Vector3(11.7f, 0.2f, 1.7f), "TrackLines");
+            });
+            DressingPrefab("BackdropT", go =>
+            {
+                Tall(go, "Stem", 0, 0, 3f, 3f, 10f);
+                Box(go, "Deck", new Vector3(0, 11f, 0), new Vector3(9f, 2f, 5f), "TrackDark");
+                Box(go, "DeckCap", new Vector3(0, 12.1f, 0), new Vector3(9.2f, 0.2f, 5.2f), "TrackLines");
+            });
+            DressingPrefab("BackdropWall", go =>
+            {
+                Tall(go, "Wall", 0, 0, 16f, 2f, 7f);
+                Tall(go, "Keep", -5f, 0, 3f, 3f, 10f);
+            });
+            DressingPrefab("BackdropStairs", go =>
+            {
+                Tall(go, "Low", -3.5f, 0, 3.5f, 4f, 5f);
+                Tall(go, "Mid", 0, 0, 3.5f, 4f, 9f);
+                Tall(go, "High", 3.5f, 0, 3.5f, 4f, 13f);
+            });
+            DressingPrefab("BackdropCrown", go =>
+            {
+                Tall(go, "Body", 0, 0, 6f, 6f, 8f);
+                Tall(go, "Spire1", -2.5f, -2.5f, 1f, 1f, 11f);
+                Tall(go, "Spire2", 2.5f, -2.5f, 1f, 1f, 11f);
+                Tall(go, "Spire3", -2.5f, 2.5f, 1f, 1f, 11f);
+                Tall(go, "Spire4", 2.5f, 2.5f, 1f, 1f, 11f);
+            });
+            DressingPrefab("BackdropLinked", go =>
+            {
+                Tall(go, "TowerA", -4f, 0, 3f, 3f, 14f);
+                Tall(go, "TowerB", 4f, 0, 3f, 3f, 14f);
+                Box(go, "Walkway", new Vector3(0, 10f, 0), new Vector3(5f, 1f, 2f), "TrackDark");
+            });
+
+            // Conifers (John, day 17): tiers that narrow to a point, every other tier turned 45 degrees.
+            DressingPrefab("ConiferTall", go => Conifer(go, 2f, new[] { 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f }, 1.0f));
+            DressingPrefab("ConiferSmall", go => Conifer(go, 1f, new[] { 1.8f, 1.3f, 0.8f, 0.4f }, 0.7f));
+            DressingPrefab("ConiferWide", go => Conifer(go, 1.2f, new[] { 3.6f, 2.9f, 2.1f, 1.3f, 0.6f }, 0.8f));
+            DressingPrefab("ConiferSlim", go => Conifer(go, 1.6f, new[] { 1.6f, 1.4f, 1.2f, 1.0f, 0.8f, 0.6f, 0.3f }, 0.9f));
+
             // Plants: blocky, to match the rest. "Foliage" is a muted tint of each palette's accent.
             DressingPrefab("TreeTiered", go =>
             {
@@ -104,8 +173,31 @@ namespace ShiftShift.EditorTools
         }
 
         private static readonly string[] BackdropNames =
-            { "BackdropTower", "BackdropSlab", "BackdropStepped", "BackdropTwin", "BackdropSpire", "BackdropArch" };
-        private static readonly string[] PlantNames = { "TreeTiered", "TreeRound", "Shrub", "Shrub" }; // shrubs twice as often
+        {
+            "BackdropTower", "BackdropSlab", "BackdropStepped", "BackdropTwin", "BackdropSpire", "BackdropArch",
+            "BackdropL", "BackdropPyramid", "BackdropNeedle", "BackdropCluster", "BackdropFrame", "BackdropT",
+            "BackdropWall", "BackdropStairs", "BackdropCrown", "BackdropLinked",
+        };
+        // Mostly conifers; the builder picks one of these per spot.
+        private static readonly string[] PlantNames =
+        {
+            "ConiferTall", "ConiferSmall", "ConiferWide", "ConiferSlim", "ConiferTall", "ConiferSmall",
+            "TreeTiered", "TreeRound", "Shrub", "Shrub",
+        };
+
+        /// <summary>A trunk and a stack of foliage tiers, widest at the bottom.</summary>
+        private static void Conifer(GameObject go, float trunk, float[] widths, float tierHeight)
+        {
+            Box(go, "Trunk", new Vector3(0, trunk * 0.5f - 0.1f, 0), new Vector3(0.3f, trunk + 0.2f, 0.3f), "TrackDark");
+            for (int i = 0; i < widths.Length; i++)
+            {
+                string name = "Tier" + i;
+                // Tiers overlap a little so no gaps show between them.
+                Box(go, name, new Vector3(0, trunk + (i + 0.5f) * tierHeight * 0.85f, 0),
+                    new Vector3(widths[i], tierHeight, widths[i]), "Foliage");
+                if (i % 2 == 1) go.transform.Find(name).localRotation = Quaternion.Euler(0f, 45f, 0f);
+            }
+        }
 
         /// <summary>A dark box from 30 m below the ground up to <paramref name="top"/>, with a lit cap.</summary>
         private static void Tall(GameObject go, string name, float x, float z, float width, float depth, float top)

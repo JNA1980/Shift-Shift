@@ -61,7 +61,8 @@ namespace ShiftShift
         [SerializeField] private List<GameObject> backdropPrefabs = new List<GameObject>();
         [Tooltip("Trees and shrubs: now and then, between the posts and the buildings.")]
         [SerializeField] private List<GameObject> plantPrefabs = new List<GameObject>();
-        [SerializeField, Range(0f, 1f)] private float plantChance = 0.45f;
+        [SerializeField, Min(2f)] private float plantEveryMetres = 7f;
+        [SerializeField, Range(0f, 1f)] private float plantChancePerSpot = 0.7f;
         [SerializeField, Min(5f)] private float backdropEveryMetres = 25f;
         [SerializeField, Min(8f)] private float backdropNearMetres = 18f;
         [SerializeField, Min(8f)] private float backdropFarMetres = 34f;
@@ -207,9 +208,9 @@ namespace ShiftShift
             if (plantPrefabs.Count > 0)
             {
                 int i = 0;
-                for (double s = _path.Start + 6; s <= _path.End; s += 12, i++)
+                for (double s = _path.Start + 3; s <= _path.End; s += plantEveryMetres, i++)
                 {
-                    if (Hash(i, 7) > plantChance || InTunnel(s) || OnBridge(s)) continue;
+                    if (Hash(i, 7) > plantChancePerSpot || InTunnel(s) || OnBridge(s)) continue;
                     GameObject prefab = plantPrefabs[Mathf.Min((int)(Hash(i, 8) * plantPrefabs.Count), plantPrefabs.Count - 1)];
                     float side = (Hash(i, 9) < 0.5f ? -1f : 1f) * Mathf.Lerp(6.5f, 11f, Hash(i, 10));
                     Quaternion turn = Quaternion.Euler(0f, 360f * Hash(i, 11), 0f);
