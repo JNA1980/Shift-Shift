@@ -44,6 +44,8 @@ namespace ShiftShift.EditorTools
             AddGapRims(log);
             RebuildOpeningLayouts(log); // step 5: solid wide bar slabs, framed gate doorway (before edges are added)
             AddGlowEdges(log);       // step 2: glowing obstacle edges
+            MakeBarrierSeeThrough(log); // day 17 (John): see the road behind the phase barrier
+            MakeWallBrick(log);         // day 17 (John): the charge wall looks like bricks
             EnableBloomInProfile(log);
             EnsureCameraFeel(log);   // step 3: camera feel asset
             EnsureLongClick(log);    // playbook 2.3: audio for the track test level

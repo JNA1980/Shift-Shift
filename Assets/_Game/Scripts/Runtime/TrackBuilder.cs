@@ -49,6 +49,17 @@ namespace ShiftShift
         [SerializeField] private GameObject pillarsPrefab;
         [SerializeField, Min(1f)] private float dressingMetres = 10f;
 
+        [Header("Roadside scenery (John, day 17: gives the world depth)")]
+        [Tooltip("Marker post, repeated on both sides of the road. Not placed in tunnels.")]
+        [SerializeField] private GameObject roadsidePrefab;
+        [SerializeField, Min(2f)] private float roadsideEveryMetres = 10f;
+        [SerializeField, Min(3.6f)] private float roadsideOffset = 5f;
+        [Tooltip("Tall block in the distance, alternating sides, at varied distances and heights.")]
+        [SerializeField] private GameObject backdropPrefab;
+        [SerializeField, Min(5f)] private float backdropEveryMetres = 25f;
+        [SerializeField, Min(8f)] private float backdropNear = 14f;
+        [SerializeField, Min(8f)] private float backdropFar = 30f;
+
         public float LengthMetres => conductor != null && conductor.Level != null
             ? (float)(conductor.Level.lengthBeats * MetresPerBeat) : lengthMetres;
 
@@ -134,7 +145,49 @@ namespace ShiftShift
                     go.name = $"{span.Piece} @{s:0}m";
                 }
             }
+            int scenery = BuildScenery();
+            Debug.Log($"[Track] {scenery} scenery objects.");
             Debug.Log($"[Track] Built {_path.End - _path.Start:0} m in {chunks} chunks, {_path.Spans.Count} pieces, {dressed} dressing parts.");
+        }
+
+        private bool InTunnel(double s) =>
+            _path.TryGetSpan(s, out TrackPath.Span span) && span.Spec.Dressing == TrackPieces.Dressing.Tunnel;
+
+        /// <summary>Same "random" value every run for the same index, 0..1 (no System.Random state to carry).</summary>
+        private static float Hash(int i, int salt)
+        {
+            double v = Math.Sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+            return (float)(v - Math.Floor(v));
+        }
+
+        private int BuildScenery()
+        {
+            int count = 0;
+            if (roadsidePrefab != null)
+                for (double s = _path.Start; s <= _path.End; s += roadsideEveryMetres)
+                {
+                    if (InTunnel(s)) continue;
+                    foreach (float side in new[] { -roadsideOffset, roadsideOffset })
+                    {
+                        Instantiate(roadsidePrefab, Point(s, side, 0f), Rotation(s), transform).name = $"Post @{s:0}m";
+                        count++;
+                    }
+                }
+            if (backdropPrefab != null)
+            {
+                int i = 0;
+                for (double s = _path.Start; s <= _path.End + 80; s += backdropEveryMetres, i++)
+                {
+                    float side = (i % 2 == 0 ? -1f : 1f) * Mathf.Lerp(backdropNear, backdropFar, Hash(i, 1));
+                    // Sunk by a varied amount, so the tops differ; the blocks reach far below the road.
+                    GameObject go = Instantiate(backdropPrefab, Point(s, side, -9f * Hash(i, 2)), Rotation(s), transform);
+                    float w = Mathf.Lerp(0.7f, 1.6f, Hash(i, 3));
+                    go.transform.localScale = new Vector3(w, 1f, Mathf.Lerp(0.7f, 1.6f, Hash(i, 4)));
+                    go.name = $"Block @{s:0}m";
+                    count++;
+                }
+            }
+            return count;
         }
 
         private void Clear()

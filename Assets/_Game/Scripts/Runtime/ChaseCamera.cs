@@ -32,6 +32,19 @@ namespace ShiftShift
             _y = feel.offset.y;
         }
 
+        /// <summary>Extra camera height when the road ahead climbs (John, day 17: obstacles poked above the horizon).</summary>
+        private float SlopeLift(TrackBuilder track, float s)
+        {
+            if (feel.slopeLift <= 0f) return 0f;
+            double camS = s + feel.offset.z;
+            // Not inside a tunnel: the ceiling is 0.2 m above the camera.
+            foreach (double at in new[] { camS, (double)s })
+                if (track.Path.TryGetSpan(at, out ShiftShift.Core.TrackPath.Span span) &&
+                    span.Spec.Dressing == ShiftShift.Core.TrackPieces.Dressing.Tunnel) return 0f;
+            double gain = track.Path.HeightAt(s + feel.slopeLookMetres) - track.Path.HeightAt(camS);
+            return Mathf.Max(0f, (float)gain) * feel.slopeLift;
+        }
+
         private void LateUpdate()
         {
             if (target == null || target.Track == null) return;
@@ -42,7 +55,7 @@ namespace ShiftShift
             float s = target.Distance;
             var t = new Vector3(target.Sideways, target.Height, 0f);
             _x = Mathf.SmoothDamp(_x, t.x + feel.offset.x, ref _vx, feel.lateralLagSeconds);
-            _y = Mathf.SmoothDamp(_y, feel.offset.y + t.y * 0.5f, ref _vy, feel.lateralLagSeconds);
+            _y = Mathf.SmoothDamp(_y, feel.offset.y + t.y * 0.5f + SlopeLift(track, s), ref _vy, feel.lateralLagSeconds);
             transform.position = track.Point(s + feel.offset.z, _x, _y);
             transform.LookAt(track.Point(s + feel.lookAhead, _x, 1f));
 

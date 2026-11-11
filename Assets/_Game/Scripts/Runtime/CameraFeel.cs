@@ -15,6 +15,13 @@ namespace ShiftShift
         public float lookAhead = 8f;
         [Min(0f)] public float lateralLagSeconds = 0.12f;
 
+        [Header("Slopes (day 17)")]
+        [Tooltip("The camera lifts by the height the road gains between itself and this far ahead of the runner, " +
+                 "so obstacles on a rise stay below eye level. Off inside tunnels.")]
+        [Min(0f)] public float slopeLookMetres = 30f;
+        [Tooltip("How much of that height gain the camera lifts by (0 = off).")]
+        [Range(0f, 2f)] public float slopeLift = 0.6f;
+
         [Header("Field of view")]
         public float baseFov = 60f;
         public float sprintFov = 72f;

@@ -452,3 +452,17 @@ Found:
 - The blue phase barrier (beat 60, on the crest) reads as "the end of the game": a full-width opaque wall with nothing visible behind or beside it. John's guess: no surroundings to give depth.
 - Obstacles poke above the horizon on slopes (expected; the 3.2 m rule assumed a flat road).
 Open, waiting for John's choice: see-through barrier, roadside scenery (not in SCOPE.md as written), what to do about the horizon on slopes.
+
+## 2026-11-11 — D17: scenery, see-through barrier, camera on slopes, brick wall
+
+John's choices after playing the track kit: roadside scenery and a see-through barrier ("like car racing games"), camera adjusts on slopes, red wall made of bricks. Scenery recorded in SCOPE.md decisions.
+
+Done:
+- Scenery (TrackBuilder): RoadsidePost every 10 m on both sides at 5 m (not in tunnels); BackdropBlock every 25 m on alternating sides, 14-30 m out, width and top height varied by a fixed hash (same every run). Both use the road-detail and line materials, so palettes colour them.
+- Barrier: material set to URP transparent, 30% solid; PhaseBarrier prefab gets glowing side posts and sill. PaletteApplier keeps each material's own alpha when recolouring.
+- Camera: lifts by slopeLift (0.6) x the height the road gains between the camera and 30 m ahead of the runner; off inside tunnels. Both values in CameraFeel.
+- Wall: the tool generates Materials/Greybox/Brick.png (64x32, running bond) and puts it on the Wall material, tiled 7 x 8; the palette's charge red tints it.
+
+Tested: compile check and 133 Core tests.
+Not run in Unity: all four. Unverified: transparent material set from script (keywords, sorting against the glow frame and the trail), brick scale, scenery density and frame rate in WebGL, how the lift feels.
+Note: Brick.png is created on John's machine and committed from there (LFS does not work from the cloud session).

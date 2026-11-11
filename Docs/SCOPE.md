@@ -36,6 +36,7 @@ Below item 6 the game no longer interprets the theme well; if that line is reach
 Rule: any task more than two days late gets cut in this order rather than caught up.
 
 ## Decisions
+- Day 17: roadside scenery (marker posts, distant blocks) added to the track kit at John's request, for depth.
 - Day 13 (M1, early): keep all 7 gestures (John). Revisit only if the all-gestures test level shows a real problem.
 
 ## Post-jam

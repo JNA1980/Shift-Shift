@@ -48,6 +48,7 @@ namespace ShiftShift
             public Material Copy;
             public Role Role;
             public bool Glow;
+            public float Alpha; // the material's own transparency (see-through barrier), kept when recolouring
         }
 
         private readonly List<Entry> _entries = new List<Entry>();
@@ -113,7 +114,8 @@ namespace ShiftShift
                     {
                         copy = new Material(m) { name = m.name + " (" + p.name + ")" };
                         copies[m] = copy;
-                        _entries.Add(new Entry { Copy = copy, Role = role.role, Glow = role.glow });
+                        float alpha = m.HasProperty("_BaseColor") ? m.GetColor("_BaseColor").a : 1f;
+                        _entries.Add(new Entry { Copy = copy, Role = role.role, Glow = role.glow, Alpha = alpha });
                     }
                     mats[i] = copy;
                     changed = true;
@@ -150,6 +152,7 @@ namespace ShiftShift
                 Color normal = ColourFor(e.Role, p);
                 Color phased = PhasedColour(e.Role, p, normal);
                 Color c = Color.Lerp(normal, phased, phase);
+                c.a = e.Alpha;
                 e.Copy.color = c;
                 if (e.Copy.HasProperty("_BaseColor")) e.Copy.SetColor("_BaseColor", c);
                 // The _EMISSION keyword is already on in the glow material asset (so builds keep the variant).

@@ -39,6 +39,96 @@ namespace ShiftShift.EditorTools
                 Box(go, "Beam", new Vector3(0, 5.25f, 5f), new Vector3(8.9f, 0.5f, 0.5f), "TrackDark");
                 Box(go, "Light", new Vector3(0, 4.97f, 5f), new Vector3(TrackWidth, 0.06f, 0.2f), "TrackLines");
             });
+            EnsureScenery();
+        }
+
+        // ---------- day 17 look changes (John): roadside scenery, see-through barrier, brick wall ----------
+
+        private const string BrickPath = MatDir + "/Brick.png";
+
+        private static void EnsureScenery()
+        {
+            DressingPrefab("RoadsidePost", go =>
+            {
+                Box(go, "Post", new Vector3(0, 0.6f, 0), new Vector3(0.18f, 2.2f, 0.18f), "TrackDark"); // from -0.5 to 1.7 m
+                Box(go, "Tip", new Vector3(0, 1.8f, 0), new Vector3(0.22f, 0.22f, 0.22f), "TrackLines");
+            });
+            DressingPrefab("BackdropBlock", go =>
+            {
+                Box(go, "Body", new Vector3(0, -9f, 0), new Vector3(5f, 42f, 5f), "TrackDark");          // top at 12 m
+                Box(go, "Cap", new Vector3(0, 12.1f, 0), new Vector3(5.2f, 0.2f, 5.2f), "TrackLines");
+            });
+        }
+
+        /// <summary>The phase barrier becomes a see-through panel in a bright frame: you can see the road go on behind it.</summary>
+        private static void MakeBarrierSeeThrough(List<string> log)
+        {
+            Material m = Mats["Barrier"];
+            Color c = m.GetColor("_BaseColor");
+            if (c.a > 0.99f || m.renderQueue < 3000)
+            {
+                // URP Lit, transparent surface (what the Inspector's Surface Type = Transparent sets).
+                c.a = 0.3f;
+                m.SetColor("_BaseColor", c);
+                m.SetFloat("_Surface", 1f);
+                m.SetFloat("_Blend", 0f);
+                m.SetOverrideTag("RenderType", "Transparent");
+                m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                m.SetFloat("_ZWrite", 0f);
+                m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                m.renderQueue = 3000;
+                EditorUtility.SetDirty(m);
+                log.Add("Barrier material: see-through (30% solid)");
+            }
+
+            string path = $"{ObstacleDir}/PhaseBarrier.prefab";
+            if (!System.IO.File.Exists(path)) return;
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            if (root.transform.Find("FrameL") == null)
+            {
+                // Bright posts and a sill in the phase glow colour (the top edge strip is already there).
+                Box(root, "FrameL", new Vector3(-3.45f, 1.5f, 0), new Vector3(0.12f, 3f, 0.34f), "PhaseGlow");
+                Box(root, "FrameR", new Vector3(3.45f, 1.5f, 0), new Vector3(0.12f, 3f, 0.34f), "PhaseGlow");
+                Box(root, "FrameBottom", new Vector3(0, 0.06f, 0), new Vector3(TrackWidth, 0.12f, 0.34f), "PhaseGlow");
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+                log.Add("PhaseBarrier: bright frame added");
+            }
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        /// <summary>Brick pattern (generated here, grey on white) on the charge wall; the palette's red tints it.</summary>
+        private static void MakeWallBrick(List<string> log)
+        {
+            if (!System.IO.File.Exists(BrickPath))
+            {
+                // One tile = one brick wide, two rows high, the second row shifted half a brick.
+                const int w = 64, h = 32, mortar = 2;
+                var tex = new Texture2D(w, h, TextureFormat.RGB24, false);
+                var brick = new Color(1f, 1f, 1f);
+                var joint = new Color(0.35f, 0.35f, 0.35f);
+                for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                {
+                    int row = y / (h / 2);
+                    bool rowJoint = y % (h / 2) < mortar;
+                    int shifted = (x + (row == 1 ? w / 2 : 0)) % w;
+                    tex.SetPixel(x, y, rowJoint || shifted < mortar ? joint : brick);
+                }
+                System.IO.File.WriteAllBytes(BrickPath, tex.EncodeToPNG());
+                Object.DestroyImmediate(tex);
+                AssetDatabase.ImportAsset(BrickPath);
+                log.Add($"Generated {BrickPath}");
+            }
+            var brickTex = AssetDatabase.LoadAssetAtPath<Texture2D>(BrickPath);
+            Material m = Mats["Wall"];
+            if (brickTex != null && m.GetTexture("_BaseMap") != brickTex)
+            {
+                m.SetTexture("_BaseMap", brickTex);
+                m.SetTextureScale("_BaseMap", new Vector2(7f, 8f)); // wall is 7 x 3 m: bricks 1 m long, rows 0.19 m
+                EditorUtility.SetDirty(m);
+                log.Add("Wall material: brick pattern");
+            }
         }
 
         private static GameObject DressingPrefab(string name, System.Action<GameObject> build)
@@ -64,6 +154,8 @@ namespace ShiftShift.EditorTools
             Set(builder, "tunnelPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/TunnelShell.prefab"));
             Set(builder, "bridgePrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/BridgeRails.prefab"));
             Set(builder, "pillarsPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/Pillars.prefab"));
+            Set(builder, "roadsidePrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/RoadsidePost.prefab"));
+            Set(builder, "backdropPrefab", AssetDatabase.LoadAssetAtPath<GameObject>($"{TrackDir}/BackdropBlock.prefab"));
             if (conductor == null)
             {
                 // Greybox: straight-shaped pieces only (its obstacles are hand-placed in world positions).
