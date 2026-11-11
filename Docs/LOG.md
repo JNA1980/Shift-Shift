@@ -522,3 +522,11 @@ John: plots look good. Walls only along the road, not around the plot; lit top e
 Done (TrackBuilder): back and end walls removed. Each plot's road-side wall has a lit strip on top (line material), a closed gate in the middle (4 m, thinner, ground-dark, lit bar on top) between two gate posts 0.5 m taller than the wall, and closed ends. Marker posts are skipped within 3.5 m of a gate's centre.
 Tested: compile check only. Not run in Unity.
 Uncertain: the lit wall edges run parallel to the road's edge lines 4 m away; they may compete with the lane lines for attention. Both use the same line material, so shared-face seams between wall and end faces rely on RecalculateNormals (possible soft shading at wall ends).
+
+## 2026-11-11 — D17: white screen fixed
+
+John: after the wall change the Game view was white with a few black marks. Nothing lost: his commit holds the code as pushed.
+Cause (from reading the code, not reproduced here): the wall end faces added in the last change shared four corners between a front-facing and a back-facing pair of triangles. RecalculateNormals averages the two opposite directions to zero; the lit shader normalises that to an invalid value (NaN); bloom spreads one invalid pixel over the whole screen.
+Fix: each side of an end face has its own four corners. The Strip() calls were already safe (every strip adds its own vertices).
+Tested: compile check only. Not run in Unity.
+Lesson for the mesh code: never let one vertex belong to triangles facing opposite ways.

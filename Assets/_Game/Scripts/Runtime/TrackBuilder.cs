@@ -314,14 +314,18 @@ namespace ShiftShift
             Strip(v, tri, centre, across, -t, high, t, high);
             Strip(v, tri, centre, across, t, high, -t, high);
             // Close both ends (the camera looks along the walls, so open ends would show).
+            // Each side gets its OWN four corners. Sharing corners between the two sides made their directions
+            // cancel out to nothing, which the lighting turned into invalid pixels that bloom smeared across the
+            // whole screen (day 17: white screen).
             foreach (int i in new[] { 0, rings - 1 })
+            foreach (bool flip in new[] { false, true })
             {
                 int n = v.Count;
                 v.Add(centre[i] + across[i] * -t + Vector3.up * low);
                 v.Add(centre[i] + across[i] * -t + Vector3.up * high);
                 v.Add(centre[i] + across[i] * t + Vector3.up * high);
                 v.Add(centre[i] + across[i] * t + Vector3.up * low);
-                foreach (int k in new[] { 0, 1, 2, 0, 2, 3, 0, 2, 1, 0, 3, 2 }) tri.Add(n + k);
+                foreach (int k in flip ? new[] { 0, 2, 1, 0, 3, 2 } : new[] { 0, 1, 2, 0, 2, 3 }) tri.Add(n + k);
             }
         }
 
