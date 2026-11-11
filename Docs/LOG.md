@@ -423,3 +423,7 @@ Done:
 Tested: per-assembly compile check against stand-ins (stand-in gap fixed: Texture now derives from Object); 120 Core tests pass.
 Not run: nothing in Unity yet — the prefab rebuild, the edge strips on the new pieces, the phase blend, the scanlines and their draw order against the HUD are all unverified until John runs Set Up Visuals and plays.
 Uncertain: whether scanlines draw over or under the GameFlow text (GUI.depth across components); whether the near-white ghost colour reads well on the dusk/night skies.
+
+## 2026-11-11 — D17: steps 4 and 5 verified
+
+John ran Set Up Visuals and played the Run scene: the phase look and the new wide bar and gate shapes work. Committed on his side. Still open: the scanline draw order against the HUD text and how the ghost colour reads on dusk/night (not tested; the test level is dawn).
