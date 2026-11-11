@@ -1,0 +1,153 @@
+{
+  "name": "Warm-up",
+  "bpm": 100.0,
+  "audioClip": "click_100_long",
+  "offsetMs": 0.0,
+  "palette": "dawn",
+  "lengthBeats": 104.0,
+  "events": [
+    {
+      "beat": 8.0,
+      "lane": 1,
+      "type": "bar"
+    },
+    {
+      "beat": 12.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 16.0,
+      "lane": 1,
+      "type": "bar"
+    },
+    {
+      "beat": 20.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 24.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 28.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 32.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 36.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 40.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 44.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 48.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 52.0,
+      "lane": 0,
+      "type": "bar"
+    },
+    {
+      "beat": 54.0,
+      "lane": 1,
+      "type": "bar"
+    },
+    {
+      "beat": 56.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 68.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 70.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 72.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 74.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 76.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 78.0,
+      "lane": 0,
+      "type": "bar"
+    },
+    {
+      "beat": 80.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 82.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 84.0,
+      "lane": 0,
+      "type": "wide"
+    },
+    {
+      "beat": 88.0,
+      "lane": 2,
+      "type": "wide"
+    },
+    {
+      "beat": 90.0,
+      "lane": 1,
+      "type": "wide"
+    },
+    {
+      "beat": 92.0,
+      "lane": 1,
+      "type": "bar"
+    },
+    {
+      "beat": 96.0,
+      "lane": 1,
+      "type": "wide"
+    }
+  ],
+  "track": [
+    { "beat": 16.0, "piece": "bendRight" },
+    { "beat": 32.0, "piece": "bendLeft" },
+    { "beat": 48.0, "piece": "crest" },
+    { "beat": 60.0, "piece": "tunnel" },
+    { "beat": 72.0, "piece": "sLeft" },
+    { "beat": 88.0, "piece": "pillars" }
+  ]
+}

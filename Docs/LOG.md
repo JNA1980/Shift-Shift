@@ -593,3 +593,12 @@ Consequence still open: tapping one Shift while holding the other (e.g. changing
 John agreed to the workaround. Browser felt smooth with all scenery (his words); build size still not known. The red Console error (UnityConnectWebRequestException: Token Exchange failed) is the editor's own Unity account service, not project code.
 Done: in the Web path of ShiftInput, a Shift pressed while the other has been held longer than bothWindowMs is fed to the classifier as press + release at once (a tap) and ignored until the browser shows it up. Documented in Docs/INPUT.md with the limits.
 Tested: compile check for both variants; new Core test (zero-length tap during a hold fires the tap, no both gesture, the hold goes on); 134 Core tests pass. Not run in a browser.
+
+## 2026-11-11 — D17: Web tap-during-hold verified; art block closed; level 1 drafted
+
+John (Chrome build): "everything works" (tap during a hold, jump, phase); asked to move on. Days 16-17 block done: palettes, glow, camera feel, phase look, shapes, track kit, scenery, running figure, Web input.
+Still not known: the Web build's size (limit 20 MB compressed). Not done: Edge calibration redo; Release Web profile build.
+
+Level 1 "Warm-up" drafted a day early (plan: day 18): Assets/_Game/Levels/level01.json, see Docs/LEVELS.md. Lane changes only, quarter notes, first 8 bars one tap each, 2-bar breather before the fastest section (plan's authoring rules). Set Up Visuals now orders the Run scene's levels: level01, test_track, test_gestures, level00.
+Tested: level validates, strict chart check has no warnings, a scripted walk-through needs at most two taps per obstacle with at least one beat per tap, file round-trips through the chart writer. Compile check passes.
+Not run in Unity. Whether it is fun, readable and the right difficulty is John's call after playing (rule of thumb: clear within 5 attempts).

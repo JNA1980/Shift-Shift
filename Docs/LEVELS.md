@@ -70,3 +70,19 @@ Rules:
 - The chart check warns about a gap on a sloped piece (the flat hole may not sit flush) and about more than 120
   degrees of turn one way (the track may cross itself).
 - Test level: `test_track.json` uses every piece once, with one obstacle on each.
+
+## Level 1, "Warm-up" (first draft, day 17)
+
+`level01.json`: 100 BPM, 104 beats (62 s), dawn palette, lane changes only (bar and wide). Placeholder audio: the long click.
+
+| Beats | What happens |
+|---|---|
+| 0-8 | Nothing: time to settle |
+| 8-36 | One obstacle every 4 beats, one tap each: bar in the middle, then wide bars that pull you back and forth |
+| 40-56 | Two taps in a row (still 4 beats apart), then two dodges 2 beats apart |
+| 57-67 | Breather, inside the tunnel |
+| 68-96 | One obstacle every 2 beats; one two-tap move at beat 88 |
+| 96-104 | Run-out |
+
+Track: right bend 16, left bend 32, hill 48, tunnel 60, S-bend 72, archways 88.
+Checked by script: valid, no warnings in the strict chart check, never more than two taps for one obstacle, never less than one beat per tap.

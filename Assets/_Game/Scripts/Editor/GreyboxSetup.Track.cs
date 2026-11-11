@@ -347,7 +347,12 @@ namespace ShiftShift.EditorTools
             EditorUtility.SetDirty(builder);
         }
 
-        private const string TrackTestLevelPath = "Assets/_Game/Levels/test_track.json";
+        // The Run scene plays the first level in GameFlow's list (until the level select, days 21-22).
+        private static readonly string[] RunLevelOrder =
+        {
+            "Assets/_Game/Levels/level01.json", "Assets/_Game/Levels/test_track.json",
+            "Assets/_Game/Levels/test_gestures.json", "Assets/_Game/Levels/level00.json",
+        };
         private const string LongClickPath = "Assets/_Game/Audio/Resources/click_100_long.wav";
 
         /// <summary>Placeholder click for the track test level (112 beats at 100 BPM; 22 kHz keeps the file near 3 MB).</summary>
@@ -361,24 +366,29 @@ namespace ShiftShift.EditorTools
             log.Add($"Generated {LongClickPath} (100 BPM, 112 beats)");
         }
 
-        /// <summary>Run scene: the track test level goes first in GameFlow's list, so pressing Play shows the kit.</summary>
+        /// <summary>Run scene: GameFlow's levels in RunLevelOrder (level 1 first), then any others already listed.</summary>
         private static void PutTrackTestLevelFirst(List<string> log)
         {
             var flow = Object.FindAnyObjectByType<GameFlow>();
-            var json = AssetDatabase.LoadAssetAtPath<TextAsset>(TrackTestLevelPath);
-            if (flow == null || json == null) return;
+            if (flow == null) return;
             var so = new SerializedObject(flow);
             SerializedProperty levels = so.FindProperty("levels");
-            var list = new List<Object> { json };
+            var list = new List<Object>();
+            foreach (string path in RunLevelOrder)
+            {
+                var json = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
+                if (json != null) list.Add(json);
+            }
             for (int i = 0; i < levels.arraySize; i++)
             {
                 Object o = levels.GetArrayElementAtIndex(i).objectReferenceValue;
-                if (o != null && o != json) list.Add(o);
+                if (o != null && !list.Contains(o)) list.Add(o);
             }
+            if (list.Count == 0) return;
             levels.arraySize = list.Count;
             for (int i = 0; i < list.Count; i++) levels.GetArrayElementAtIndex(i).objectReferenceValue = list[i];
             so.ApplyModifiedPropertiesWithoutUndo();
-            log.Add("Run: 'Test - track kit' is now the first level (GameFlow > Levels); the others follow it");
+            log.Add($"Run: plays '{list[0].name}' (first of {list.Count} in GameFlow > Levels)");
         }
 
         /// <summary>Existing scenes: remove the pieces saved by the old builder, wire the new one.</summary>
