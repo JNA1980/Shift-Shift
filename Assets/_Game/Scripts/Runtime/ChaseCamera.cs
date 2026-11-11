@@ -11,7 +11,9 @@ namespace ShiftShift
     public sealed class ChaseCamera : MonoBehaviour
     {
         [SerializeField] private Runner target;
-        [SerializeField] private Vector3 offset = new Vector3(0f, 4f, -7f);
+        // 3.3 m: below the tunnel ceiling (3.5 m) so overhangs pass overhead in view, and above every obstacle top
+        // (<= 3.2 m) so obstacles stay below the horizon, against the road (palette decision, day 16).
+        [SerializeField] private Vector3 offset = new Vector3(0f, 3.3f, -7f);
         [SerializeField] private float lookAhead = 8f;
         [SerializeField, Min(0f)] private float lateralLagSeconds = 0.12f;
         [SerializeField] private float baseFov = 60f;

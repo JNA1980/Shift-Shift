@@ -67,5 +67,5 @@ Status: proposed, not yet approved.
   colour-blind separation >= 20 dE (normal, deuteranopia, protanopia). Road vs light skies 8-9.5:1; lines vs dark
   skies 7-11:1.
 - **Known trade-off (John's choice):** four action colours are below the plan's 4.5:1 against what is behind them (the
-  road); 3:1 is the agreed floor. Obstacles always appear below the horizon (camera 4 m up, tallest obstacle 3.7 m),
-  i.e. against the road. Shape stays the primary cue.
+  road); 3:1 is the agreed floor. Obstacles always appear below the horizon (camera 3.3 m up since day 17; every
+  obstacle top <= 3.2 m), i.e. against the road. Keep new obstacles under the camera height or this no longer holds. Shape stays the primary cue.
