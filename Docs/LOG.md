@@ -530,3 +530,7 @@ Cause (from reading the code, not reproduced here): the wall end faces added in 
 Fix: each side of an end face has its own four corners. The Strip() calls were already safe (every strip adds its own vertices).
 Tested: compile check only. Not run in Unity.
 Lesson for the mesh code: never let one vertex belong to triangles facing opposite ways.
+
+## 2026-11-11 — D17: walls, gates and white-screen fix verified in the editor
+
+John: "now it looks good" (Run scene, test_track): walls along the road with lit edges, closed gates with taller posts, plots with buildings and trees; the white screen is gone. Next: browser Build And Run to check frame rate, glow and the see-through barrier in WebGL (not done yet).
