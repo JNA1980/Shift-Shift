@@ -617,3 +617,9 @@ Tested: validates, strict chart check clean, scripted walk (gate openings always
 John's decision: points for every obstacle passed, Ok 5, Good 20, Perfect 50, the on-beat grades being the bonus.
 Done: ScoreKeeper values 50 / 20 / 5 (were 100 / 50 / 0), all times the streak multiplier. An OK no longer resets the streak; it neither adds to it nor breaks it (my choice, so the streak and multiplier stay a reward for on-beat play; one line to change if John wants passes to build the streak too). Best-score keys moved to ShiftShift.BestV2.* so bests under the old values are not compared with new ones. Docs/SCORING.md updated.
 Tested: 136 Core tests pass (3 scoring tests rewritten, 2 added: a clean off-beat run of 27 scores 135; an OK uses the multiplier). Compile check passes. Not run in Unity.
+
+## 2026-11-11 — D17: camera lowered to 2.8 m
+
+John (level 2, editor): the gate's top beam (2.95-3.15 m) was level with the camera (3.3 m), looked like it hit the camera and blocked the view of the runner. Asked for the camera to come down so the beam passes overhead. His screenshot also shows the new scoring counting up (115 points at beat 41).
+Done: CameraFeel offset y 3.3 -> 2.8 (asset and code default); tunnelDrop default 0.5 -> 0 (2.8 m is the height he already approved inside the tunnel). Docs/PALETTES.md notes that the day-16 rule "every obstacle top below the camera" no longer holds for the 3 m obstacles.
+Tested: compile check only. Not run in Unity.

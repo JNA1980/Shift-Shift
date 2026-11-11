@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61885430d28343b19e252e63f633d8be, type: 3}
   m_Name: CameraFeel
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.CameraFeel
-  offset: {x: 0, y: 3.3, z: -7}
+  offset: {x: 0, y: 2.8, z: -7}
   lookAhead: 8
   lateralLagSeconds: 0.12
   baseFov: 60

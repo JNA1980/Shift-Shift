@@ -73,3 +73,5 @@ Status: proposed, not yet approved.
 ## Phase look (day 17, playbook 2.2 step 4)
 
 While both Shifts are held (phased), over 0.1 s: the sky and fog shift to the palette's phase colour x Phase Sky Darken (0.6); ghost-layer blocks (the only things that can hit you while phased) turn near-white; every other obstacle and glow edge dims to x Phase Dim (0.45); road and lines stay as they are; scanlines fade in at Scanline Strength (0.25). All three settings are per palette (Palette asset, "Phase look" header).
+
+**Camera height changed (day 17, later):** the camera is now 2.8 m up, not 3.3 m (John: the gate's top beam sat at eye level, looked like it hit the camera and hid the runner). The beam now passes overhead. The "obstacles always below the horizon" note above no longer holds for the tallest obstacles: the red wall, the phase barrier and the gate (about 3 m) reach just above eye level.

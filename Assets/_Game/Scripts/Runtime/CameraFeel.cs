@@ -10,8 +10,10 @@ namespace ShiftShift
     public sealed class CameraFeel : ScriptableObject
     {
         [Header("Position")]
-        [Tooltip("3.3 m up: under the tunnel ceiling (3.5 m), above every obstacle top (<= 3.2 m). See Docs/PALETTES.md.")]
-        public Vector3 offset = new Vector3(0f, 3.3f, -7f);
+        [Tooltip("2.8 m up (John, day 17): the gate's top beam (2.95-3.15 m) passes overhead instead of across the " +
+                 "view. Was 3.3 m, above every obstacle top; the red wall, barrier and gate (about 3 m) now reach " +
+                 "just above eye level. Tunnel ceiling is at 3.5 m.")]
+        public Vector3 offset = new Vector3(0f, 2.8f, -7f);
         public float lookAhead = 8f;
         [Min(0f)] public float lateralLagSeconds = 0.12f;
 
@@ -25,7 +27,7 @@ namespace ShiftShift
 
         [Tooltip("The camera drops by this much inside a tunnel (John, day 17: at 3.3 m it sat right under the 3.5 m " +
                  "ceiling). Gate tops (3.1 m) are then above the camera while in the tunnel.")]
-        [Range(0f, 1.5f)] public float tunnelDrop = 0.5f;
+        [Range(0f, 1.5f)] public float tunnelDrop = 0f; // 0 since the camera itself came down to 2.8 m
 
         [Tooltip("The drop eases in over this distance before a tunnel and out over it after (no sudden rise at the exit).")]
         [Min(0.5f)] public float tunnelEaseMetres = 12f;
