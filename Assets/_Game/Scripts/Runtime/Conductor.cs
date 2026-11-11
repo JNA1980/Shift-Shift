@@ -35,7 +35,9 @@ namespace ShiftShift
         public string LevelAssetName { get; private set; }
         public bool IsStarted { get; private set; }
         public int CountInBeats => countInBeats;
+        /// <summary>The level's starting tempo (also the count-in's). See <see cref="BpmAtBeat"/> for levels that change tempo.</summary>
         public double Bpm => Level != null ? Level.bpm : 120.0;
+        public double BpmAtBeat(double beat) => _tempo != null ? _tempo.BpmAtBeat(beat) : Bpm;
         public double CurrentBeat => BeatAt(SongTime);
         public double UserOffsetMs => _userOffsetMs;
 
@@ -43,11 +45,13 @@ namespace ShiftShift
             ? AudioSettings.dspTime - _audioStartDsp - _offsetSeconds
             : -(startDelay + CountInSeconds) - _offsetSeconds; // frozen at the start value until the run begins
 
-        public double BeatAt(double songTime) => songTime * Bpm / 60.0;
-        public double SongTimeAtBeat(double beat) => beat * 60.0 / Bpm;
+        // Through the tempo map: identical to beat x 60 / bpm for a level with one tempo.
+        public double BeatAt(double songTime) => _tempo != null ? _tempo.BeatAtTime(songTime) : songTime * Bpm / 60.0;
+        public double SongTimeAtBeat(double beat) => _tempo != null ? _tempo.TimeAtBeat(beat) : beat * 60.0 / Bpm;
 
         private double CountInSeconds => countInBeats * 60.0 / Bpm;
 
+        private TempoMap _tempo;
         private AudioSource _source;
         private AudioClip _clip;
         private double _audioStartDsp;
@@ -73,6 +77,7 @@ namespace ShiftShift
                 return false;
             }
             levelJson = json;
+            _tempo = new TempoMap(Level.bpm, Level.tempo);
             LevelAssetName = json.name;
             _userOffsetMs = PlayerPrefs.GetFloat(UserOffsetKey, 0f);
             _offsetSeconds = (Level.offsetMs + _userOffsetMs) / 1000.0;

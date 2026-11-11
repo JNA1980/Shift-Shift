@@ -55,7 +55,7 @@ namespace ShiftShift
                 float z = (float)(e.beat * runner.MetresPerBeat);
                 // A gap's or hurdle's beat is the take-off: place it half a jump later so jumping on the click clears it.
                 if (spec.Kind == ObstacleKind.Gap || spec.Kind == ObstacleKind.Hurdle)
-                    z += (float)track.JumpShiftMetres(conductor.Bpm);
+                    z += (float)track.JumpShiftMetres(conductor.BpmAtBeat(e.beat));
                 // The track can bend and slope: place and turn the obstacle along it.
                 GameObject go = Instantiate(prefab, track.Point(z, x, 0f), track.Rotation(z), transform);
                 go.name = $"{e.type} b{e.beat:0.##}" + (spec.AllLanes ? "" : $" lane {e.lane}");

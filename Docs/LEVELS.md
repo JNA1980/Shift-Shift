@@ -159,3 +159,37 @@ Track: S-bend 16, left bend 32, hill 48, right bend 64, dip 88, tunnel 102, S-be
 Rules kept: at least 3 free beats before every wall (the four taps take about 1.5 beats on eighth notes at this tempo); the charge taps move the runner sideways, so the lane after a wall is treated as unknown: the next lane obstacle needs one tap at most, and a gate only comes after a wide bar has fixed the lane.
 The plan's "walls on eighths" is the tapping itself (four taps on eighth notes); obstacles stay on quarter notes.
 Track: right bend 16, left bend 32, S-bend 48, hill 64, dip 80, right bend 96, tunnel 110, S-bend 124, rise 140, archways 156, left bend 168, drop 184.
+
+## Tempo and palette changes inside a level (day 17)
+
+Two optional lists, used by level 6:
+
+```json
+"tempo": [
+  { "beat": 96.0, "bpm": 150.0 }
+],
+"paletteChanges": [
+  { "beat": 32.0, "palette": "overcast" }
+]
+```
+
+- `bpm` is the tempo at the start (and of the count-in); each `tempo` entry takes over from its beat. Beats stay the unit everywhere: obstacles and track pieces are still placed by beat, and the runner still covers 5 m per beat, so it runs faster after a tempo rise.
+- `palette` is the look at the start; each `paletteChanges` entry is a hard cut on its beat. Only sky, fog and scenery tint differ between palettes.
+- The audio file must follow the same tempo map (the placeholder click for level 6 is generated from it).
+
+## Level 6, "Full shift" (first draft, day 17)
+
+`level06.json`: 130 BPM rising to 150 at beat 96; 208 beats (89 s); starts in dawn and cuts through every palette. Nothing new: one section per earlier level, then everything. Level 6 is the first item in the cut order.
+
+| Beats | Palette | What happens |
+|---|---|---|
+| 8-30 | dawn | Lane changes |
+| 32-60 | overcast | Slides and sprint gates |
+| 64-92 | dusk | Jumps, with slides and lane changes |
+| 93-103 | dusk, night from 96 | Breather in the tunnel; the tempo rises at 96 |
+| 104-132 | night | Phase, ghost blocks |
+| 136-172 | neon | Walls, with the earlier moves between |
+| 176-202 | fullshift | One of everything |
+
+Rules kept: all of the earlier levels' (3 free beats before a wall, lane unknown after a wall, gates only in a certain lane, lane change + phase gets 4 beats, holds 4 beats apart, no gap on a slope).
+Track: hill 16, right bend 24, dip 40, left bend 48, S-bend 56, S-bend 72, archways 84, tunnel 94, rise 104, drop 120, right bend 128, left bend 152, S-bend 160, archways 184, rise 200.

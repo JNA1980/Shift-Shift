@@ -15,10 +15,16 @@ namespace ShiftShift.Core
         public static byte[] GenerateWav(double bpm, int beats, int beatsPerBar = 4, int sampleRate = 44100)
         {
             if (bpm <= 0) throw new ArgumentException("bpm must be > 0");
+            return GenerateWav(new TempoMap(bpm), beats, beatsPerBar, sampleRate);
+        }
+
+        /// <summary>A metronome that follows a tempo map (level 6: the clicks speed up where the tempo rises).</summary>
+        public static byte[] GenerateWav(TempoMap tempo, int beats, int beatsPerBar = 4, int sampleRate = 44100)
+        {
+            if (tempo == null) throw new ArgumentNullException(nameof(tempo));
             if (beats <= 0) throw new ArgumentException("beats must be > 0");
 
-            double beatSeconds = 60.0 / bpm;
-            int totalSamples = (int)Math.Ceiling(beats * beatSeconds * sampleRate);
+            int totalSamples = (int)Math.Ceiling(tempo.TimeAtBeat(beats) * sampleRate);
             var pcm = new short[totalSamples];
             int clickSamples = (int)(ClickSeconds * sampleRate);
 
@@ -27,7 +33,7 @@ namespace ShiftShift.Core
                 bool accent = b % beatsPerBar == 0;
                 double freq = accent ? 1500.0 : 1000.0;
                 double amp = accent ? 0.9 : 0.6;
-                int start = (int)Math.Round(b * beatSeconds * sampleRate);
+                int start = (int)Math.Round(tempo.TimeAtBeat(b) * sampleRate);
                 for (int i = 0; i < clickSamples && start + i < totalSamples; i++)
                 {
                     double t = (double)i / sampleRate;

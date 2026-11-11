@@ -55,6 +55,7 @@ namespace ShiftShift
         private float _phase;          // 0 normal .. 1 phased
         private float _appliedPhase = -1f;
         private Texture2D _scanlines;
+        private int _nextChange; // index into the level's paletteChanges
 
         private void Start()
         {
@@ -72,12 +73,47 @@ namespace ShiftShift
             string wanted = conductor != null && conductor.Level != null ? conductor.Level.palette : null;
             if (!string.IsNullOrEmpty(wanted))
             {
-                string key = Normalize(wanted);
-                foreach (Palette p in palettes)
-                    if (p != null && Normalize(p.name) == key) return p;
+                Palette p = Find(wanted);
+                if (p != null) return p;
                 Debug.LogWarning($"[Palette] Level palette '{wanted}' not found; using {(fallback != null ? fallback.name : "none")}.", this);
             }
             return fallback;
+        }
+
+        private Palette Find(string name)
+        {
+            string key = Normalize(name);
+            foreach (Palette p in palettes)
+                if (p != null && Normalize(p.name) == key) return p;
+            return null;
+        }
+
+        /// <summary>
+        /// Level 6: the look switches palette on set beats (LevelData.paletteChanges). A hard cut on the beat. Only
+        /// the sky, fog, trail and scenery tint differ between palettes; the action colours are the same on all.
+        /// </summary>
+        private void FollowPaletteChanges()
+        {
+            if (conductor == null || conductor.Level == null || !conductor.IsStarted) return;
+            ShiftShift.Core.PaletteChange[] changes = conductor.Level.paletteChanges;
+            if (changes == null) return;
+            double beat = conductor.CurrentBeat;
+            while (_nextChange < changes.Length && changes[_nextChange].beat <= beat)
+            {
+                Palette p = Find(changes[_nextChange].palette);
+                if (p == null) Debug.LogWarning($"[Palette] Palette '{changes[_nextChange].palette}' not found; keeping {Current.name}.", this);
+                else
+                {
+                    Current = p;
+                    if (trail != null)
+                    {
+                        trail.startColor = p.accent;
+                        trail.endColor = new Color(p.accent.r, p.accent.g, p.accent.b, 0f);
+                    }
+                    Colourise(p, _phase);
+                }
+                _nextChange++;
+            }
         }
 
         private static string Normalize(string s) => s.Replace("-", "").Replace("_", "").Replace(" ", "").ToLowerInvariant();
@@ -133,6 +169,7 @@ namespace ShiftShift
         private void Update()
         {
             if (Current == null) return;
+            FollowPaletteChanges();
             float target = runner != null && runner.IsPhased ? 1f : 0f;
             _phase = Mathf.MoveTowards(_phase, target, Time.unscaledDeltaTime / phaseBlendSeconds);
             if (!Mathf.Approximately(_phase, _appliedPhase)) Colourise(Current, _phase);

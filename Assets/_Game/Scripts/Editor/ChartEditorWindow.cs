@@ -96,8 +96,10 @@ namespace ShiftShift.EditorTools
 
         // ---------- audio (edit mode) ----------
 
-        private double SecondsAtBeat(double beat) => beat * 60.0 / _chart.Level.bpm + _chart.Level.offsetMs / 1000.0;
-        private double BeatAtSeconds(double s) => (s - _chart.Level.offsetMs / 1000.0) * _chart.Level.bpm / 60.0;
+        // Through the tempo map, so a level with a tempo change (level 6) lines up with its audio.
+        private TempoMap Tempo => new TempoMap(_chart.Level.bpm, _chart.Level.tempo);
+        private double SecondsAtBeat(double beat) => Tempo.TimeAtBeat(beat) + _chart.Level.offsetMs / 1000.0;
+        private double BeatAtSeconds(double s) => Tempo.BeatAtTime(s - _chart.Level.offsetMs / 1000.0);
 
         private void EnsureSource()
         {

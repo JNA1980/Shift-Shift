@@ -195,7 +195,7 @@ namespace ShiftShift
             foreach (LevelEvent e in conductor.Level.events)
             {
                 if (!ObstacleTypes.TryGet(e.type, out ObstacleTypes.Spec spec) || spec.Kind != ObstacleKind.Gap) continue;
-                double centre = e.beat * MetresPerBeat + JumpShiftMetres(conductor.Bpm);
+                double centre = e.beat * MetresPerBeat + JumpShiftMetres(conductor.BpmAtBeat(e.beat));
                 _holes.Add(new Vector2((float)(centre - gapMetres * 0.5), (float)(centre + gapMetres * 0.5)));
             }
         }

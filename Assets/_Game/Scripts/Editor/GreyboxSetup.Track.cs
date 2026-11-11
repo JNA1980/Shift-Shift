@@ -350,8 +350,8 @@ namespace ShiftShift.EditorTools
         // The Run scene plays the first level in GameFlow's list (until the level select, days 21-22).
         private static readonly string[] RunLevelOrder =
         {
-            // The level being worked on goes first for now (level 5).
-            "Assets/_Game/Levels/level05.json", "Assets/_Game/Levels/level04.json", "Assets/_Game/Levels/level03.json", "Assets/_Game/Levels/level02.json",
+            // The level being worked on goes first for now (level 6).
+            "Assets/_Game/Levels/level06.json", "Assets/_Game/Levels/level05.json", "Assets/_Game/Levels/level04.json", "Assets/_Game/Levels/level03.json", "Assets/_Game/Levels/level02.json",
             "Assets/_Game/Levels/level01.json",
             "Assets/_Game/Levels/test_track.json",
             "Assets/_Game/Levels/test_gestures.json", "Assets/_Game/Levels/level00.json",
@@ -376,6 +376,15 @@ namespace ShiftShift.EditorTools
                 System.IO.File.WriteAllBytes(path, ClickTrack.GenerateWav(bpm, beats, 4, 22050));
                 AssetDatabase.ImportAsset(path);
                 log.Add($"Generated {path} ({bpm:0} BPM, {beats} beats)");
+            }
+            // Level 6: 130 BPM, rising to 150 at beat 96. Must match level06.json's bpm and tempo list.
+            const string risingClick = "Assets/_Game/Audio/Resources/click_130_150.wav";
+            if (!System.IO.File.Exists(risingClick))
+            {
+                var tempo = new TempoMap(130, new[] { new TempoChange { beat = 96, bpm = 150 } });
+                System.IO.File.WriteAllBytes(risingClick, ClickTrack.GenerateWav(tempo, 216, 4, 22050));
+                AssetDatabase.ImportAsset(risingClick);
+                log.Add($"Generated {risingClick} (130 BPM, 150 from beat 96, 216 beats)");
             }
         }
 

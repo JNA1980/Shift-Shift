@@ -22,7 +22,7 @@ namespace ShiftShift.Core
             Sort();
         }
 
-        public double LengthSeconds => Level.bpm > 0 ? Level.lengthBeats * 60.0 / Level.bpm : 0;
+        public double LengthSeconds => Level.bpm > 0 ? new TempoMap(Level.bpm, Level.tempo).TimeAtBeat(Level.lengthBeats) : 0;
 
         /// <summary>Nearest grid position: subdivision 1 = quarter notes (whole beats), 2 = eighths.</summary>
         public static double Snap(double beat, int subdivision)
@@ -150,6 +150,8 @@ namespace ShiftShift.Core
             lengthBeats = Level.lengthBeats,
             events = Events.ToArray(),
             track = Level.track, // edited by hand in the JSON for now; kept as loaded
+            tempo = Level.tempo,
+            paletteChanges = Level.paletteChanges,
         };
 
         /// <summary>Human-readable JSON, two-space indent, events sorted by beat then lane, invariant number format.</summary>
@@ -175,7 +177,25 @@ namespace ShiftShift.Core
                 sb.Append("    }");
             }
             bool hasTrack = Level.track != null && Level.track.Length > 0;
-            sb.Append(Events.Count > 0 ? "\n  ]" : "]").Append(hasTrack ? ",\n" : "\n");
+            bool hasTempo = Level.tempo != null && Level.tempo.Length > 0;
+            bool hasPalettes = Level.paletteChanges != null && Level.paletteChanges.Length > 0;
+            sb.Append(Events.Count > 0 ? "\n  ]" : "]").Append(hasTrack || hasTempo || hasPalettes ? ",\n" : "\n");
+            if (hasTempo)
+            {
+                sb.Append("  \"tempo\": [");
+                for (int i = 0; i < Level.tempo.Length; i++)
+                    sb.Append(i == 0 ? "\n" : ",\n").Append("    { \"beat\": ").Append(Fmt(Level.tempo[i].beat))
+                        .Append(", \"bpm\": ").Append(Fmt(Level.tempo[i].bpm)).Append(" }");
+                sb.Append("\n  ]").Append(hasPalettes || hasTrack ? ",\n" : "\n");
+            }
+            if (hasPalettes)
+            {
+                sb.Append("  \"paletteChanges\": [");
+                for (int i = 0; i < Level.paletteChanges.Length; i++)
+                    sb.Append(i == 0 ? "\n" : ",\n").Append("    { \"beat\": ").Append(Fmt(Level.paletteChanges[i].beat))
+                        .Append(", \"palette\": ").Append(Str(Level.paletteChanges[i].palette)).Append(" }");
+                sb.Append("\n  ]").Append(hasTrack ? ",\n" : "\n");
+            }
             if (hasTrack)
             {
                 // One line per piece: short, and easy to edit by hand.

@@ -21,6 +21,10 @@ namespace ShiftShift.Core
         public LevelEvent[] events;
         /// <summary>Optional track pieces (playbook 2.3). Missing or empty = a straight track.</summary>
         public TrackEvent[] track;
+        /// <summary>Optional tempo changes (level 6). Missing or empty = <see cref="bpm"/> throughout.</summary>
+        public TempoChange[] tempo;
+        /// <summary>Optional palette changes during the run (level 6). <see cref="palette"/> is the one at the start.</summary>
+        public PaletteChange[] paletteChanges;
 
         /// <summary>Problems that would make the level unplayable. Empty list = valid.</summary>
         public List<string> Validate()
@@ -46,6 +50,15 @@ namespace ShiftShift.Core
                 if (!seen.Add((e.beat, e.lane))) errors.Add($"{at}: two events on the same beat and lane");
             }
             errors.AddRange(TrackPieces.Validate(track, lengthBeats));
+            errors.AddRange(TempoMap.Validate(tempo, lengthBeats));
+            if (paletteChanges != null)
+                for (int i = 0; i < paletteChanges.Length; i++)
+                {
+                    PaletteChange c = paletteChanges[i];
+                    if (string.IsNullOrWhiteSpace(c.palette)) errors.Add($"paletteChanges {i}: palette is missing");
+                    if (c.beat < 0 || c.beat > lengthBeats) errors.Add($"paletteChanges {i} (beat {c.beat}): beat outside 0-{lengthBeats}");
+                    if (i > 0 && c.beat < paletteChanges[i - 1].beat) errors.Add($"paletteChanges {i}: must be in order");
+                }
             return errors;
         }
     }

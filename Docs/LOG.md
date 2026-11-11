@@ -666,3 +666,18 @@ Level 5 "Drumline" drafted: Assets/_Game/Levels/level05.json (Docs/LEVELS.md), c
 Tested: validates, strict check clean, scripted walk (3 free beats before each wall, lane unknown after a wall, gates only with a certain lane, at most two taps, lane change + phase gets 4 beats), round-trips. Compile check passes. Not played.
 Uncertain: whether four taps before every wall at 135 BPM is tiring over 92 s (21 walls); the open M1 question that charge taps move the runner sideways is now felt in a real level.
 Schedule: five of six levels exist as first drafts on day 17 (plan: levels 1-4 by day 20, 5-6 on days 21-22). All use placeholder clicks.
+
+## 2026-11-11 — D17: level 5 played; tempo and palette changes; level 6 drafted
+
+John: level 5 cleared on attempt 3. Asked for level 6.
+Level 6 needs a tempo rise and a palette cycle (plan). Done:
+- Core/TempoMap.cs: beats <-> seconds with tempo changes; LevelData gets optional `tempo` and `paletteChanges` lists (validated). With no changes the maths is the old beat x 60 / bpm.
+- Conductor converts through the tempo map (BeatAt, SongTimeAtBeat, new BpmAtBeat); the count-in uses the starting tempo. Spawner and TrackBuilder place gaps and hurdles using the tempo at their own beat.
+- ClickTrack can follow a tempo map; the tool generates click_130_150.wav for level 6.
+- PaletteApplier cuts to the listed palette on its beat (sky, fog, trail, scenery tint).
+- Chart keeps and writes both lists; the chart editor converts time through the tempo map.
+- Level 6 "Full shift": Assets/_Game/Levels/level06.json (Docs/LEVELS.md); first in the Run scene's list.
+
+Tested: 145 Core tests (8 new: tempo map continuity and round trip, click length, chart save, validation). Level validates, strict check clean, scripted walk with all earlier rules, round-trips; length 89.1 s. Compile check passes. Not played.
+Uncertain (all need John's eyes and ears): that the click and the obstacles stay together across the tempo rise at beat 96 in the editor and in WebGL; the feel of the speed-up (the runner goes from 10.8 to 12.5 m/s); hard palette cuts on the beat; a gap's hole position right after the rise.
+Schedule: all six levels exist as first drafts on day 17, on placeholder clicks.
