@@ -42,6 +42,7 @@ namespace ShiftShift.EditorTools
             EnsureAssets();                 // materials (incl. TrackLines) and prefabs exist
             AddTrackLines(log);
             AddGapRims(log);
+            RebuildOpeningLayouts(log); // step 5: solid wide bar slabs, framed gate doorway (before edges are added)
             AddGlowEdges(log);       // step 2: glowing obstacle edges
             EnableBloomInProfile(log);
             EnsureCameraFeel(log);   // step 3: camera feel asset
@@ -171,7 +172,7 @@ namespace ShiftShift.EditorTools
                 ("TrackLines", PaletteApplier.Role.Lines), ("Obstacle", PaletteApplier.Role.Lane),
                 ("Low", PaletteApplier.Role.Slide), ("Gate", PaletteApplier.Role.Sprint),
                 ("Hurdle", PaletteApplier.Role.Jump), ("Barrier", PaletteApplier.Role.Phase),
-                ("Ghost", PaletteApplier.Role.Phase), ("Wall", PaletteApplier.Role.Charge), ("Hole", PaletteApplier.Role.Hole),
+                ("Ghost", PaletteApplier.Role.Ghost), ("Wall", PaletteApplier.Role.Charge), ("Hole", PaletteApplier.Role.Hole),
             };
             var all = new List<(Material mat, PaletteApplier.Role role, bool glow)>();
             foreach (var r in roles) all.Add((Mats[r.mat], r.role, false));

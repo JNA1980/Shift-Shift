@@ -69,3 +69,7 @@ Status: proposed, not yet approved.
 - **Known trade-off (John's choice):** four action colours are below the plan's 4.5:1 against what is behind them (the
   road); 3:1 is the agreed floor. Obstacles always appear below the horizon (camera 3.3 m up since day 17; every
   obstacle top <= 3.2 m), i.e. against the road. Keep new obstacles under the camera height or this no longer holds. Shape stays the primary cue.
+
+## Phase look (day 17, playbook 2.2 step 4)
+
+While both Shifts are held (phased), over 0.1 s: the sky and fog shift to the palette's phase colour x Phase Sky Darken (0.6); ghost-layer blocks (the only things that can hit you while phased) turn near-white; every other obstacle and glow edge dims to x Phase Dim (0.45); road and lines stay as they are; scanlines fade in at Scanline Strength (0.25). All three settings are per palette (Palette asset, "Phase look" header).

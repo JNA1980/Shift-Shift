@@ -413,3 +413,13 @@
 ## 2026-11-11 — D17: steps 2 and 3 verified (John)
 - Glowing edges, bloom, runner trail, FOV widening (sprint/phase) and lane-change roll seen in the editor: "looks good". No tuning changes requested; defaults kept (glow 1.5, bloom 0.8/0.9/0.7, FOV 60/72/78, roll 2 deg).
 - Remaining in playbook 2.2: step 4 phase look (palette inversion + scanlines), step 5 solid wide bar + gate frame.
+
+## 2026-11-11 — D17: steps 4 and 5 (phase look, obstacle shapes)
+
+Done:
+- Step 4: PaletteApplier now keeps each material copy with its role and blends every frame toward the phase look while the runner is phased (0.1 s, unscaled time): sky/fog to phase colour x phaseSkyDarken, Ghost role (new, added at the end of the enum) to near-white, other obstacle/glow roles x phaseDim, road/lines unchanged, IMGUI scanline overlay (1x4 repeating texture). New Palette fields: phaseSkyDarken 0.6, phaseDim 0.45, scanlineStrength 0.25. Set Up Visuals maps the Ghost material to the Ghost role and wires the applier's runner.
+- Step 5: Set Up Visuals rebuilds WideBar and GateOpening prefabs (once; skipped if Open0 exists) into three layouts Open0/1/2. Wide bar: blocked lanes = solid 2 m slabs to the road edge. Gate: 3 m walls plus a framed doorway (posts 0.25 m, beam with top 3.1 m). Middle opening is necessarily two pieces. ObstacleSpawner activates Open{lane} and hides the others; falls back to the old Panel{lane} hiding for old prefabs. Gameplay rules unchanged.
+
+Tested: per-assembly compile check against stand-ins (stand-in gap fixed: Texture now derives from Object); 120 Core tests pass.
+Not run: nothing in Unity yet — the prefab rebuild, the edge strips on the new pieces, the phase blend, the scanlines and their draw order against the HUD are all unverified until John runs Set Up Visuals and plays.
+Uncertain: whether scanlines draw over or under the GameFlow text (GUI.depth across components); whether the near-white ghost colour reads well on the dusk/night skies.

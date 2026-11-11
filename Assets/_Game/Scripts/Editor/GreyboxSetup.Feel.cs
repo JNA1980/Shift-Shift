@@ -64,6 +64,7 @@ namespace ShiftShift.EditorTools
                 else trail = existing.GetComponent<TrailRenderer>();
             }
             if (applier != null && trail != null) Set(applier, "trail", trail);
+            if (applier != null && runner != null) Set(applier, "runner", runner); // step 4: phase look
             log.Add($"{label}: CameraFeel on the chase camera, runner trail ({(trail != null ? "ok" : "no runner")})");
         }
     }

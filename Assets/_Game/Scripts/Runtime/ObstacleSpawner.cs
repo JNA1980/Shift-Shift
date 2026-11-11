@@ -66,10 +66,20 @@ namespace ShiftShift
                 o.openLane = e.RunnerLane;
                 if (spec.LaneIsOpening)
                 {
-                    // Prefab has one panel per lane, named Panel0/Panel1/Panel2 (chart lanes): open the event's lane.
-                    Transform panel = go.transform.Find("Panel" + e.lane);
-                    if (panel != null) panel.gameObject.SetActive(false);
-                    else Debug.LogWarning($"[Spawner] {prefab.name} has no Panel{e.lane} child to open.", go);
+                    // Day 17: prefabs carry one ready-made layout per open lane (Open0/Open1/Open2): solid slab or
+                    // framed doorway. Older prefabs have one panel per lane (Panel0/1/2): hide the open lane's panel.
+                    Transform layout = go.transform.Find("Open" + e.lane);
+                    if (layout != null)
+                    {
+                        foreach (Transform child in go.transform)
+                            if (child.name.StartsWith("Open")) child.gameObject.SetActive(child == layout);
+                    }
+                    else
+                    {
+                        Transform panel = go.transform.Find("Panel" + e.lane);
+                        if (panel != null) panel.gameObject.SetActive(false);
+                        else Debug.LogWarning($"[Spawner] {prefab.name} has no Open{e.lane} or Panel{e.lane} child.", go);
+                    }
                 }
                 spawned++;
             }

@@ -29,6 +29,13 @@ namespace ShiftShift
         [Tooltip("Emission strength of the obstacles' glowing edges; bloom picks it up. Lower it on light skies if it washes out.")]
         [Range(0f, 6f)] public float glowIntensity = 1.5f;
 
+        [Header("Phase look (playbook 2.2 step 4)")]
+        [Tooltip("Sky while phased = the phase colour x this.")]
+        [Range(0f, 1f)] public float phaseSkyDarken = 0.6f;
+        [Tooltip("Non-ghost obstacles while phased = their colour x this.")]
+        [Range(0f, 1f)] public float phaseDim = 0.45f;
+        [Range(0f, 1f)] public float scanlineStrength = 0.25f;
+
         public static double Contrast(Color a, Color b) => ColorContrast.Ratio(a.r, a.g, a.b, b.r, b.g, b.b);
 
         private void OnValidate()
