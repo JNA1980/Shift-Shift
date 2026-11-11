@@ -500,7 +500,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!96 &417481455
 TrailRenderer:
   serializedVersion: 4
@@ -4568,6 +4568,8 @@ MonoBehaviour:
   armSwingDegrees: 50
   runLeanDegrees: 8
   sprintLeanDegrees: 22
+  bendLean: 3
+  maxBendLeanDegrees: 16
   dust: {fileID: 956675917}
   puffsPerStep: 4
   footOffset: {x: 0.14, y: 0.05, z: -0.25}
