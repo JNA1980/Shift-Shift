@@ -623,3 +623,9 @@ Tested: 136 Core tests pass (3 scoring tests rewritten, 2 added: a clean off-bea
 John (level 2, editor): the gate's top beam (2.95-3.15 m) was level with the camera (3.3 m), looked like it hit the camera and blocked the view of the runner. Asked for the camera to come down so the beam passes overhead. His screenshot also shows the new scoring counting up (115 points at beat 41).
 Done: CameraFeel offset y 3.3 -> 2.8 (asset and code default); tunnelDrop default 0.5 -> 0 (2.8 m is the height he already approved inside the tunnel). Docs/PALETTES.md notes that the day-16 rule "every obstacle top below the camera" no longer holds for the 3 m obstacles.
 Tested: compile check only. Not run in Unity.
+
+## 2026-11-11 — D17: camera closer after the height change
+
+John (level 2, editor, camera at 2.8 m): the gate beam now passes overhead, but the runner "looks a little far ahead", so judging the distance to an obstacle is tricky. (The earlier ArgumentNullException "clock" was scripts reloading during Play mode after a pull, not a game bug; advised Recompile After Finished Playing.)
+Done: CameraFeel offset z -7 -> -5.5 (closer behind the runner) and lookAhead 8 -> 6 (aims nearer, so the view tilts down about 3 degrees more and shows more road around the runner). Asset and code defaults.
+Tested: compile check only. These are first guesses by geometry, not by eye; John can tune Offset Z and Look Ahead in the CameraFeel asset while playing.

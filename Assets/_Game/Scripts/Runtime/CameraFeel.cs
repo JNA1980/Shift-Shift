@@ -13,8 +13,10 @@ namespace ShiftShift
         [Tooltip("2.8 m up (John, day 17): the gate's top beam (2.95-3.15 m) passes overhead instead of across the " +
                  "view. Was 3.3 m, above every obstacle top; the red wall, barrier and gate (about 3 m) now reach " +
                  "just above eye level. Tunnel ceiling is at 3.5 m.")]
-        public Vector3 offset = new Vector3(0f, 2.8f, -7f);
-        public float lookAhead = 8f;
+        public Vector3 offset = new Vector3(0f, 2.8f, -5.5f);
+        [Tooltip("How far ahead of the runner the camera aims. Smaller = looks down at the road more, which makes " +
+                 "distances easier to judge (6 since the camera came down to 2.8 m; was 8).")]
+        public float lookAhead = 6f;
         [Min(0f)] public float lateralLagSeconds = 0.12f;
 
         [Header("Slopes (day 17)")]
