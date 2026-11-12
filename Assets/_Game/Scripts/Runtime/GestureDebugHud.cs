@@ -14,7 +14,6 @@ namespace ShiftShift
         private const int MaxLines = 5;
 
         [SerializeField] private ShiftInput input;
-        [SerializeField] private bool visible = true;
 
         private readonly List<string> _lines = new List<string>();
         private GUIStyle _style;
@@ -44,10 +43,10 @@ namespace ShiftShift
         {
             var kb = UnityEngine.InputSystem.Keyboard.current;
             if (kb == null) return;
-            if (kb.f1Key.wasPressedThisFrame) visible = !visible;
+            if (kb.f1Key.wasPressedThisFrame) DebugOverlay.Visible = !DebugOverlay.Visible;
             if (kb.f2Key.wasPressedThisFrame)
             {
-                // Latency calibration (playbook 1.4). It returns to the Run scene.
+                // Latency calibration (playbook 1.4). It returns to the menu.
                 if (Application.CanStreamedLevelBeLoaded("Calibrate"))
                     UnityEngine.SceneManagement.SceneManager.LoadScene("Calibrate");
                 else
@@ -90,7 +89,7 @@ namespace ShiftShift
 
         private void OnGUI()
         {
-            if (!visible || input == null || !input.enabled || input.Clock == null) return;
+            if (!DebugOverlay.Visible || input == null || !input.enabled || input.Clock == null) return;
             if (_style == null) _style = new GUIStyle(GUI.skin.label) { fontSize = 16, richText = true };
 
             GestureSettings s = input.Settings;

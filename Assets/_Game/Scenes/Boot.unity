@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6aa533e02d4a4aaa100a2b84453c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ShiftShift.Runtime::ShiftShift.Boot
-  firstScene: Run
+  firstScene: Menu
 --- !u!4 &366716534
 Transform:
   m_ObjectHideFlags: 0

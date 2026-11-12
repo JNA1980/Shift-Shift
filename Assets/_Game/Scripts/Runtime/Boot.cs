@@ -3,10 +3,10 @@ using UnityEngine.SceneManagement;
 
 namespace ShiftShift
 {
-    /// <summary>First scene in the build: loads the next one. Points at Run until the Menu exists (days 21-22).</summary>
+    /// <summary>First scene in the build: loads the menu.</summary>
     public sealed class Boot : MonoBehaviour
     {
-        [SerializeField] private string firstScene = "Run";
+        [SerializeField] private string firstScene = "Menu";
 
         private void Start() => SceneManager.LoadScene(firstScene);
     }

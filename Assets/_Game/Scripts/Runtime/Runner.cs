@@ -280,7 +280,7 @@ namespace ShiftShift
 
         private void OnGUI()
         {
-            if (_model == null) return;
+            if (_model == null || !DebugOverlay.Visible) return;
             if (_style == null) _style = new GUIStyle(GUI.skin.label) { fontSize = 16, richText = true };
 
             double now = Now;

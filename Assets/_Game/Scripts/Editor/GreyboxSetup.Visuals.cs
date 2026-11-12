@@ -60,6 +60,7 @@ namespace ShiftShift.EditorTools
                 CreateGlowMaterials();
                 WireScene(scene, palettes, log);
             }
+            WireMenuScene(log);      // playbook 2.5: menu, level select, credits
             if (File.Exists(RunScenePath)) EditorSceneManager.OpenScene(RunScenePath, OpenSceneMode.Single);
             Debug.Log("[Visuals] Done.\n- " + string.Join("\n- ", log));
         }
@@ -210,6 +211,10 @@ namespace ShiftShift.EditorTools
             WirePostProcessing(Camera.main, log, Path.GetFileNameWithoutExtension(scene.path));
             WireFeelAndTrail(applier, log, Path.GetFileNameWithoutExtension(scene.path));
             if (scene.path == RunScenePath) PutTrackTestLevelFirst(log);
+            // GameFlow reads the menu keys (retry, next, pause) through ShiftInput.
+            var flow = Object.FindAnyObjectByType<GameFlow>();
+            var flowInput = Object.FindAnyObjectByType<ShiftInput>();
+            if (flow != null && flowInput != null) Set(flow, "input", flowInput);
             // Keep the spawner's chart types up to date here too (new types: ghostbar, ghostwide), so one menu item is enough.
             var spawner = Object.FindAnyObjectByType<ObstacleSpawner>();
             if (spawner != null) SetTypePrefabs(spawner, TypeMap(EnsureAssets()));

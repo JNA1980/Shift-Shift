@@ -350,9 +350,9 @@ namespace ShiftShift.EditorTools
         // The Run scene plays the first level in GameFlow's list (until the level select, days 21-22).
         private static readonly string[] RunLevelOrder =
         {
-            // The level being worked on goes first for now (level 6).
-            "Assets/_Game/Levels/level06.json", "Assets/_Game/Levels/level05.json", "Assets/_Game/Levels/level04.json", "Assets/_Game/Levels/level03.json", "Assets/_Game/Levels/level02.json",
-            "Assets/_Game/Levels/level01.json",
+            // Play order. Pressing Play in the Run scene itself starts level 1; the menu picks any of them by name.
+            "Assets/_Game/Levels/level01.json", "Assets/_Game/Levels/level02.json", "Assets/_Game/Levels/level03.json",
+            "Assets/_Game/Levels/level04.json", "Assets/_Game/Levels/level05.json", "Assets/_Game/Levels/level06.json",
             "Assets/_Game/Levels/test_track.json",
             "Assets/_Game/Levels/test_gestures.json", "Assets/_Game/Levels/level00.json",
         };
@@ -399,7 +399,7 @@ namespace ShiftShift.EditorTools
             foreach (string path in RunLevelOrder)
             {
                 var json = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-                if (json != null) list.Add(json);
+                if (json != null && !list.Contains(json)) list.Add(json);
             }
             for (int i = 0; i < levels.arraySize; i++)
             {

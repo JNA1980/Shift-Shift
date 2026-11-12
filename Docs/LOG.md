@@ -681,3 +681,18 @@ Level 6 needs a tempo rise and a palette cycle (plan). Done:
 Tested: 145 Core tests (8 new: tempo map continuity and round trip, click length, chart save, validation). Level validates, strict check clean, scripted walk with all earlier rules, round-trips; length 89.1 s. Compile check passes. Not played.
 Uncertain (all need John's eyes and ears): that the click and the obstacles stay together across the tempo rise at beat 96 in the editor and in WebGL; the feel of the speed-up (the runner goes from 10.8 to 12.5 m/s); hard palette cuts on the beat; a gap's hole position right after the rise.
 Schedule: all six levels exist as first drafts on day 17, on placeholder clicks.
+
+## 2026-11-12 — D18: menu, level select, results choices, pause
+
+John: level 6 cleared on attempt 3 (so the tempo rise and palette cuts work in the editor). Asked for the menu.
+Done (Docs/MENU.md):
+- Core/ShiftMenuKeys: Left / Right / Both from the two Shift keys, engine-free, 5 tests.
+- MainMenu (Menu scene): levels 1-6 with length and best score, Calibrate timing, Credits; Sticky Keys tip. Left/Right choose, Both opens.
+- GameFlow: static Play(level) used by the menu (starts at once); results: Left retry, Right next level, Both menu; fail: any Shift retries as before, Esc menu; Esc pauses during count-in and play (Left/Esc resume, Right restart, Both menu). Keys now come through ShiftInput, not the keyboard directly, so the Web key fix applies to retry too.
+- Conductor.Pause/Resume: freezes SongTime, pauses audio, shifts the song start by the paused time.
+- DebugOverlay: gesture log and runner box are off by default in builds, on in the editor; F1 toggles.
+- Boot opens Menu; Calibrate returns to Menu; Set Up Visuals fills the Menu scene, gives GameFlow its input, orders the Run scene's levels 1-6, and puts Boot, Menu, Run, Calibrate first in the build list.
+
+Tested: 150 Core tests; compile check (stand-in gaps filled: TextArea, AudioSource.Pause/UnPause, Application.isEditor, GUIStyle.wordWrap/fontStyle). Not run in Unity.
+Uncertain: audio and beat staying together after a pause (UnPause is not sample-exact; may drift a few ms per pause), pause during the count-in, Esc in a browser (leaves fullscreen first), menu text sizes at small window sizes, a key held across a scene change.
+Still placeholder: all UI is IMGUI text; no UI sounds until the audio pass.

@@ -21,7 +21,7 @@ namespace ShiftShift
         [SerializeField, Min(8)] private int clicks = 20;
         [Tooltip("First clicks to let the player find the beat; not measured.")]
         [SerializeField, Min(0)] private int warmUp = 4;
-        [SerializeField] private string returnScene = "Run";
+        [SerializeField] private string returnScene = "Menu";
 
         private enum State { Ready, Running, Result }
 

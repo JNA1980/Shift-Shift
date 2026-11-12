@@ -11,7 +11,9 @@ namespace ShiftShift
     /// Run loop for the Run scene (playbook 1.4): loads a level by name, two-bar count-in with beat pulses, play,
     /// fail (flash + hit-stop, then any Shift restarts), complete (results panel, local best). Restart reloads the
     /// scene and starts at once, so the run is moving again well under a second after the press.
-    /// UI is IMGUI placeholder until the UI pass (days 21-22).
+    /// Flow (playbook 2.5): the menu starts a level with <see cref="Play"/>. Results: Left = retry, Right = next
+    /// level, Both = menu. Esc pauses (Left = resume, Right = restart, Both = menu) or leaves a failed or finished run.
+    /// Keys come from ShiftInput, so Web builds use the browser key reader (Docs/INPUT.md).
     /// </summary>
     [DefaultExecutionOrder(-300)] // give the Conductor its level before it (and the spawner) wake up
     public sealed class GameFlow : MonoBehaviour
@@ -24,6 +26,9 @@ namespace ShiftShift
         [SerializeField] private List<TextAsset> levels = new List<TextAsset>();
         [SerializeField] private Conductor conductor;
         [SerializeField] private Runner runner;
+        [Tooltip("Optional; found in the scene if empty. Menu keys (retry, next, pause) are read through it.")]
+        [SerializeField] private ShiftInput input;
+        [SerializeField] private string menuScene = "Menu";
         [SerializeField, Min(0f)] private float hitStopSeconds = 0.06f;
         [SerializeField, Min(0.01f)] private float flashSeconds = 0.3f;
 
@@ -39,7 +44,26 @@ namespace ShiftShift
             _autoStart = false;
         }
 
+        /// <summary>Start a level from another scene (the menu). The run starts at once: no "press Shift" screen.</summary>
+        public static void Play(string levelAssetName, string runScene = "Run")
+        {
+            LevelToLoad = levelAssetName;
+            _autoStart = true;
+            SceneManager.LoadScene(runScene);
+        }
+
+        /// <summary>"level03" -> "level04". Null when the name has no number at the end.</summary>
+        public static string NextLevelName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return null;
+            int i = name.Length;
+            while (i > 0 && char.IsDigit(name[i - 1])) i--;
+            if (i == name.Length || !int.TryParse(name.Substring(i), out int n)) return null;
+            return name.Substring(0, i) + (n + 1).ToString(new string('0', name.Length - i));
+        }
+
         public Phase Current { get; private set; } = Phase.Ready;
+        public bool IsPaused => conductor != null && conductor.IsPaused;
         public ScoreKeeper Score { get; } = new ScoreKeeper();
 
         private string _bestKey;
@@ -49,6 +73,9 @@ namespace ShiftShift
         private float _flash;
         private string _lastGrade;
         private float _lastGradeAt = -10f;
+        private readonly ShiftMenuKeys _keys = new ShiftMenuKeys();
+        private bool _prevLeft, _prevRight;
+        private string _nextLevel; // asset name of the next level, if it is in the list
 
         private void Awake()
         {
@@ -66,6 +93,11 @@ namespace ShiftShift
             }
             _bestKey = BestKeyPrefix + json.name;
             _best = PlayerPrefs.GetInt(_bestKey, 0);
+
+            if (input == null) input = FindAnyObjectByType<ShiftInput>();
+            string next = NextLevelName(json.name);
+            foreach (TextAsset t in levels)
+                if (t != null && t.name == next) _nextLevel = next;
         }
 
         private TextAsset Pick()
@@ -108,10 +140,63 @@ namespace ShiftShift
             if (Current == Phase.CountIn && conductor.CurrentBeat >= 0) Current = Phase.Playing;
             if (_flash > 0f) _flash = Mathf.Max(0f, _flash - Time.unscaledDeltaTime / flashSeconds);
 
-            bool canRestart = (Current == Phase.Failed && _canRestart) || Current == Phase.Results;
+            bool left = input != null && input.IsDown(Side.Left), right = input != null && input.IsDown(Side.Right);
+            bool pressed = (left && !_prevLeft) || (right && !_prevRight);
+            _prevLeft = left;
+            _prevRight = right;
+            MenuKey key = _keys.Poll(left, right);
             Keyboard kb = Keyboard.current;
-            if (canRestart && kb != null && (kb.leftShiftKey.wasPressedThisFrame || kb.rightShiftKey.wasPressedThisFrame))
+            bool esc = kb != null && kb.escapeKey.wasPressedThisFrame;
+
+            if (IsPaused)
+            {
+                if (esc || key == MenuKey.Left) SetPaused(false);
+                else if (key == MenuKey.Right) Restart();
+                else if (key == MenuKey.Both) ToMenu();
+            }
+            else if (Current == Phase.CountIn || Current == Phase.Playing)
+            {
+                if (esc) SetPaused(true);
+            }
+            else if (Current == Phase.Failed)
+            {
+                if (esc) ToMenu();
+                else if (_canRestart && pressed) Restart(); // any Shift, at once: the fast retry
+            }
+            else if (Current == Phase.Results)
+            {
+                if (key == MenuKey.Left) Restart();
+                else if (key == MenuKey.Right) { if (_nextLevel != null) Play(_nextLevel, gameObject.scene.name); else ToMenu(); }
+                else if (key == MenuKey.Both || esc) ToMenu();
+            }
+        }
+
+        private void SetPaused(bool paused)
+        {
+            if (paused == IsPaused) return;
+            if (paused)
+            {
+                conductor.Pause();
+                Time.timeScale = 0f;
+            }
+            else
+            {
+                Time.timeScale = 1f;
+                if (input != null) input.ResetState(); // presses made in the pause menu are not gestures
+                conductor.Resume();
+            }
+            _keys.Reset(input != null && input.IsDown(Side.Left), input != null && input.IsDown(Side.Right));
+        }
+
+        private void ToMenu()
+        {
+            Time.timeScale = 1f;
+            if (Application.CanStreamedLevelBeLoaded(menuScene)) SceneManager.LoadScene(menuScene);
+            else
+            {
+                Debug.LogWarning($"[GameFlow] Scene '{menuScene}' is not in the build list; restarting the level.");
                 Restart();
+            }
         }
 
         private void OnJudged(Obstacle o, Grade g)
@@ -140,6 +225,8 @@ namespace ShiftShift
         private void OnCompleted()
         {
             Current = Phase.Results;
+            // A key still held from the last obstacle must not pick a results option.
+            _keys.Reset(input != null && input.IsDown(Side.Left), input != null && input.IsDown(Side.Right));
             int points = (int)Score.Points;
             if (points > _best)
             {
@@ -152,6 +239,7 @@ namespace ShiftShift
 
         private void Restart()
         {
+            Time.timeScale = 1f;
             _autoStart = true; // audio is already unlocked by the first press
             LevelToLoad = conductor.LevelAssetName;
             SceneManager.LoadScene(gameObject.scene.name);
@@ -221,7 +309,11 @@ namespace ShiftShift
 
                 case Phase.Failed:
                     DrawScore(w);
-                    if (_canRestart) GUI.Label(new Rect(0, h * 0.45f, w, 80), "Shift to retry", _big);
+                    if (_canRestart)
+                    {
+                        GUI.Label(new Rect(0, h * 0.45f, w, 80), "Shift to retry", _big);
+                        GUI.Label(new Rect(0, h * 0.45f + 70, w, 30), "Esc: menu", _small);
+                    }
                     break;
 
                 case Phase.Results:
@@ -231,8 +323,19 @@ namespace ShiftShift
                     GUI.Label(new Rect(0, h * 0.41f, w, 40), $"Best streak  {Score.BestStreak}", _mid);
                     GUI.Label(new Rect(0, h * 0.49f, w, 40), $"Perfect  {Score.PerfectPercent:0}%", _mid);
                     GUI.Label(new Rect(0, h * 0.57f, w, 40), $"Best score  {_best}", _mid);
-                    GUI.Label(new Rect(0, h * 0.67f, w, 30), "Shift to play again", _small);
+                    GUI.Label(new Rect(0, h * 0.67f, w, 30),
+                        "Left Shift: retry   ·   Right Shift: " + (_nextLevel != null ? "next level" : "menu") + "   ·   Both: menu", _small);
                     break;
+            }
+
+            if (IsPaused)
+            {
+                GUI.Box(new Rect(w * 0.3f, h * 0.28f, w * 0.4f, h * 0.4f), GUIContent.none);
+                GUI.Label(new Rect(0, h * 0.32f, w, 60), "<b>Paused</b>", _big);
+                GUI.Label(new Rect(0, h * 0.45f, w, 30), "Left Shift or Esc: resume", _mid);
+                GUI.Label(new Rect(0, h * 0.51f, w, 30), "Right Shift: restart", _mid);
+                GUI.Label(new Rect(0, h * 0.57f, w, 30), "Both: menu", _mid);
+                return;
             }
 
             if (Time.unscaledTime - _lastGradeAt < 0.5f && (Current == Phase.Playing || Current == Phase.Failed))

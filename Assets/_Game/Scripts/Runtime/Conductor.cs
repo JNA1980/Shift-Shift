@@ -41,8 +41,10 @@ namespace ShiftShift
         public double CurrentBeat => BeatAt(SongTime);
         public double UserOffsetMs => _userOffsetMs;
 
+        public bool IsPaused { get; private set; }
+
         public double SongTime => IsStarted
-            ? AudioSettings.dspTime - _audioStartDsp - _offsetSeconds
+            ? (IsPaused ? _pausedAtDsp : AudioSettings.dspTime) - _audioStartDsp - _offsetSeconds
             : -(startDelay + CountInSeconds) - _offsetSeconds; // frozen at the start value until the run begins
 
         // Through the tempo map: identical to beat x 60 / bpm for a level with one tempo.
@@ -55,6 +57,7 @@ namespace ShiftShift
         private AudioSource _source;
         private AudioClip _clip;
         private double _audioStartDsp;
+        private double _pausedAtDsp;
         private double _offsetSeconds;
         private double _userOffsetMs;
         private int _lastBeat = int.MinValue;
@@ -127,6 +130,37 @@ namespace ShiftShift
             // From here on, gestures are stamped in song time. A press still held is discarded by the swap.
             if (input != null) input.SetClock(this);
             Debug.Log($"[Conductor] Started. Audio at dspTime {_audioStartDsp:F3}, count-in {countInBeats} beats.");
+        }
+
+        /// <summary>
+        /// Freezes the song clock and the audio (pause menu). <see cref="Resume"/> moves the song's start forward by
+        /// the time spent paused, so beats and audio line up again.
+        /// </summary>
+        public void Pause()
+        {
+            if (!IsStarted || IsPaused) return;
+            _pausedAtDsp = AudioSettings.dspTime;
+            IsPaused = true;
+            if (_clip == null) return;
+            // Audio not started yet (count-in): cancel the scheduled start; Resume schedules it again.
+            if (_pausedAtDsp < _audioStartDsp) _source.Stop();
+            else _source.Pause();
+        }
+
+        public void Resume()
+        {
+            if (!IsPaused) return;
+            double now = AudioSettings.dspTime;
+            bool audioHadStarted = _pausedAtDsp >= _audioStartDsp;
+            _audioStartDsp += now - _pausedAtDsp;
+            IsPaused = false;
+            if (_clip == null) return;
+            if (audioHadStarted) _source.UnPause();
+            else
+            {
+                _source.clip = _clip;
+                _source.PlayScheduled(_audioStartDsp);
+            }
         }
 
         public void StopSong()
