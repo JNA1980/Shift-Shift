@@ -696,3 +696,10 @@ Done (Docs/MENU.md):
 Tested: 150 Core tests; compile check (stand-in gaps filled: TextArea, AudioSource.Pause/UnPause, Application.isEditor, GUIStyle.wordWrap/fontStyle). Not run in Unity.
 Uncertain: audio and beat staying together after a pause (UnPause is not sample-exact; may drift a few ms per pause), pause during the count-in, Esc in a browser (leaves fullscreen first), menu text sizes at small window sizes, a key held across a scene change.
 Still placeholder: all UI is IMGUI text; no UI sounds until the audio pass.
+
+## 2026-11-13 — D19: commit attribution removed
+
+John asked for Claude to be removed as a contributor and for it not to recur.
+Done: the 73 "Co-Authored-By: Claude ..." lines were stripped from the commit messages on main (history rewritten; every commit has a new hash). Trees, authors, committers, dates and the rest of each message are unchanged, checked commit by commit; the 73 commits that carried a signature were re-signed with the session key for now, the other 36 stay unsigned as before. .claude/settings.json added with attribution.commit and attribution.pr set to "" so Claude Code adds no attribution to commits or pull requests. Commits made in these sessions from here on carry no co-author line.
+Also removed, at John's request: the "Claude-Session:" link line the same 73 commit messages ended with; .claude/settings.json sets attribution.sessionUrl to false so it is not added again. Signing: John will re-sign the commits on his own machine with his own key, so GitHub shows them as verified under his account. Not changed: mentions of Claude inside files (CLAUDE.md, Docs, the in-game credits text) are content, not git attribution.
+After the forced push, John's clone must be reset to the new history (not pulled), or the old commits come back as a merge.
