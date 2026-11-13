@@ -211,7 +211,7 @@ namespace ShiftShift
                 case Role.Sprint: return p.sprint;
                 case Role.Jump: return p.jump;
                 case Role.Phase: return p.phase;
-                // Ghost blocks (inside a blue barrier): light pink on every level (John, day 17), so they stand out
+                // Ghost blocks (inside a blue barrier): light pink on every level (ELIA, day 17), so they stand out
                 // from the barrier before you phase. Paler than the jump pink.
                 case Role.Ghost: return GhostBlockPink;
                 case Role.Charge: return p.charge;

@@ -113,7 +113,7 @@ namespace ShiftShift.Core
         {
             { "bar", new Spec(ObstacleKind.Block, ObstacleLayer.Solid, false) }, // change lane
             { "wide", new Spec(ObstacleKind.Block, ObstacleLayer.Solid, false, true) }, // two lanes blocked: be in the free lane
-            { "low", new Spec(ObstacleKind.Low, ObstacleLayer.Solid, true) },    // slide (all lanes: no dodging it, John day 13)
+            { "low", new Spec(ObstacleKind.Low, ObstacleLayer.Solid, true) },    // slide (all lanes: no dodging it, ELIA day 13)
             { "gate", new Spec(ObstacleKind.Gate, ObstacleLayer.Solid, false, true) }, // sprint through the one open lane
             { "gap", new Spec(ObstacleKind.Gap, ObstacleLayer.Solid, true) },    // jump
             { "hurdle", new Spec(ObstacleKind.Hurdle, ObstacleLayer.Solid, true) }, // short wall: jump

@@ -113,7 +113,7 @@ namespace ShiftShift
             if (hit)
             {
                 // A Shift pressed while the other has been held for longer than the both-window: the browser will
-                // not report its release until BOTH are up (measured on John's machine, day 17: Docs/LOG.md), so
+                // not report its release until BOTH are up (measured on ELIA's machine, day 17: Docs/LOG.md), so
                 // it cannot be told from a hold. Count it as a tap now (lane change during a slide or sprint).
                 // Cost: in Web builds a second HOLD cannot start while the first is still held.
                 bool otherHeld = _classifier.IsDown(other) && now - _downAt[o] > settings.bothWindowMs / 1000.0;

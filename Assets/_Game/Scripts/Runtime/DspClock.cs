@@ -5,7 +5,7 @@ namespace ShiftShift
 {
     /// <summary>
     /// Stand-in song clock until the Conductor exists (day 12): song time = AudioSettings.dspTime since creation,
-    /// at a fixed BPM. Rhythm timing never uses Time.time (CLAUDE.md).
+    /// at a fixed BPM. Rhythm timing never uses Time.time (project rules).
     ///
     /// Not yet verified (see Docs/LOG.md): in WebGL, dspTime may not advance until the browser unlocks audio
     /// (first click or key press), and it advances in audio-buffer steps rather than smoothly.

@@ -50,7 +50,7 @@ namespace ShiftShift.EditorTools
                 {
                     // Doorway frame. Posts stand 0.2 m above the walls and the beam 0.15 m above the posts, each a
                     // little deeper than the last, so no two faces (or glow strips) share a plane: v1 had them level
-                    // and the gate flickered (John, day 17). Beam top at 3.15 m (<= 3.2 m).
+                    // and the gate flickered (ELIA, day 17). Beam top at 3.15 m (<= 3.2 m).
                     Box(layout, "PostL", new Vector3(a, (height + 0.2f) * 0.5f, 0f), new Vector3(0.25f, height + 0.2f, 0.5f), mat);
                     Box(layout, "PostR", new Vector3(b, (height + 0.2f) * 0.5f, 0f), new Vector3(0.25f, height + 0.2f, 0.5f), mat);
                     Box(layout, "Beam", new Vector3((a + b) * 0.5f, height + 0.25f, 0f), new Vector3(b - a + 0.35f, 0.2f, 0.6f), mat);

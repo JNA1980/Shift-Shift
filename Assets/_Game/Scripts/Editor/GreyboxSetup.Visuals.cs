@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ShiftShift.EditorTools
 {
     /// <summary>
-    /// Shift+Shift > Set Up Visuals (playbook 2.2, step 1): six Palette assets (Docs/PALETTES.md, chosen with John on
+    /// Shift+Shift > Set Up Visuals (playbook 2.2, step 1): six Palette assets (Docs/PALETTES.md, chosen with ELIA on
     /// day 16), road edge and lane lines on the track pieces, and a PaletteApplier in the Run, LevelTest and Greybox
     /// scenes (tracks rebuilt, fog enabled in each scene's lighting so builds keep the fog shader variants).
     /// Re-runnable: creates what is missing, refreshes the rest. Never changes an existing palette's colours.
@@ -44,8 +44,8 @@ namespace ShiftShift.EditorTools
             AddGapRims(log);
             RebuildOpeningLayouts(log); // step 5: solid wide bar slabs, framed gate doorway (before edges are added)
             AddGlowEdges(log);       // step 2: glowing obstacle edges
-            MakeBarrierSeeThrough(log); // day 17 (John): see the road behind the phase barrier
-            MakeWallBrick(log);         // day 17 (John): the charge wall looks like bricks
+            MakeBarrierSeeThrough(log); // day 17 (ELIA): see the road behind the phase barrier
+            MakeWallBrick(log);         // day 17 (ELIA): the charge wall looks like bricks
             EnableBloomInProfile(log);
             EnsureCameraFeel(log);   // step 3: camera feel asset
             EnsureLongClick(log);    // playbook 2.3: audio for the track test level
@@ -145,7 +145,7 @@ namespace ShiftShift.EditorTools
             }
             if (root.transform.Find("Pit") == null)
             {
-                // Day 17 (John): depth for the gap. The road is cut at play time; this pit shows through the cut.
+                // Day 17 (ELIA): depth for the gap. The road is cut at play time; this pit shows through the cut.
                 // Wall tops sit just under the ground level (-0.05) so nothing lies in the same plane as it.
                 var pit = new GameObject("Pit");
                 pit.transform.SetParent(root.transform, false);

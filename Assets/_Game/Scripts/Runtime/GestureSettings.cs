@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ShiftShift
 {
     /// <summary>
-    /// Gesture thresholds (CLAUDE.md: thresholds live in a ScriptableObject).
+    /// Gesture thresholds (project rules: thresholds live in a ScriptableObject).
     /// Asset: Assets/_Game/Settings/GestureSettings.asset. Starting values from the plan; tune on day 15.
     /// Edits during Play mode apply immediately (ShiftInput rebuilds its classifier).
     /// </summary>

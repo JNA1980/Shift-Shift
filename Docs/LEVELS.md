@@ -141,7 +141,7 @@ Ghost blocks only hit a phased runner, and you have to be phased at the barrier,
 | 101-111 | Breather, inside the tunnel |
 | 112-152 | Something every 2 beats; a lane change plus phase always gets 4 beats |
 
-Not done from the plan: eighth notes (levels 4-5 "move to eighth notes"). Left on quarter notes because levels 2 and 3 already took John 4 attempts each.
+Not done from the plan: eighth notes (levels 4-5 "move to eighth notes"). Left on quarter notes because levels 2 and 3 already took ELIA 4 attempts each.
 Track: S-bend 16, left bend 32, hill 48, right bend 64, dip 88, tunnel 102, S-bend 128, rise 148.
 
 ## Level 5, "Drumline" (first draft, day 17)

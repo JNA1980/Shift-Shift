@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ShiftShift
 {
     /// <summary>
-    /// The runner as a blocky running figure (John, day 17: instead of the capsule), with dust puffs from the heels.
+    /// The runner as a blocky running figure (ELIA, day 17: instead of the capsule), with dust puffs from the heels.
     /// Built from boxes by Shift+Shift > Set Up Visuals; this component only animates it.
     /// The stride follows the runner's distance along the track, which follows the song: one full stride (two
     /// footfalls) per beat, so the feet land in time with the music. No frame time involved.
@@ -32,9 +32,9 @@ namespace ShiftShift
         [SerializeField, Range(0f, 45f)] private float runLeanDegrees = 8f;
         [SerializeField, Range(0f, 45f)] private float sprintLeanDegrees = 22f;
 
-        [Tooltip("Lean into bends (John, day 17): degrees of lean per degree the track turns over the next few metres.")]
+        [Tooltip("Lean into bends (ELIA, day 17): degrees of lean per degree the track turns over the next few metres.")]
         [SerializeField, Range(0f, 8f)] private float bendLeanFactor = 1f;
-        [Tooltip("Kept slight (John, day 17): a big lean reads as a lane change.")]
+        [Tooltip("Kept slight (ELIA, day 17): a big lean reads as a lane change.")]
         [SerializeField, Range(0f, 30f)] private float bendLeanMaxDegrees = 5f;
 
         [Header("Dust from the heels")]

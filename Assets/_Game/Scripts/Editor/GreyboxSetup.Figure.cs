@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ShiftShift.EditorTools
 {
     /// <summary>
-    /// Day 17 (John): the runner becomes a blocky running figure with dust from the heels, built here from boxes
+    /// Day 17 (ELIA): the runner becomes a blocky running figure with dust from the heels, built here from boxes
     /// (no model files). The old capsule ("Body") is kept in the scene, switched off.
     /// </summary>
     public static partial class GreyboxSetup

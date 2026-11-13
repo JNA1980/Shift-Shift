@@ -4,7 +4,7 @@ namespace ShiftShift.Core
 {
     public enum Side { Left, Right }
 
-    /// <summary>The seven gestures (CLAUDE.md).</summary>
+    /// <summary>The seven gestures (project rules).</summary>
     public enum GestureType
     {
         TapLeft,

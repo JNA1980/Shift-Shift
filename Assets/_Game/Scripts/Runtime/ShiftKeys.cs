@@ -7,7 +7,7 @@ namespace ShiftShift
     /// <summary>
     /// The two Shift keys as the browser sees them (Assets/Plugins/WebGL/ShiftKeys.jslib). Used only in Web builds:
     /// on Windows the browser gets no key-up for one Shift while the other is still down, which left Unity's own
-    /// keyboard state showing a key held for good and swallowed its next press (John, day 17: jump at a gap not
+    /// keyboard state showing a key held for good and swallowed its next press (ELIA, day 17: jump at a gap not
     /// seen; left taps ignored). Elsewhere <see cref="FromBrowser"/> is false and ShiftInput reads the Input System.
     /// Known limit that remains: letting go of ONE Shift while the other stays down is not seen until both are up
     /// or that key is pressed again.

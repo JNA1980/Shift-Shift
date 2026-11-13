@@ -191,7 +191,7 @@ namespace ShiftShift.Tests
         [Test]
         public void Score_CleanRunOffTheBeat_StillScores()
         {
-            // John's level 1 run on day 17: 27 obstacles dodged early. Was 0-50 points; now every pass counts.
+            // ELIA's level 1 run on day 17: 27 obstacles dodged early. Was 0-50 points; now every pass counts.
             var s = new ScoreKeeper();
             for (int i = 0; i < 27; i++) s.Add(Grade.Ok);
             Assert.AreEqual(135, s.Points);

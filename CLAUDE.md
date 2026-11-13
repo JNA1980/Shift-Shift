@@ -1,8 +1,8 @@
-# CLAUDE.md
+# Project rules
 
 Project: Shift+Shift, a Unity 6 URP rhythm auto-runner for GitHub Game Off 2026 (theme SHIFT). Solo developer plus you. Deadline 1 Dec 2026. Primary target WebGL, secondary Windows x64.
 
-Controls: Left Shift and Right Shift only. Seven gestures: Tap L, Tap R, Hold L (slide), Hold R (sprint), Both tap within 80 ms (jump), Both hold (phase shift), Alternate L R L R quickly, no beat needed (charge; changed by John on day 13). Thresholds live in a ScriptableObject, never hard-coded.
+Controls: Left Shift and Right Shift only. Seven gestures: Tap L, Tap R, Hold L (slide), Hold R (sprint), Both tap within 80 ms (jump), Both hold (phase shift), Alternate L R L R quickly, no beat needed (charge; changed by ELIA on day 13). Thresholds live in a ScriptableObject, never hard-coded.
 
 Architecture: single Unity project, plain C#, no third-party frameworks. Systems: ShiftInput, Conductor, TrackBuilder, ObstacleSpawner, Runner, Judge, Scoring, GameFlow, ChartEditor (editor only). Level data is JSON in Assets/_Game/Levels. All game code under Assets/_Game/Scripts.
 

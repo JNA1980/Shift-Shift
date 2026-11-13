@@ -10,7 +10,7 @@ namespace ShiftShift
     /// gestures, moves the visuals, and judges obstacles as the runner reaches them. Docs/RUNNER.md.
     ///
     /// - Forward position comes from the song: distance along the track = metresPerBeat * beat (no frame time;
-    ///   CLAUDE.md), so obstacles placed at beat * metresPerBeat are reached exactly on their beat, whatever the BPM.
+    ///   project rules), so obstacles placed at beat * metresPerBeat are reached exactly on their beat, whatever the BPM.
     ///   The track may bend, rise and drop (playbook 2.3): the TrackBuilder turns (distance, sideways, height) into
     ///   a world position. Rules and timing only ever use the distance.
     /// - With a Conductor: waits (and ignores gestures) until it starts; the run ends at the level's last beat.

@@ -14,7 +14,7 @@ Play it on itch.io: _link goes here once the page is public_.
 | Hold Right Shift | Sprint through speed gates |
 | Tap both | Jump |
 | Hold both | Phase shift into the ghost layer |
-| Alternate L, R, L, R on the beat | Charge through walls |
+| Alternate L, R, L, R quickly | Charge through the red brick walls |
 
 **Windows players:** pressing Shift five times can open the Sticky Keys dialog. Turn it off in
 Settings > Accessibility > Keyboard > Sticky keys (or say "No" to the shortcut prompt).

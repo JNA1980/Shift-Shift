@@ -100,7 +100,7 @@ namespace ShiftShift.EditorTools
                 Box(go, "RimBack", new Vector3(0, 0.05f, 1.25f), new Vector3(TrackWidth, 0.03f, 0.15f), "Hurdle");
             });
 
-            // Day 13 (John): gate with a one-lane opening, wide bar with one free lane, short pink hurdle.
+            // Day 13 (ELIA): gate with a one-lane opening, wide bar with one free lane, short pink hurdle.
             // Opening types have one panel per lane (Panel0/1/2 = chart lanes left/middle/right); the spawner hides
             // the open lane's panel.
             k.GateOpening = ObstaclePrefab("GateOpening", ObstacleKind.Gate, ObstacleLayer.Solid, false, 0.4f, go =>

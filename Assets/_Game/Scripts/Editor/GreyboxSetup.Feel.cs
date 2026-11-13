@@ -64,7 +64,7 @@ namespace ShiftShift.EditorTools
                 else trail = existing.GetComponent<TrailRenderer>();
             }
             if (applier != null && trail != null) Set(applier, "trail", trail);
-            // John, day 17: with the running figure and its dust the yellow trail is not needed. Kept, switched off.
+            // ELIA, day 17: with the running figure and its dust the yellow trail is not needed. Kept, switched off.
             if (trail != null && trail.gameObject.activeSelf)
             {
                 trail.gameObject.SetActive(false);

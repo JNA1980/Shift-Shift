@@ -11,7 +11,7 @@ namespace ShiftShift.Core
         Gap,   // missing floor: be in the air (Both tap)
         Wall,  // breakable wall: needs a charge (Alternate x ChargeTaps)
         Barrier, // phase barrier: only passable while phased (Both hold). Added last: kinds are saved as numbers.
-        Hurdle,  // short wall: jump it (Both tap). The tall Wall stays charge-only (John, day 13).
+        Hurdle,  // short wall: jump it (Both tap). The tall Wall stays charge-only (ELIA, day 13).
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ namespace ShiftShift.Core
         public bool AllLanes;
         /// <summary>
         /// The obstacle blocks every lane EXCEPT <see cref="Lane"/>: the runner must be in that lane (gate opening,
-        /// free lane of a wide bar). John, day 13.
+        /// free lane of a wide bar). ELIA, day 13.
         /// </summary>
         public bool LaneIsOpening;
         /// <summary>Song time (s) at which the runner reaches this obstacle.</summary>
@@ -73,7 +73,7 @@ namespace ShiftShift.Core
 
     /// <summary>
     /// Engine-free runner state over song time, built from gesture events (Docs/RUNNER.md).
-    /// Decision A (John, day 10): every action counts from its key-down time, even though taps and holds are
+    /// Decision A (ELIA, day 10): every action counts from its key-down time, even though taps and holds are
     /// only recognised later. So state is a timeline that can be queried at any past song time, and an obstacle
     /// is judged by the state at the moment the runner reaches it.
     /// Lanes: three lanes, -1..1, start in the middle.

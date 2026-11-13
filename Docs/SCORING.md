@@ -28,7 +28,7 @@ Multiplier by streak: x2 from 10, x3 from 25, x4 from 50 (the 10th hit already s
 Results: score, best streak, perfect % (perfects / graded obstacles), best score per level in PlayerPrefs
 (`ShiftShift.BestV2.<level asset>`).
 
-Changed on day 17 (John): every obstacle passed scores (was: only on-beat answers scored, 100 / 50, and an OK reset
+Changed on day 17 (ELIA): every obstacle passed scores (was: only on-beat answers scored, 100 / 50, and an OK reset
 the streak). A clean run made off the beat used to score almost nothing. The streak now counts on-beat answers in a
 row; an OK neither adds to it nor breaks it. Best scores saved under the old values are not carried over.
 

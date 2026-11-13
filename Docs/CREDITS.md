@@ -9,4 +9,4 @@ no NC (non-commercial) or ND (no-derivatives) licences. Music must have a steady
 
 ## Tools
 - Unity 6 LTS (URP)
-- Code written by John with Claude Code
+- Design, code and levels by ELIA

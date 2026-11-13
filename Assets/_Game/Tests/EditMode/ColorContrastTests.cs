@@ -18,7 +18,7 @@ namespace ShiftShift.Tests
         [Test]
         public void ChosenColours_OnCharcoalRoad_AreAtLeast3To1()
         {
-            // John, day 16: charcoal road #333333; vivid action colours identical on every level.
+            // ELIA, day 16: charcoal road #333333; vivid action colours identical on every level.
             foreach (string c in new[] { "#F27017", "#FCC41E", "#00FCF9", "#F40E9D", "#0E79F1", "#F21E3D" })
                 Assert.That(Hex(c, "#333333"), Is.GreaterThanOrEqualTo(2.995), c);
         }

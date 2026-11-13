@@ -42,7 +42,7 @@ namespace ShiftShift.EditorTools
             EnsureScenery();
         }
 
-        // ---------- day 17 look changes (John): roadside scenery, see-through barrier, brick wall ----------
+        // ---------- day 17 look changes (ELIA): roadside scenery, see-through barrier, brick wall ----------
 
         private const string BrickPath = MatDir + "/Brick.png";
 
@@ -53,7 +53,7 @@ namespace ShiftShift.EditorTools
                 Box(go, "Post", new Vector3(0, 0.6f, 0), new Vector3(0.18f, 2.2f, 0.18f), "TrackDark"); // from -0.5 to 1.7 m
                 Box(go, "Tip", new Vector3(0, 1.8f, 0), new Vector3(0.22f, 0.22f, 0.22f), "TrackLines");
             });
-            // Buildings: six shapes (John, day 17: one repeated block looked repetitive). Each stands on the ground and
+            // Buildings: six shapes (ELIA, day 17: one repeated block looked repetitive). Each stands on the ground and
             // reaches below it, so it stays grounded where the builder sinks it or the road slopes.
             DressingPrefab("BackdropTower", go => Tall(go, "Body", 0, 0, 5f, 5f, 14f));
             DressingPrefab("BackdropSlab", go => Tall(go, "Body", 0, 0, 12f, 6f, 5f));
@@ -82,7 +82,7 @@ namespace ShiftShift.EditorTools
                 Box(go, "Cap", new Vector3(0, 9.6f, 0), new Vector3(9.2f, 0.2f, 2.2f), "TrackLines");
             });
 
-            // Ten more shapes (John, day 17: six still looked alike).
+            // Ten more shapes (ELIA, day 17: six still looked alike).
             DressingPrefab("BackdropL", go =>
             {
                 Tall(go, "Wing", -2f, 0, 4f, 10f, 9f);
@@ -145,7 +145,7 @@ namespace ShiftShift.EditorTools
                 Box(go, "Walkway", new Vector3(0, 10f, 0), new Vector3(5f, 1f, 2f), "TrackDark");
             });
 
-            // Conifers (John, day 17): tiers that narrow to a point, every other tier turned 45 degrees.
+            // Conifers (ELIA, day 17): tiers that narrow to a point, every other tier turned 45 degrees.
             DressingPrefab("ConiferTall", go => Conifer(go, 2f, new[] { 3.0f, 2.5f, 2.0f, 1.5f, 1.0f, 0.5f }, 1.0f));
             DressingPrefab("ConiferSmall", go => Conifer(go, 1f, new[] { 1.8f, 1.3f, 0.8f, 0.4f }, 0.7f));
             DressingPrefab("ConiferWide", go => Conifer(go, 1.2f, new[] { 3.6f, 2.9f, 2.1f, 1.3f, 0.6f }, 0.8f));
@@ -221,7 +221,7 @@ namespace ShiftShift.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private const float BarrierAlpha = 0.65f; // John, day 17: 0.3, then 0.5, were too see-through
+        private const float BarrierAlpha = 0.65f; // ELIA, day 17: 0.3, then 0.5, were too see-through
 
         /// <summary>The phase barrier becomes a see-through panel in a bright frame: you can see the road go on behind it.</summary>
         private static void MakeBarrierSeeThrough(List<string> log)
@@ -263,7 +263,7 @@ namespace ShiftShift.EditorTools
         /// <summary>Brick pattern (generated here, grey on white) on the charge wall; the palette's red tints it.</summary>
         private static void MakeWallBrick(List<string> log)
         {
-            // 256 x 128 with smooth filtering (John, day 17: the first 64 x 32 version shimmered as the wall came closer).
+            // 256 x 128 with smooth filtering (ELIA, day 17: the first 64 x 32 version shimmered as the wall came closer).
             const int w = 256, h = 128, mortar = 8;
             var current = AssetDatabase.LoadAssetAtPath<Texture2D>(BrickPath);
             if (current == null || current.width != w)
@@ -298,7 +298,7 @@ namespace ShiftShift.EditorTools
             Material m = Mats["Wall"];
             if (brickTex != null)
             {
-                // Wall is 7 x 3 m: bricks 2 m long in rows of 0.5 m (John, day 17: the first, smaller bricks only
+                // Wall is 7 x 3 m: bricks 2 m long in rows of 0.5 m (ELIA, day 17: the first, smaller bricks only
                 // showed up close).
                 m.SetTexture("_BaseMap", brickTex);
                 m.SetTextureScale("_BaseMap", new Vector2(3.5f, 3f));

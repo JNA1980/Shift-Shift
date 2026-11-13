@@ -266,7 +266,7 @@ namespace ShiftShift
 
                 case Phase.CountIn:
                 {
-                    // Last bar counts down 4-3-2-1; any earlier count-in beats show "Get ready" (John, day 17: two
+                    // Last bar counts down 4-3-2-1; any earlier count-in beats show "Get ready" (ELIA, day 17: two
                     // bars of 1-2-3-4 read as counting twice).
                     double beat = conductor.CurrentBeat;
                     if (beat >= -conductor.CountInBeats)
@@ -281,7 +281,7 @@ namespace ShiftShift
                         }
                         else
                         {
-                            // Earlier bar: "Get ready" stays put (John: pulsing read as showing 4 times); a dot per beat.
+                            // Earlier bar: "Get ready" stays put (ELIA: pulsing read as showing 4 times); a dot per beat.
                             var style = new GUIStyle(_big) { fontSize = 64 };
                             GUI.Label(new Rect(0, h * 0.3f, w, 120), "Get ready", style);
                             int lit = (whole + conductor.CountInBeats) % 4 + 1; // 1..4 across each "Get ready" bar

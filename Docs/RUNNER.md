@@ -8,7 +8,7 @@ Code: `Assets/_Game/Scripts/Core/RunnerModel.cs` (rules, engine-free, tested), `
 - **By rules, not physics.** When the runner reaches an obstacle (beat = obstacle Z / metres per beat, converted to
   song time by the clock), the state at that
   moment decides: Pass, Hit (run fails) or Break (wall). Colliders are not used.
-- **Decision A (John, day 10): actions count from key-down.** A slide that was pressed before a low bar passes it,
+- **Decision A (ELIA, day 10): actions count from key-down.** A slide that was pressed before a low bar passes it,
   even though the slide is only recognised 250 ms after the press. If a press made before the obstacle is still
   undecided, the Runner waits for it (at most one tap/hold threshold), so a fail can show up to ~250 ms late.
 - **Visuals start on recognition** (lane ease 120 ms, jump arc 0.5 s, slide pose), so they can lag the rules slightly.
@@ -39,7 +39,7 @@ ignores gestures until then.
 
 1. **Sprint does not change forward speed.** The playbook says "speed x1.5", but obstacle timing comes from song
    time; actually speeding up would make every later obstacle arrive off the beat. Sprint = state for gates + FOV
-   kick (60 → 72). Confirmed by John, day 11: keep it.
+   kick (60 → 72). Confirmed by ELIA, day 11: keep it.
 2. **A charge lasts until the next wall uses it.** Every 4th on-beat alternation earns one.
 3. ~~Walls are in the solid layer, so a phased runner also passes them.~~ Changed day 13: only a charge breaks a wall.
 4. **Gaps are checked at both edges**, other obstacles at their centre.

@@ -1,4 +1,4 @@
-# Palettes (proposal, day 16, for John's approval)
+# Palettes (proposal, day 16, for ELIA's approval)
 
 Preview image: sent in the session chat (not in the repo: PNGs go through LFS, which the cloud session cannot upload). Contrast is WCAG 2 (the plan: obstacle vs background >= 4.5:1). Also checked:
 obstacle vs track >= 3:1, and hurdle / wall / ghost / accent vs background and track >= 3:1. All pass.
@@ -10,7 +10,7 @@ obstacle vs track >= 3:1, and hurdle / wall / ghost / accent vs background and t
 | obstacle | bars, wide bars, low bars (orange family, darker on light palettes for contrast) |
 | accent | runner trail, gate, UI highlights |
 | ghost | phase barrier, ghost-layer obstacles |
-| hurdle / wall | John's pink and red, lightness tuned per palette |
+| hurdle / wall | ELIA's pink and red, lightness tuned per palette |
 
 | Palette | Level | background | track | obstacle | accent | ghost | hurdle | wall | obstacle/bg |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,7 +26,7 @@ Status: proposed, not yet approved.
 
 ## Proposal 2 (day 16): colour = what you press
 
-John's suggestion (one colour per obstacle type) combined with per-level skies. Obstacles answered the same way share a
+ELIA's suggestion (one colour per obstacle type) combined with per-level skies. Obstacles answered the same way share a
 colour; shape still distinguishes them (colour is a second cue, never the only one).
 
 | Action | Hue | Obstacles |
@@ -56,7 +56,7 @@ that collapses under deuteranopia or protanopia (dE 0-12).
 
 Status: proposed, not yet approved.
 
-## Decision (John, day 16): Option 3 skies, charcoal road with lines, colour = what you press
+## Decision (ELIA, day 16): Option 3 skies, charcoal road with lines, colour = what you press
 
 - **Skies** (camera, fog): dawn #FBD9C0, overcast #C9D1D8, dusk #3B2550, night #0B1026, neon #07020F, fullshift #101418.
 - **Road** #333333 on every level (charcoal), tunnel walls / rails #2A2A2A, **edge and lane lines** #BFBFBF.
@@ -66,7 +66,7 @@ Status: proposed, not yet approved.
 - **Checks:** action colours vs road 3.0-9.8:1 (lane 4.3, slide 7.9, sprint 9.8, jump 3.2, phase 3.0, charge 3.0);
   colour-blind separation >= 20 dE (normal, deuteranopia, protanopia). Road vs light skies 8-9.5:1; lines vs dark
   skies 7-11:1.
-- **Known trade-off (John's choice):** four action colours are below the plan's 4.5:1 against what is behind them (the
+- **Known trade-off (ELIA's choice):** four action colours are below the plan's 4.5:1 against what is behind them (the
   road); 3:1 is the agreed floor. Obstacles always appear below the horizon (camera 3.3 m up since day 17; every
   obstacle top <= 3.2 m), i.e. against the road. Keep new obstacles under the camera height or this no longer holds. Shape stays the primary cue.
 
@@ -74,4 +74,4 @@ Status: proposed, not yet approved.
 
 While both Shifts are held (phased), over 0.1 s: the sky and fog shift to the palette's phase colour x Phase Sky Darken (0.6); ghost-layer blocks (the only things that can hit you while phased) turn near-white; every other obstacle and glow edge dims to x Phase Dim (0.45); road and lines stay as they are; scanlines fade in at Scanline Strength (0.25). All three settings are per palette (Palette asset, "Phase look" header).
 
-**Camera height changed (day 17, later):** the camera is now 2.8 m up, not 3.3 m (John: the gate's top beam sat at eye level, looked like it hit the camera and hid the runner). The beam now passes overhead. The "obstacles always below the horizon" note above no longer holds for the tallest obstacles: the red wall, the phase barrier and the gate (about 3 m) reach just above eye level.
+**Camera height changed (day 17, later):** the camera is now 2.8 m up, not 3.3 m (ELIA: the gate's top beam sat at eye level, looked like it hit the camera and hid the runner). The beam now passes overhead. The "obstacles always below the horizon" note above no longer holds for the tallest obstacles: the red wall, the phase barrier and the gate (about 3 m) reach just above eye level.

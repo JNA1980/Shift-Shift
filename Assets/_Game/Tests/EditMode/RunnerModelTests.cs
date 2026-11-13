@@ -63,7 +63,7 @@ namespace ShiftShift.Tests
         [Test]
         public void MovingBackEarly_ReleasedAfterBlock_Passes()
         {
-            // John's day-11 run: right at 2.24, back left pressed 2.88 / recognised 3.051, block in the middle at 3.0.
+            // ELIA's day-11 run: right at 2.24, back left pressed 2.88 / recognised 3.051, block in the middle at 3.0.
             _m.OnGestureFired(GestureType.TapRight, 2.240, 1, 2.304);
             _m.OnGestureFired(GestureType.TapLeft, 2.880, 1, 3.051);
             Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Block, 3.0, lane: 0)));
@@ -147,7 +147,7 @@ namespace ShiftShift.Tests
         [Test]
         public void Jump_StaysAirborneUntilVisualLanding()
         {
-            // John's day-13 run: key-down 14.113, recognised 14.348; far edge of the gap reached at 14.800.
+            // ELIA's day-13 run: key-down 14.113, recognised 14.348; far edge of the gap reached at 14.800.
             _m.OnGestureFired(GestureType.BothTap, 14.113, 0, 14.348);
             Assert.IsTrue(_m.IsAirborne(14.800));
             Assert.AreEqual(ObstacleOutcome.Pass, _m.Resolve(Obs(ObstacleKind.Gap, 14.800, all: true)));
@@ -162,7 +162,7 @@ namespace ShiftShift.Tests
             Assert.IsFalse(_m.IsAirborne(1.99));
         }
 
-        // ---------- opening lane (gate with one open lane, wide bar) and hurdle: John, day 13 ----------
+        // ---------- opening lane (gate with one open lane, wide bar) and hurdle: ELIA, day 13 ----------
 
         private static ObstacleInfo Opening(ObstacleKind kind, double t, int openLane) =>
             new ObstacleInfo { Kind = kind, Time = t, Lane = openLane, LaneIsOpening = true, Layer = ObstacleLayer.Solid };

@@ -1,11 +1,11 @@
 # Shift+Shift — Game Off 2026 Design & Build Plan
 
-Nov 8, 2026 · @John
+Nov 8, 2026 · @ELIA
 
 ## Overview
 
 Shift+Shift is a 3D rhythm auto-runner controlled with only two keys:
-Left Shift and Right Shift. It is a solo entry (John + Claude Code) for
+Left Shift and Right Shift. It is a solo entry by ELIA for
 GitHub Game Off 2026, built in Unity, shipped as a browser (WebGL) game
 on itch.io with a Windows build as backup.
 
@@ -23,7 +23,7 @@ on itch.io with a Windows build as backup.
 
 **Team and constraints**
 
-- One developer with Claude Code for scripting, tooling and build
+- One developer for design, scripting, tooling and the build
   pipeline. No artist, no composer, no dedicated tester.
 
 - Working window: 9 Nov to 1 Dec, 23 days. Assumed availability 4 to 6
@@ -135,7 +135,7 @@ checkpoints and no text tutorials.
 - Level 6 is the showcase: everything combined, one tempo increase
   mid-track, built to be clipped for the trailer.
 
-- Rule of thumb for solo testing: if John cannot clear a level within 5
+- Rule of thumb for solo testing: if ELIA cannot clear a level within 5
   attempts, it is too hard for a jam rater who will give it 2 attempts.
 
 ## Level plan
@@ -166,8 +166,8 @@ mandatory; 5 and 6 are the first to be cut if the schedule slips.
 **Tooling**
 
 Levels are JSON charts edited in a small in-editor tool: a timeline that
-plays the track, lets John place obstacles on beat positions with lane
-and type, and previews the run. Claude Code builds this on days 11 to
+plays the track, lets ELIA place obstacles on beat positions with lane
+and type, and previews the run. It is built on days 11 to
 12; it is the single biggest time-saver in the project.
 
 ## Art and audio direction
@@ -243,7 +243,7 @@ no backend.
 
 **Level data**: one JSON per level with bpm, audioClip, offsetMs,
 palette, and an events array of {beat, lane, type}. Human-readable,
-diffable, and editable by Claude Code directly.
+diffable, and editable directly as text.
 
 **WebGL specifics**
 
@@ -275,7 +275,7 @@ diffable, and editable by Claude Code directly.
 
 - Daily pushes; tag v1.0-jam at submission.
 
-**Where Claude Code is used**
+**Where the code and tooling effort goes**
 
 - Input classifier and its unit tests (edit-mode tests for gesture
   timing are cheap and worth it).
@@ -286,8 +286,8 @@ diffable, and editable by Claude Code directly.
 
 - Build scripts, WebGL template tweaks, itch.io butler upload script.
 
-- Not used for: deciding whether a level is fun, tuning timing windows
-  by feel, or choosing the palette.
+- Decided by playing, not by tooling: whether a level is fun, timing
+  windows by feel, and the palette.
 
 ## Scope lock
 
@@ -414,8 +414,8 @@ close.
 - [x] LICENSE chosen: MIT for code (LICENSE), All Rights Reserved for assets
   and Docs/ (LICENSE-ASSETS), copyright ELIA. Third-party assets keep their
   own licences.
-- [ ] Right before the final submission: on John's PC, batch-sign all commits
-  with his own SSH key (commits made from the cloud session are unsigned),
+- [ ] Right before the final submission: on ELIA's PC, batch-sign all commits
+  with their own SSH key (commits made from the cloud session are unsigned),
   then force-push. Command and steps: Docs/LOG.md, 2026-11-13.
 
 - [ ] Tag v1.0-jam on the submitted commit
@@ -525,7 +525,7 @@ purpose.
 
 The jam's return is not prize money; it is a shipped, publicly rated
 game, a working Unity-to-itch pipeline, and evidence of how fast one
-developer plus Claude Code can move. Each of those feeds the sub-\$10
+developer can move. Each of those feeds the sub-\$10
 Steam co-op plan directly.
 
 **Reusable from this project**

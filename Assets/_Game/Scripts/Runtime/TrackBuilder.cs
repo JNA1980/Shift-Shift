@@ -51,7 +51,7 @@ namespace ShiftShift
         [SerializeField] private GameObject pillarsPrefab;
         [SerializeField, Min(1f)] private float dressingMetres = 10f;
 
-        [Header("Roadside scenery (John, day 17: gives the world depth)")]
+        [Header("Roadside scenery (ELIA, day 17: gives the world depth)")]
         [Tooltip("Marker post, repeated on both sides of the road. Not placed in tunnels.")]
         [SerializeField] private GameObject roadsidePrefab;
         [SerializeField, Min(2f)] private float roadsideEveryMetres = 10f;
@@ -59,7 +59,7 @@ namespace ShiftShift
         [Tooltip("Ground beside the road (not under bridges), so the scenery stands on something.")]
         [SerializeField] private Material groundMaterial;
         [SerializeField, Min(5f)] private float groundHalfWidth = 45f;
-        [Header("Plots (John, day 17): walled plots along both sides, each with a building and trees, or trees only")]
+        [Header("Plots (ELIA, day 17): walled plots along both sides, each with a building and trees, or trees only")]
         [SerializeField] private List<GameObject> backdropPrefabs = new List<GameObject>();
         [SerializeField] private List<GameObject> plantPrefabs = new List<GameObject>();
         [Tooltip("Compound wall around each plot. Empty = no walls.")]
@@ -282,7 +282,7 @@ namespace ShiftShift
         }
 
         /// <summary>
-        /// Compound wall along the road side of one plot (John, day 17: not around it), with a lit top edge and a
+        /// Compound wall along the road side of one plot (ELIA, day 17: not around it), with a lit top edge and a
         /// closed gate in the middle between two taller gate posts.
         /// </summary>
         private void BuildPlotWall(double s0, double s1, float side)
@@ -393,7 +393,7 @@ namespace ShiftShift
         private void BuildChunk(double s0, double s1)
         {
             // Cross-sections every ringMetres, plus one exactly at each gap edge inside this chunk, so the road can be
-            // cut cleanly there (John, day 17: gaps are real holes with a pit below).
+            // cut cleanly there (ELIA, day 17: gaps are real holes with a pit below).
             var at = new List<double>();
             int regular = Mathf.Max(2, Mathf.CeilToInt((float)(s1 - s0) / ringMetres) + 1);
             for (int i = 0; i < regular; i++) at.Add(Math.Min(s0 + i * (double)ringMetres, s1));

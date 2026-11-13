@@ -13,7 +13,7 @@ namespace ShiftShift.Core
     /// - HoldStarted(type, t) / HoldEnded(type, t): for HoldLeft, HoldRight, BothHold. Start reports key-down time,
     ///   end reports key-up time.
     /// - Alternate: GestureFired(Alternate, t) after each tap that continues an L/R streak (streak >= 2): sides
-    ///   alternate and each key-down is within AlternateMaxGap of the previous one. No beat needed (John, day 13).
+    ///   alternate and each key-down is within AlternateMaxGap of the previous one. No beat needed (ELIA, day 13).
     ///   Read <see cref="AlternateStreak"/> for the count (Charge Taps = charge).
     /// </summary>
     public sealed class GestureClassifier
@@ -207,7 +207,7 @@ namespace ShiftShift.Core
         {
             GestureFired?.Invoke(side == Side.Left ? GestureType.TapLeft : GestureType.TapRight, onset);
 
-            // Alternate (John, day 13: option A): sides alternate, each key-down within the max gap of the last.
+            // Alternate (ELIA, day 13: option A): sides alternate, each key-down within the max gap of the last.
             if (AlternateStreak > 0 && side != _lastAltSide && onset - _lastAltTime <= _t.AlternateMaxGapSeconds)
                 AlternateStreak++;
             else

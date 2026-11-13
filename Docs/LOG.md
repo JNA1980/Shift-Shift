@@ -12,7 +12,7 @@
 **Tested**
 - 24/24 edit-mode tests pass in Unity and via `dotnet test tools/CoreTests`.
 - All 7 gestures register in the editor and in the Web build (Edge, local Build And Run).
-- Lane taps resolve on key-up (~60–107 ms after key-down in the overlay); John: feels fine. Keep as is.
+- Lane taps resolve on key-up (~60–107 ms after key-down in the overlay); ELIA: feels fine. Keep as is.
 
 **Uncertain / not yet tested**
 - Shift+Shift > Build WebGL menu item not yet run (Build And Run was used instead).
@@ -27,7 +27,7 @@
 - Thresholds moved to a `GestureSettings` ScriptableObject (`Assets/_Game/Settings/GestureSettings.asset`), wired into InputTest. Live edits in Play mode rebuild the classifier.
 - `IClock` interface (Core) + `DspClock` stub (dspTime, fixed BPM, default 120 on ShiftInput).
 - Events now `GestureFired(type, songTime)`, `HoldStarted`, `HoldEnded`; GestureType is the seven gestures.
-- Alternate is now beat-based (Option 1, John's decision): within ±0.25 beats of a beat line, alternating sides, consecutive beats; streak expires when the next beat passes.
+- Alternate is now beat-based (Option 1, ELIA's decision): within ±0.25 beats of a beat line, alternating sides, consecutive beats; streak expires when the next beat passes.
 - Overlay shows key states, clock + beat, thresholds, alternate streak and the last five gestures.
 - Kept `Scripts/Core` + `Scripts/Runtime` instead of `Scripts/Input/` (Core split lets tests run without Unity; moving files risks breaking scene references).
 
@@ -59,7 +59,7 @@
 - Both scripts run against a fake butler (PowerShell 7 on Linux): correct targets and version, Windows zip contents, and clear errors for missing env file, placeholder user, missing builds, bad channel, butler failure.
 
 **Not yet run**
-- Windows PowerShell 5.1 on John's PC; real butler upload (needs itch draft project + `butler login`).
+- Windows PowerShell 5.1 on ELIA's PC; real butler upload (needs itch draft project + `butler login`).
 
 ## 2026-11-09 — D10: Input System errors after script reload
 
@@ -69,7 +69,7 @@
 
 ## 2026-11-09 — D10: dspTime clock verified in the Web build (Edge)
 
-**Tested (John, Web build, Edge, InputTest)**
+**Tested (ELIA, Web build, Edge, InputTest)**
 - DspClock advances before any click/key (no frozen clock before audio unlock).
 - Holds decide at +255 ms against a 250 ms threshold (~5 ms frame delay); hold ends at +0 ms.
 - Tap timestamps look smooth (gaps 279–328 ms, no fixed step), so no audio-buffer quantisation visible at this level.
@@ -81,7 +81,7 @@
 - Input-to-audio latency not measured yet (day 13, needs Conductor + clicks).
 - Info message from the template's experimental `com.unity.pipeline` package on every build: harmless; removal is out of scope for now.
 
-## 2026-11-09 — D10: project setup applied (John)
+## 2026-11-09 — D10: project setup applied (ELIA)
 
 **Done**
 - Ran Shift+Shift > Apply Project Setup: Materials/UI folders, Boot/Menu/Run scenes, build list Boot → Menu → Run → InputTest, neutral Volume profile. Committed (29af827).
@@ -97,7 +97,7 @@
 
 - Web profile player settings verified in the committed profile asset (d630369): 1280x720, Brotli, decompression fallback on, data caching on, explicit exceptions only, strip engine code, IL2CPP code generation = size, Input System only. C++ compiler configuration is Debug (Development profile); Release profile still needed before upload.
 - Playbook Day 0 (0.1–0.4) and 1.1 complete. Plan "done when" for days 9–10 met: WebGL build runs in a browser and all 7 gestures log correctly. About one day ahead of plan.
-- Still John's (not blocking): itch.io draft project, butler install + login, tools/itch.env.
+- Still ELIA's (not blocking): itch.io draft project, butler install + login, tools/itch.env.
 - Next: playbook 1.2 Runner + TrackBuilder (day 11).
 
 ## 2026-11-09 — D11: Runner, TrackBuilder, chase camera (playbook 1.2)
@@ -125,20 +125,20 @@
 
 - Unity compile errors in GreyboxSetup.cs: `ShiftShift.Core` not found. Cause: ShiftShift.Editor.asmdef did not reference ShiftShift.Core (the stand-in compile builds everything as one assembly, so it cannot catch missing asmdef references). Added the reference.
 - Warning CS0618 in Runner.cs: `FindObjectsByType(FindObjectsSortMode)` is deprecated in 6000.6. Harmless; left as is until the replacement overload is confirmed from the full warning text.
-- John confirmed: sprint does not change forward speed.
+- ELIA confirmed: sprint does not change forward speed.
 
 ## 2026-11-09 — D11: greybox scene, first Play
 
 - 47/47 tests pass in Unity. Greybox scene generated (track, runner, obstacles, camera all wired) but Play failed: ShiftInput.settings was empty in the generated scene, so input disabled itself and the Runner refused to start. All other references set by the tool were fine.
-- Likely cause (not confirmed): the settings asset was loaded at the start of the tool, before ~20 prefab/material assets were created; an asset reload in between left the reference stale. Fix: load it just before assigning, and every assignment is now verified and logs an error if it did not stick. John assigns it by hand in the existing scene.
+- Likely cause (not confirmed): the settings asset was loaded at the start of the tool, before ~20 prefab/material assets were created; an asset reload in between left the reference stale. Fix: load it just before assigning, and every assignment is now verified and logs an error if it did not stick. ELIA assigns it by hand in the existing scene.
 
-## 2026-11-09 — D11: beat dot on the debug panel (John asked)
+## 2026-11-09 — D11: beat dot on the debug panel (ELIA asked)
 
 - Wall charge kept failing: with no beat cue, on-beat taps were effectively random. With Alternate Beat Tolerance temporarily at 0.45 (not committed), the charge and wall work.
 - Added a beat dot to GestureDebugHud: lit for the first 20% of each beat (yellow on beat 1 of the bar, green otherwise) with the beat number 1-4. Debug aid until the Conductor's click track (day 12).
 - Not run in Unity yet. Compiles against stand-in types.
 
-## 2026-11-09 — D11: greybox played (John)
+## 2026-11-09 — D11: greybox played (ELIA)
 
 **Tested (editor, Greybox scene)**
 - Day 11 question answered: moving the capsule with two keys feels responsive.
@@ -151,14 +151,14 @@
 
 ## 2026-11-09 — D11: fix "fails after passing a block"
 
-**Diagnosis (from John's run)**
+**Diagnosis (from ELIA's run)**
 - TapLeft key-down 2.880 s, recognised 3.051 s; Block @30m (middle) at 3.000 s. Rules (decision A, key-down) put the runner back in the middle before the block, while the screen only moves the capsule after key-up (3.05 s + 120 ms ease). The fail was then shown at 30.5 m because judging waited for the tap to resolve, so it looked like a fail after passing.
 
-**Fix (John: go)**
+**Fix (ELIA: go)**
 - A lane change is "in between" from key-down to key-up: a one-lane obstacle passes if either lane is clear. RunnerModel records each tap's recognition time; Runner passes it in. Holds, jumps, phase unchanged.
 
 **Tested**
-- 52/52 core tests (5 new, including John's exact timings → Pass, and released-before-block → Hit).
+- 52/52 core tests (5 new, including ELIA's exact timings → Pass, and released-before-block → Hit).
 - New check: Core, Runtime and Editor compiled as separate assemblies with only their asmdef references (non-transitive, like Unity). Verified it reproduces yesterday's missing-reference error.
 
 **Not yet run**
@@ -166,10 +166,10 @@
 
 ## 2026-11-09 — D11: wall feel note (for M1 review, day 15)
 
-- John: after L R L R the red wall "looked like I failed but it went through". Rules are correct (charge breaks the next wall; no extra input needed). The look comes from: wall hidden only when the runner reaches its centre (capsule already touching the face), no break effect yet (day 27 juice), and a possible up-to-250 ms wait when a key was down just before the wall (decision A).
+- ELIA: after L R L R the red wall "looked like I failed but it went through". Rules are correct (charge breaks the next wall; no extra input needed). The look comes from: wall hidden only when the runner reaches its centre (capsule already touching the face), no break effect yet (day 27 juice), and a possible up-to-250 ms wait when a key was down just before the wall (decision A).
 - Not changed. Option if needed: break walls at their front face. Decide at M1 review.
 
-## 2026-11-09 — D11: 30 m block fix confirmed (John)
+## 2026-11-09 — D11: 30 m block fix confirmed (ELIA)
 
 ## 2026-11-09 — D12: Conductor and level JSON (playbook 1.3)
 
@@ -181,8 +181,8 @@
 - Shift+Shift > Create Level Test Scene: generates click_100.wav (if missing) and LevelTest.unity.
 - Docs/LEVELS.md (format), CREDITS (generated click track).
 
-**Deviations from the playbook (flagged to John)**
-1. Click track generated by an editor menu (C#) instead of a Python script in Tools/: no Python needed on John's PC, and the WAV must be committed from his machine (LFS uploads are blocked from the cloud session).
+**Deviations from the playbook (flagged to ELIA)**
+1. Click track generated by an editor menu (C#) instead of a Python script in Tools/: no Python needed on ELIA's PC, and the WAV must be committed from his machine (LFS uploads are blocked from the cloud session).
 2. Obstacle "tags" are the Obstacle component's kind/layer, not Unity tags (Unity tags need TagManager edits; the rules never read tags).
 3. Chart type "ghost" = phase barrier (playbook 1.4: ghost -> phase held). Ghost-layer obstacles are not in the format yet (needed for level 4).
 
@@ -203,11 +203,11 @@
 
 ## 2026-11-09 — D12: clearer level-file errors in the level test tool
 
-- Regenerating LevelTest failed with "level00.json is missing or invalid" (it had loaded fine on the previous run; file unchanged in git). Waiting on `git status` from John to see whether it was deleted. The tool now says which: not found (and whether the file exists on disk) vs. the list of validation errors.
+- Regenerating LevelTest failed with "level00.json is missing or invalid" (it had loaded fine on the previous run; file unchanged in git). Waiting on `git status` from ELIA to see whether it was deleted. The tool now says which: not found (and whether the file exists on disk) vs. the list of validation errors.
 
-## 2026-11-09 — D12: level00 sync check (John)
+## 2026-11-09 — D12: level00 sync check (ELIA)
 
-- Obstacles reach the runner exactly as the click sounds ("the click happens just as the obstacle passes by"): sync is correct as built. It feels early because the obstacle visibly approaches before it is level with the runner. offsetMs experiments did not help (it is not latency). John: keep A (click = obstacle level with runner); revisit at M1 review if pressing on the click feels wrong.
+- Obstacles reach the runner exactly as the click sounds ("the click happens just as the obstacle passes by"): sync is correct as built. It feels early because the obstacle visibly approaches before it is level with the runner. offsetMs experiments did not help (it is not latency). ELIA: keep A (click = obstacle level with runner); revisit at M1 review if pressing on the click feels wrong.
 - level00.json had been deleted while deleting the broken LevelTest scene; restored. Laptop speakers.
 
 ## 2026-11-09 — D13: judge, scoring, run loop, calibration (playbook 1.4)
@@ -237,7 +237,7 @@
 - Single tap on the last click: +111 ms. Tapping every click: only 4 of ~16 measured clicks counted (mean +7, spread 29).
 - Hypotheses: (1) Windows Sticky Keys popup after 5 Shift presses (start + 4 practice taps = exactly 5) stealing focus; (2) taps beyond the ±240 ms cutoff; (3) Game view focus. Result screen now shows "counted X of Y taps" and the Console logs every tap's offset to tell them apart.
 
-## 2026-11-09 — D13: first Web builds of the run loop (John)
+## 2026-11-09 — D13: first Web builds of the run loop (ELIA)
 
 **Tested**
 - Build And Run failed until the Web profile's Client Browser Type was set (it pointed at a non-default browser with no executable). Then ran in **Chrome and Firefox** (same localhost server).
@@ -245,7 +245,7 @@
 - Firefox fail "bar b16 lane 0" was legitimate (tapped into the bar's lane at beat 13.3).
 - Score 0 in completed runs is expected: level00's bars sit in the side lanes and the runner starts in the middle, so most need no action (ungraded). Grades only appear when dodging a bar in your own lane.
 
-**Pending from John**
+**Pending from ELIA**
 - Calibration offset/spread/counted-of-taps for Editor, Chrome, Firefox (Sticky Keys shortcut checked off).
 - Restart time after a fail (< 1 s target). Grades seen when dodging on the click.
 
@@ -261,21 +261,21 @@
 
 - Kill criterion 2 (beat sync off by > 60 ms in WebGL with no fix): **passes**. The offset is compensated by calibration; the jitter (spread ~±30 ms) is within budget.
 - Chrome and Firefox differ by ~100 ms, so calibration has to be per browser. Flagged (not built): prompt calibration on first launch, since itch players will not find F2.
-- **Decision (John): keep all 7 gestures.** Recorded in SCOPE.md.
+- **Decision (ELIA): keep all 7 gestures.** Recorded in SCOPE.md.
 
 **Done**
 - Assets/_Game/Levels/test_gestures.json: one of each gesture, 4 beats apart, 100 BPM, 40 beats (fits click_100). Validated against the level rules.
-- Restart after a fail feels under a second (John). Playbook 1.4 targets met: count-in, flash + hit-stop, instant restart, results, calibration; Chrome and Firefox tested.
+- Restart after a fail feels under a second (ELIA). Playbook 1.4 targets met: count-in, flash + hit-stop, instant restart, results, calibration; Chrome and Firefox tested.
 
 ## 2026-11-10 — D13: one answer per obstacle (phase exploit fix, all-lane low bars)
 
-**Found (John, test level):** holding both Shift keys passed the low bar (beat 16), the gate (20) and the wall (36). Cause: the playbook 1.2 rule "phased runners ignore Solid obstacles" made phase pass everything; it also broke 1.4's "exactly one correct gesture per obstacle".
+**Found (ELIA, test level):** holding both Shift keys passed the low bar (beat 16), the gate (20) and the wall (36). Cause: the playbook 1.2 rule "phased runners ignore Solid obstacles" made phase pass everything; it also broke 1.4's "exactly one correct gesture per obstacle".
 
 **Changed**
 - New ObstacleKind.Barrier (added last; kinds are saved as numbers). Only a Barrier is passed by phasing; low/gate/gap/wall/bar need their own answer, phased or not. Ghost-layer obstacles still only hit while phased.
 - Chart "ghost" → Barrier. PhaseBarrier prefab kind set to Barrier (prefab file edited).
-- Low bars span all lanes (John): chart "low" is all-lane; LowBar prefab all-lane and full track width (prefab file edited).
-- Wall: only a charge breaks it. A charge still lasts until the next wall (early charge = OK grade); unchanged unless John asks.
+- Low bars span all lanes (ELIA): chart "low" is all-lane; LowBar prefab all-lane and full track width (prefab file edited).
+- Wall: only a charge breaks it. A charge still lasts until the next wall (early charge = OK grade); unchanged unless ELIA asks.
 - Docs RUNNER, LEVELS, SCORING updated.
 
 **Tested**
@@ -285,27 +285,27 @@
 
 ## 2026-11-10 — D13: gap failed while the capsule looked airborne
 
-- John's run: jump key-down 14.113 s (half a beat early), recognised 14.348 s; gap far edge reached 14.800 s. Rules had the runner airborne 14.113–14.613 (from key-down), the screen 14.348–14.848 (arc starts on recognition), so the fail showed mid-air.
+- ELIA's run: jump key-down 14.113 s (half a beat early), recognised 14.348 s; gap far edge reached 14.800 s. Rules had the runner airborne 14.113–14.613 (from key-down), the screen 14.348–14.848 (arc starts on recognition), so the fail showed mid-air.
 - Fix (same principle as day 11's lane rule): a jump is airborne from key-down until the visual landing (recognised + 0.5 s). Grading unchanged: that jump now passes as OK.
-- 89/89 core tests (3 new, including John's exact timings). Per-assembly compile check passes. Not yet run in Unity.
+- 89/89 core tests (3 new, including ELIA's exact timings). Per-assembly compile check passes. Not yet run in Unity.
 - Also from the screenshot: slide (Hold L) and sprint (Hold R) through beats 16 and 20 passed on this run.
 
 ## 2026-11-10 — D13: charge shortened to two taps (tuning)
 
-- John asked for an easier charge ("two presses of L R"); no preference among the options offered. Set GestureSettings Charge Taps 4 → 2 (setting only, no code): L, R on consecutive clicks charges; the second tap on the wall's click = Perfect. Side effect: dodging left then right on back-to-back clicks also charges (harmless; only walls use it). Revisit at M1 (2, 3 or 4).
+- ELIA asked for an easier charge ("two presses of L R"); no preference among the options offered. Set GestureSettings Charge Taps 4 → 2 (setting only, no code): L, R on consecutive clicks charges; the second tap on the wall's click = Perfect. Side effect: dodging left then right on back-to-back clicks also charges (harmless; only walls use it). Revisit at M1 (2, 3 or 4).
 - The plan's "four on-beat alternations" is now a tunable value, not a rule.
 
-## 2026-11-10 — D13: charge redesign (John: option A, 4 taps)
+## 2026-11-10 — D13: charge redesign (ELIA: option A, 4 taps)
 
-- John: "L R L R doesn't seem to work". Alternatives offered (no-beat alternate, double jump, roll, double tap, mash); John chose **A: quick alternating taps, no beat, 4 taps**. The 2-tap tuning from earlier today is reverted (Charge Taps back to 4).
+- ELIA: "L R L R doesn't seem to work". Alternatives offered (no-beat alternate, double jump, roll, double tap, mash); ELIA chose **A: quick alternating taps, no beat, 4 taps**. The 2-tap tuning from earlier today is reverted (Charge Taps back to 4).
 - Classifier: alternate streak continues when sides alternate and key-downs are within Alternate Max Gap (400 ms, GestureSettings; replaces Alternate Beat Tolerance). Expires 400 ms after the last tap.
 - Bug fixed: a charge had to complete strictly before the wall's moment, so a last tap aimed at the click failed about half the time. Now a charge completed up to the Good window (120 ms) after the wall still breaks it; the Runner waits that long while a streak is in progress.
-- CLAUDE.md, INPUT, RUNNER, LEVELS, SCORING updated.
+- Project rules file, INPUT, RUNNER, LEVELS, SCORING updated.
 - 92/92 core tests (alternate tests rewritten for gaps; late-charge tests; two "not a jump" tests updated because a quick L then R is now also alternate step 2). Per-assembly check passes. Not yet run in Unity.
 
-## 2026-11-10 — D13: gate opening, wide bar, hurdle (John)
+## 2026-11-10 — D13: gate opening, wide bar, hurdle (ELIA)
 
-**Decisions (John)**
+**Decisions (ELIA)**
 - Gate: one-lane opening whose position varies; you must change into it and sprint through.
 - Short wall ("hurdle", **pink**) cleared by jumping; the tall **red** wall stays charge-only, so all 7 gestures keep a purpose.
 - Two-lane obstacles: a new **wide bar** (one free lane) alongside the normal one-lane bars ("simple and complex"). Orange stays the colour for bars.
@@ -322,7 +322,7 @@
 
 **Not yet run** in Unity: new prefabs, panel hiding, scene refresh, the updated test level.
 
-## 2026-11-10 — D13: new obstacles verified in the editor (John)
+## 2026-11-10 — D13: new obstacles verified in the editor (ELIA)
 
 - After Shift+Shift > Set Up Run Scenes refreshed the obstacle lists, all 8 types appear and the test level completes ("works good"). The first attempt showed "No prefab for type 'wide'/'hurdle'" and "Gate has no Panel0" because the Run scene still had its old list (the refresh had not been run after the pull).
 - **For the art pass (day 17, playbook 2.2/2.3):** the wide bar and the gate read as separate bars (one block per lane with gaps). Make the wide bar one solid piece and give the gate a frame with a clearly visible opening.
@@ -339,7 +339,7 @@
 
 **Not yet run** in Unity: the window, edit-mode audio playback (highest risk), waveform, save/reimport round trip.
 
-## 2026-11-10 — D16: chart editor verified (John)
+## 2026-11-10 — D16: chart editor verified (ELIA)
 
 **Tested (editor)**
 - 116/116 tests pass in Unity. Window opens, level00 loads, obstacles drawn in lane rows, edit-mode audio playback works (the highest risk), waveform shows the click spikes exactly on the beat lines.
@@ -349,7 +349,7 @@
 
 ## 2026-11-10 — D16: palettes decided; visuals step 1 (playbook 2.2)
 
-**Decisions (John)** — see Docs/PALETTES.md: colour = what you press (six action colours identical on every level), Option 3 skies (pale dawn/overcast, dark others), charcoal road #333333 with light edge and lane lines. Four action colours sit at 3.0-4.3:1 on the road, below the plan's 4.5:1; agreed floor 3:1.
+**Decisions (ELIA)** — see Docs/PALETTES.md: colour = what you press (six action colours identical on every level), Option 3 skies (pale dawn/overcast, dark others), charcoal road #333333 with light edge and lane lines. Four action colours sit at 3.0-4.3:1 on the road, below the plan's 4.5:1; agreed floor 3:1.
 
 **Done**
 - Palette ScriptableObject (warns in the Inspector if an action colour drops below 3:1 on the road); PaletteApplier (camera background, linear fog, recolours runtime copies of mapped materials so assets are never modified by playing; palette picked from the level JSON's "palette" field).
@@ -363,24 +363,24 @@
 
 ## 2026-11-11 — D17: first look at the palettes; camera lowered
 
-**Seen (John)**
+**Seen (ELIA)**
 - Run scene, dawn: pale sky, charcoal road, edge/lane lines; loop, grades and results work.
 - The "black" run without Shift prompt, count-in or scores was the **Greybox** scene (night fallback palette, no conductor/game loop, by design), not the Run scene; the neon edit to test_gestures.json only shows in Run.
 - Unity closed abnormally once (scene backup prompt). Cause unknown; kept backups. `/Assets/_Recovery/` is now git-ignored.
 
-**Changed (John: camera too high, the overhang hides the view)**
+**Changed (ELIA: camera too high, the overhang hides the view)**
 - The camera sat at 4 m, inside the tunnel ceiling slab (3.5-4.0 m). Lowered to 3.3 m (ChaseCamera default and the three scenes' serialized offset).
 - To keep every obstacle below eye level (the palette decision relies on it), both gate prefabs lowered from 3.5-3.7 m to 3.2 m (prefab files and the tool). Tunnel ceiling now passes overhead.
 - Per-assembly compile check passes. Not yet seen in Unity.
 - Note: a jump raises the camera by half the jump height (0.75 m); inside a tunnel it would clip the ceiling. Avoid gaps/hurdles in tunnels.
 
-## 2026-11-11 — D17: tunnel question, count-in, gap flicker (John)
+## 2026-11-11 — D17: tunnel question, count-in, gap flicker (ELIA)
 
 - "Tunnel gone": the Run scene's track has always been straight pieces only (tunnel exists in the Greybox track). Per-level track pieces come with playbook 2.3 (modular kit). Flagged, not built: automatic tunnel around low bars.
 - Count-in read as "counting twice" (two bars of 1-2-3-4). Now: first bar "Get ready" with a pulse per beat, last bar 4-3-2-1, "GO" fading over beat 0.
 - Gap "fidgety": z-fighting. The gap's black patch and the new lane lines were at the same height (0-0.02 m). Patch lifted to 0.02-0.04 m and pink (jump colour) rims added at its front and back edges. GapMarker prefab file edited for the height; rims are added by Shift+Shift > Set Up Visuals (re-runnable) and by the tool for new projects.
 - Per-assembly compile check passes. Not yet seen in Unity.
-- Gap rims and the new count-in confirmed in the editor (John: "all good"). "Get ready" pulsed on each beat and read as appearing 4 times: now it stays steady with four dots lighting one per beat; 4-3-2-1 still pulse.
+- Gap rims and the new count-in confirmed in the editor (ELIA: "all good"). "Get ready" pulsed on each beat and read as appearing 4 times: now it stays steady with four dots lighting one per beat; 4-3-2-1 still pulse.
 
 ## 2026-11-11 — D17: glowing edges and bloom (playbook 2.2 step 2)
 
@@ -410,7 +410,7 @@
 - Step 2 (glow, bloom) and step 3 not yet seen in Unity.
 - Sprites/Default for the trail under URP: expected to render (unlit, vertex colours); if it shows pink, switch the Trail material to URP Particles/Unlit.
 
-## 2026-11-11 — D17: steps 2 and 3 verified (John)
+## 2026-11-11 — D17: steps 2 and 3 verified (ELIA)
 - Glowing edges, bloom, runner trail, FOV widening (sprint/phase) and lane-change roll seen in the editor: "looks good". No tuning changes requested; defaults kept (glow 1.5, bloom 0.8/0.9/0.7, FOV 60/72/78, roll 2 deg).
 - Remaining in playbook 2.2: step 4 phase look (palette inversion + scanlines), step 5 solid wide bar + gate frame.
 
@@ -421,16 +421,16 @@ Done:
 - Step 5: Set Up Visuals rebuilds WideBar and GateOpening prefabs (once; skipped if Open0 exists) into three layouts Open0/1/2. Wide bar: blocked lanes = solid 2 m slabs to the road edge. Gate: 3 m walls plus a framed doorway (posts 0.25 m, beam with top 3.1 m). Middle opening is necessarily two pieces. ObstacleSpawner activates Open{lane} and hides the others; falls back to the old Panel{lane} hiding for old prefabs. Gameplay rules unchanged.
 
 Tested: per-assembly compile check against stand-ins (stand-in gap fixed: Texture now derives from Object); 120 Core tests pass.
-Not run: nothing in Unity yet — the prefab rebuild, the edge strips on the new pieces, the phase blend, the scanlines and their draw order against the HUD are all unverified until John runs Set Up Visuals and plays.
+Not run: nothing in Unity yet — the prefab rebuild, the edge strips on the new pieces, the phase blend, the scanlines and their draw order against the HUD are all unverified until ELIA runs Set Up Visuals and plays.
 Uncertain: whether scanlines draw over or under the GameFlow text (GUI.depth across components); whether the near-white ghost colour reads well on the dusk/night skies.
 
 ## 2026-11-11 — D17: steps 4 and 5 verified
 
-John ran Set Up Visuals and played the Run scene: the phase look and the new wide bar and gate shapes work. Committed on his side. Still open: the scanline draw order against the HUD text and how the ghost colour reads on dusk/night (not tested; the test level is dawn).
+ELIA ran Set Up Visuals and played the Run scene: the phase look and the new wide bar and gate shapes work. Committed on his side. Still open: the scanline draw order against the HUD text and how the ghost colour reads on dusk/night (not tested; the test level is dawn).
 
 ## 2026-11-11 — D17: modular track kit (playbook 2.3)
 
-John chose the full kit (bends, rises, drops) over a cut-down straight kit.
+ELIA chose the full kit (bends, rises, drops) over a cut-down straight kit.
 
 Done:
 - Core/TrackPath.cs: 12 pieces (straight, bendLeft/Right, sLeft/Right, rise, drop, crest, dip, tunnel, bridge, pillars), each 8 beats. The path is the track's centre line; distance along it is measured on the ground plan, so distance = beat x 5 m everywhere and timing and rules are untouched. Turns and slopes ease in and out.
@@ -445,17 +445,17 @@ Uncertain: obstacles on a rise may poke above the horizon (the 3.2 m rule assume
 Unused now, left in place: TrackPiece.cs and the Straight/Tunnel/Bridge/Gap prefabs (old scenes still reference the script until Set Up Visuals is run).
 Flagged, not built: editing track pieces in the chart editor.
 
-## 2026-11-11 — D17: track kit played by John (Run scene, test_track, dusk)
+## 2026-11-11 — D17: track kit played by ELIA (Run scene, test_track, dusk)
 
 Works: the level plays to the end on the bent and sloped track ("overall the game is good"); no underside of the road seen at the crest; the road and lines render.
 Found:
-- The blue phase barrier (beat 60, on the crest) reads as "the end of the game": a full-width opaque wall with nothing visible behind or beside it. John's guess: no surroundings to give depth.
+- The blue phase barrier (beat 60, on the crest) reads as "the end of the game": a full-width opaque wall with nothing visible behind or beside it. ELIA's guess: no surroundings to give depth.
 - Obstacles poke above the horizon on slopes (expected; the 3.2 m rule assumed a flat road).
-Open, waiting for John's choice: see-through barrier, roadside scenery (not in SCOPE.md as written), what to do about the horizon on slopes.
+Open, waiting for ELIA's choice: see-through barrier, roadside scenery (not in SCOPE.md as written), what to do about the horizon on slopes.
 
 ## 2026-11-11 — D17: scenery, see-through barrier, camera on slopes, brick wall
 
-John's choices after playing the track kit: roadside scenery and a see-through barrier ("like car racing games"), camera adjusts on slopes, red wall made of bricks. Scenery recorded in SCOPE.md decisions.
+ELIA's choices after playing the track kit: roadside scenery and a see-through barrier ("like car racing games"), camera adjusts on slopes, red wall made of bricks. Scenery recorded in SCOPE.md decisions.
 
 Done:
 - Scenery (TrackBuilder): RoadsidePost every 10 m on both sides at 5 m (not in tunnels); BackdropBlock every 25 m on alternating sides, 14-30 m out, width and top height varied by a fixed hash (same every run). Both use the road-detail and line materials, so palettes colour them.
@@ -465,25 +465,25 @@ Done:
 
 Tested: compile check and 133 Core tests.
 Not run in Unity: all four. Unverified: transparent material set from script (keywords, sorting against the glow frame and the trail), brick scale, scenery density and frame rate in WebGL, how the lift feels.
-Note: Brick.png is created on John's machine and committed from there (LFS does not work from the cloud session).
+Note: Brick.png is created on ELIA's machine and committed from there (LFS does not work from the cloud session).
 
-## 2026-11-11 — D17: scenery second pass (John's feedback after playing)
+## 2026-11-11 — D17: scenery second pass (ELIA's feedback after playing)
 
-John: posts looked like floating lights; buildings repetitive; wants trees or shrubs at times; barrier a little less see-through; bricks only visible up close; camera a tad raised throughout, put it back.
+ELIA: posts looked like floating lights; buildings repetitive; wants trees or shrubs at times; barrier a little less see-through; bricks only visible up close; camera a tad raised throughout, put it back.
 
 Done:
 - Ground: a 45 m band each side of the road, 5 cm below the surface, in the road-detail colour; left out under bridges. Posts, plants and buildings now stand on it. No posts on bridges.
 - Buildings: six shapes (tower, slab, stepped, twin, spire, arch), picked per spot by a fixed hash, with varied distance (18-34 m), size, sink and quarter-turn. They and the plants stand upright on slopes (yaw only).
 - Plants: two blocky trees and a shrub, at about 45% of the 12 m spots, 6.5-11 m from the centre line, random turn and size. New Foliage material, new PaletteApplier role Scenery (accent mixed 55% toward road-detail; unchanged while phased).
 - Barrier 50% solid (was 30%). Bricks 2 m x 0.5 m (were 1 m x 0.19 m).
-- Camera slope lift off by default (field renamed slopeLiftAmount so the saved 0.6 is dropped). So obstacles on rises poke above the horizon again; John will say if it needs a small value.
+- Camera slope lift off by default (field renamed slopeLiftAmount so the saved 0.6 is dropped). So obstacles on rises poke above the horizon again; ELIA will say if it needs a small value.
 
 Tested: compile check, 133 Core tests. Not run in Unity. Unverified: ground meeting the road edge, the scenery mix by eye, frame rate in WebGL with the extra objects.
 Unused now: BackdropBlock prefab.
 
 ## 2026-11-11 — D17: scenery third pass
 
-John after playing: posts look planted; buildings varied but not realistic (asked if cosmetics come later); barrier to 65%; red wall "kinda jittery"; camera should lower slightly under the first bridge (read as: the tunnel, the first structure passed under; the pillars archway is fine).
+ELIA after playing: posts look planted; buildings varied but not realistic (asked if cosmetics come later); barrier to 65%; red wall "kinda jittery"; camera should lower slightly under the first bridge (read as: the tunnel, the first structure passed under; the pillars archway is fine).
 
 Done: barrier 65% solid. Brick texture regenerated at 256 x 128 with mipmaps, trilinear and anisotropic 8 (guess at the cause: shimmer from thin high-contrast joints). Camera drops CameraFeel.tunnelDrop (0.5 m) while camera or runner is in a tunnel.
 Tested: compile check only. Not run in Unity.
@@ -492,10 +492,10 @@ Flagged, not built: realistic buildings and trees would need imported 3D models 
 
 ## 2026-11-11 — D17: scenery fourth pass
 
-John: the camera rises at the pink wall (hurdle, beat 44, just after the tunnel) and should not; buildings still look alike, make 10 more; more trees, conifers.
+ELIA: the camera rises at the pink wall (hurdle, beat 44, just after the tunnel) and should not; buildings still look alike, make 10 more; more trees, conifers.
 
 Done:
-- Camera: jump-follow is now a CameraFeel setting, 0 by default (was a fixed 0.5), so the camera stays level on every jump. The tunnel drop eases in over 12 m before a tunnel and out over 12 m after it (it used to snap back at the exit, about 13 m before the hurdle). Not known which of the two John saw; both changed.
+- Camera: jump-follow is now a CameraFeel setting, 0 by default (was a fixed 0.5), so the camera stays level on every jump. The tunnel drop eases in over 12 m before a tunnel and out over 12 m after it (it used to snap back at the exit, about 13 m before the hurdle). Not known which of the two ELIA saw; both changed.
 - Buildings: 10 more shapes (L, pyramid, needle, cluster, frame, T, wall, stairs, crown, linked towers): 16 in total.
 - Plants: four conifers (tiers narrowing to a point, alternate tiers turned 45 degrees); conifers are 6 of the 10 entries the builder picks from. A plant spot every 7 m with a 70% chance (was every 12 m, 45%).
 
@@ -504,7 +504,7 @@ Uncertain: wide buildings at the near distance can reach the plant band (6.5-11 
 
 ## 2026-11-11 — D17: plots and compound walls
 
-John: fourth pass "looks good". Asked for trees beside the buildings or in empty spaces, so it reads as plots (building + trees, or trees only), and a compound wall to tell plots apart.
+ELIA: fourth pass "looks good". Asked for trees beside the buildings or in empty spaces, so it reads as plots (building + trees, or trees only), and a compound wall to tell plots apart.
 
 Done (TrackBuilder scenery placement rewritten; posts unchanged):
 - Both sides of the road are divided into plots 30 m long with a 4 m lane between them, from 7.5 m to 40 m out. None where a plot would touch a bridge.
@@ -517,7 +517,7 @@ Uncertain: wall colour against the ground (#333 on #2A2A2A may be too close); wa
 
 ## 2026-11-11 — D17: plot walls second pass
 
-John: plots look good. Walls only along the road, not around the plot; lit top edge; closed gates instead of openings; no marker posts in front of gates.
+ELIA: plots look good. Walls only along the road, not around the plot; lit top edge; closed gates instead of openings; no marker posts in front of gates.
 
 Done (TrackBuilder): back and end walls removed. Each plot's road-side wall has a lit strip on top (line material), a closed gate in the middle (4 m, thinner, ground-dark, lit bar on top) between two gate posts 0.5 m taller than the wall, and closed ends. Marker posts are skipped within 3.5 m of a gate's centre.
 Tested: compile check only. Not run in Unity.
@@ -525,7 +525,7 @@ Uncertain: the lit wall edges run parallel to the road's edge lines 4 m away; th
 
 ## 2026-11-11 — D17: white screen fixed
 
-John: after the wall change the Game view was white with a few black marks. Nothing lost: his commit holds the code as pushed.
+ELIA: after the wall change the Game view was white with a few black marks. Nothing lost: his commit holds the code as pushed.
 Cause (from reading the code, not reproduced here): the wall end faces added in the last change shared four corners between a front-facing and a back-facing pair of triangles. RecalculateNormals averages the two opposite directions to zero; the lit shader normalises that to an invalid value (NaN); bloom spreads one invalid pixel over the whole screen.
 Fix: each side of an end face has its own four corners. The Strip() calls were already safe (every strip adds its own vertices).
 Tested: compile check only. Not run in Unity.
@@ -533,11 +533,11 @@ Lesson for the mesh code: never let one vertex belong to triangles facing opposi
 
 ## 2026-11-11 — D17: walls, gates and white-screen fix verified in the editor
 
-John: "now it looks good" (Run scene, test_track): walls along the road with lit edges, closed gates with taller posts, plots with buildings and trees; the white screen is gone. Next: browser Build And Run to check frame rate, glow and the see-through barrier in WebGL (not done yet).
+ELIA: "now it looks good" (Run scene, test_track): walls along the road with lit edges, closed gates with taller posts, plots with buildings and trees; the white screen is gone. Next: browser Build And Run to check frame rate, glow and the see-through barrier in WebGL (not done yet).
 
 ## 2026-11-11 — D17: first browser build with scenery; gap pit, gate fix, running figure
 
-John ran Build And Run (Chrome, development build): the track test level plays in the browser with scenery, bricks and the tunnel. No frame-rate complaint; build size not reported yet. Feedback:
+ELIA ran Build And Run (Chrome, development build): the track test level plays in the browser with scenery, bricks and the tunnel. No frame-rate complaint; build size not reported yet. Feedback:
 - Screen "shakes" on quick left-right: that is the step-3 camera roll (2 degrees) and sideways lag; explained, not changed (CameraFeel > Roll Degrees).
 - Gap needs depth, maybe water. Gate ("green wall") looks jittery. Wants a running character instead of the capsule, with white smoke from the heels.
 
@@ -548,11 +548,11 @@ Done:
 
 Tested: compile check (stand-ins added for ParticleSystem and its modules), 133 Core tests. Not run in Unity.
 Uncertain: the cut road and pit by eye, especially on slopes and where a gap crosses a 40 m chunk boundary; the particle setup from script (module properties) and its look in WebGL; limb swing directions; how the squashed figure reads as a slide.
-Scope note: the figure and dust were asked for by John; particles were already on the day-27 juice list.
+Scope note: the figure and dust were asked for by ELIA; particles were already on the day-27 juice list.
 
 ## 2026-11-11 — D17: stuck Shift key in the browser, bend lean, trail off
 
-John (Chrome build): figure and gate look good. Asked if the yellow trail is needed; thought he pressed on time at the gap (beat 68) but failed; wants the runner to lean into bends; sometimes left taps do nothing, "especially in the open stretch".
+ELIA (Chrome build): figure and gate look good. Asked if the yellow trail is needed; thought he pressed on time at the gap (beat 68) but failed; wants the runner to lean into bends; sometimes left taps do nothing, "especially in the open stretch".
 
 Finding (from his screenshots, not reproduced here): at the gap failure the debug log's newest entry is the phase hold ending at beat 61: no gesture at all was registered near beat 68. An earlier screenshot shows "R-Shift: DOWN" at beat 54.9 with no gesture logged since the jump at beat 43.8, i.e. a key shown as held for 6 s after a both-press. Reading: on Windows, when both Shift keys are down and one is released, the browser gets no key-up for it; Unity's keyboard state keeps that key down, so its next press has no down edge and is lost. This follows every jump and phase, which matches both complaints. The editor reads the keyboard differently and was not affected.
 
@@ -567,16 +567,16 @@ Remaining limit: releasing one Shift while the other stays held is not seen unti
 
 ## 2026-11-11 — D17: both-press lost in the Web build (my regression), lean reduced
 
-John (Chrome): pressing both Shifts did not jump, three tries. His screenshot at the hurdle (beat 44) logs only "TapRight": the left key's press was never registered. Before the browser key reader, the same spot logged BothTap, so the reader introduced this.
+ELIA (Chrome): pressing both Shifts did not jump, three tries. His screenshot at the hurdle (beat 44) logs only "TapRight": the left key's press was never registered. Before the browser key reader, the same spot logged BothTap, so the reader introduced this.
 Likely cause (not confirmed on his machine): the reader skipped key-down events flagged "repeat"; with one Shift already down, Windows flags the first press of the other Shift as a repeat. Fix: a repeat is ignored only when that same key is already marked down.
-Also: bend lean reduced to 1 degree per degree of turn, at most 5 (was 3 and 16): John found the big lean read like a lane change. Fields renamed so the saved values are dropped.
+Also: bend lean reduced to 1 degree per degree of turn, at most 5 (was 3 and 16): ELIA found the big lean read like a lane change. Fields renamed so the saved values are dropped.
 Added tools/shift-key-test.html: a page that lists the browser's raw Shift key events (code, repeat, shiftKey) for four short tests, to replace guesses about the Windows behaviour with facts.
 Tested: compile check; the key script simulated in Node (second Shift flagged repeat counts, true auto-repeat ignored). Not run in a browser.
-Uncertain: everything about what Windows and Chrome really send for two Shift keys until John's test page results are in. In particular, tapping one Shift while holding the other (lane change during a slide) may leave the tapped key marked down.
+Uncertain: everything about what Windows and Chrome really send for two Shift keys until ELIA's test page results are in. In particular, tapping one Shift while holding the other (lane change during a slide) may leave the tapped key marked down.
 
 ## 2026-11-11 — D17: Web input verified; what Chrome on Windows really reports for two Shift keys
 
-John (Chrome build): "works well now"; test_track completed in the browser with jumps, phase and taps registering.
+ELIA (Chrome build): "works well now"; test_track completed in the browser with jumps, phase and taps registering.
 
 Facts from tools/shift-key-test.html on his machine (Chrome, Windows):
 1. Both together: keydown ShiftRight (repeat false), keydown ShiftLeft 4 ms later with repeat TRUE, then auto-repeat of ShiftLeft, then ONE keyup (ShiftRight, shiftKey false). No keyup for ShiftLeft.
@@ -586,65 +586,65 @@ Facts from tools/shift-key-test.html on his machine (Chrome, Windows):
 
 So: the second Shift's key-down is always flagged repeat (confirms the last fix); only the LAST Shift released produces a key-up; the first release is silent. Auto-repeat moves to the most recently pressed key.
 
-Consequence still open: tapping one Shift while holding the other (e.g. changing lane during a slide) cannot be seen as a tap in the browser: the tapped key stays marked down until the held key is released, so it is read as a hold (and both down). Proposed to John, not built: in Web builds, a second Shift pressed more than the both-window (80 ms) after the first counts as a tap straight away. Windows desktop builds are not affected.
+Consequence still open: tapping one Shift while holding the other (e.g. changing lane during a slide) cannot be seen as a tap in the browser: the tapped key stays marked down until the held key is released, so it is read as a hold (and both down). Proposed to ELIA, not built: in Web builds, a second Shift pressed more than the both-window (80 ms) after the first counts as a tap straight away. Windows desktop builds are not affected.
 
 ## 2026-11-11 — D17: Web tap-during-hold workaround
 
-John agreed to the workaround. Browser felt smooth with all scenery (his words); build size still not known. The red Console error (UnityConnectWebRequestException: Token Exchange failed) is the editor's own Unity account service, not project code.
+ELIA agreed to the workaround. Browser felt smooth with all scenery (his words); build size still not known. The red Console error (UnityConnectWebRequestException: Token Exchange failed) is the editor's own Unity account service, not project code.
 Done: in the Web path of ShiftInput, a Shift pressed while the other has been held longer than bothWindowMs is fed to the classifier as press + release at once (a tap) and ignored until the browser shows it up. Documented in Docs/INPUT.md with the limits.
 Tested: compile check for both variants; new Core test (zero-length tap during a hold fires the tap, no both gesture, the hold goes on); 134 Core tests pass. Not run in a browser.
 
 ## 2026-11-11 — D17: Web tap-during-hold verified; art block closed; level 1 drafted
 
-John (Chrome build): "everything works" (tap during a hold, jump, phase); asked to move on. Days 16-17 block done: palettes, glow, camera feel, phase look, shapes, track kit, scenery, running figure, Web input.
+ELIA (Chrome build): "everything works" (tap during a hold, jump, phase); asked to move on. Days 16-17 block done: palettes, glow, camera feel, phase look, shapes, track kit, scenery, running figure, Web input.
 Still not known: the Web build's size (limit 20 MB compressed). Not done: Edge calibration redo; Release Web profile build.
 
 Level 1 "Warm-up" drafted a day early (plan: day 18): Assets/_Game/Levels/level01.json, see Docs/LEVELS.md. Lane changes only, quarter notes, first 8 bars one tap each, 2-bar breather before the fastest section (plan's authoring rules). Set Up Visuals now orders the Run scene's levels: level01, test_track, test_gestures, level00.
 Tested: level validates, strict chart check has no warnings, a scripted walk-through needs at most two taps per obstacle with at least one beat per tap, file round-trips through the chart writer. Compile check passes.
-Not run in Unity. Whether it is fun, readable and the right difficulty is John's call after playing (rule of thumb: clear within 5 attempts).
+Not run in Unity. Whether it is fun, readable and the right difficulty is ELIA's call after playing (rule of thumb: clear within 5 attempts).
 
 ## 2026-11-11 — D17: level 1 played; level 2 drafted
 
-John: cleared level 1 on the first attempt; visuals "look good, realistic with lighting". Asked if level 1 should have only one type of obstacle: yes by the plan (level 1 = Tap L and Tap R only; bar and wide are both lane changes, same orange).
+ELIA: cleared level 1 on the first attempt; visuals "look good, realistic with lighting". Asked if level 1 should have only one type of obstacle: yes by the plan (level 1 = Tap L and Tap R only; bar and wide are both lane changes, same orange).
 Build folder size (development Web build): 59.4 MB uncompressed on disk. Not comparable with the 20 MB compressed limit: needs a Release profile build to measure. Flagged as a risk to check before day 24, not day 28.
-Noticed, not changed: his clean run scored 50 with best streak 1 and 0% perfect. By design a dodge made away from the obstacle's beat grades "Ok" (no points, streak reset); only moves within 120 ms of the beat score. On a lane-change level that makes a clean run look like a bad one. This is the open M1 question "when should the click land"; needs John's decision.
+Noticed, not changed: his clean run scored 50 with best streak 1 and 0% perfect. By design a dodge made away from the obstacle's beat grades "Ok" (no points, streak reset); only moves within 120 ms of the beat score. On a lane-change level that makes a clean run look like a bad one. This is the open M1 question "when should the click land"; needs ELIA's decision.
 
 Level 2 "Low ceiling" drafted: Assets/_Game/Levels/level02.json (Docs/LEVELS.md). Set Up Visuals generates click_110.wav and puts level02 first in the Run scene's list.
 Tested: validates, strict chart check clean, scripted walk (gate openings always in the player's lane, holds at least 4 beats apart, nothing under 2 beats), round-trips through the chart writer. Compile check passes. Not played.
 
 ## 2026-11-11 — D17: scoring: every obstacle passed scores
 
-John's decision: points for every obstacle passed, Ok 5, Good 20, Perfect 50, the on-beat grades being the bonus.
-Done: ScoreKeeper values 50 / 20 / 5 (were 100 / 50 / 0), all times the streak multiplier. An OK no longer resets the streak; it neither adds to it nor breaks it (my choice, so the streak and multiplier stay a reward for on-beat play; one line to change if John wants passes to build the streak too). Best-score keys moved to ShiftShift.BestV2.* so bests under the old values are not compared with new ones. Docs/SCORING.md updated.
+ELIA's decision: points for every obstacle passed, Ok 5, Good 20, Perfect 50, the on-beat grades being the bonus.
+Done: ScoreKeeper values 50 / 20 / 5 (were 100 / 50 / 0), all times the streak multiplier. An OK no longer resets the streak; it neither adds to it nor breaks it (my choice, so the streak and multiplier stay a reward for on-beat play; one line to change if ELIA wants passes to build the streak too). Best-score keys moved to ShiftShift.BestV2.* so bests under the old values are not compared with new ones. Docs/SCORING.md updated.
 Tested: 136 Core tests pass (3 scoring tests rewritten, 2 added: a clean off-beat run of 27 scores 135; an OK uses the multiplier). Compile check passes. Not run in Unity.
 
 ## 2026-11-11 — D17: camera lowered to 2.8 m
 
-John (level 2, editor): the gate's top beam (2.95-3.15 m) was level with the camera (3.3 m), looked like it hit the camera and blocked the view of the runner. Asked for the camera to come down so the beam passes overhead. His screenshot also shows the new scoring counting up (115 points at beat 41).
+ELIA (level 2, editor): the gate's top beam (2.95-3.15 m) was level with the camera (3.3 m), looked like it hit the camera and blocked the view of the runner. Asked for the camera to come down so the beam passes overhead. His screenshot also shows the new scoring counting up (115 points at beat 41).
 Done: CameraFeel offset y 3.3 -> 2.8 (asset and code default); tunnelDrop default 0.5 -> 0 (2.8 m is the height he already approved inside the tunnel). Docs/PALETTES.md notes that the day-16 rule "every obstacle top below the camera" no longer holds for the 3 m obstacles.
 Tested: compile check only. Not run in Unity.
 
 ## 2026-11-11 — D17: camera closer after the height change
 
-John (level 2, editor, camera at 2.8 m): the gate beam now passes overhead, but the runner "looks a little far ahead", so judging the distance to an obstacle is tricky. (The earlier ArgumentNullException "clock" was scripts reloading during Play mode after a pull, not a game bug; advised Recompile After Finished Playing.)
+ELIA (level 2, editor, camera at 2.8 m): the gate beam now passes overhead, but the runner "looks a little far ahead", so judging the distance to an obstacle is tricky. (The earlier ArgumentNullException "clock" was scripts reloading during Play mode after a pull, not a game bug; advised Recompile After Finished Playing.)
 Done: CameraFeel offset z -7 -> -5.5 (closer behind the runner) and lookAhead 8 -> 6 (aims nearer, so the view tilts down about 3 degrees more and shows more road around the runner). Asset and code defaults.
-Tested: compile check only. These are first guesses by geometry, not by eye; John can tune Offset Z and Look Ahead in the CameraFeel asset while playing.
+Tested: compile check only. These are first guesses by geometry, not by eye; ELIA can tune Offset Z and Look Ahead in the CameraFeel asset while playing.
 
 ## 2026-11-11 — D17: camera settled; level 3 drafted; release build requested
 
-John: "camera feels right now" (2.8 m up, 5.5 m behind, aiming 6 m ahead). Asked for level 3 or the build; doing both: he runs Shift+Shift > Build WebGL (release, Brotli, prints the size against the 20 MB budget) while level 3 is drafted. Level 2 attempts not reported yet.
+ELIA: "camera feels right now" (2.8 m up, 5.5 m behind, aiming 6 m ahead). Asked for level 3 or the build; doing both: he runs Shift+Shift > Build WebGL (release, Brotli, prints the size against the 20 MB budget) while level 3 is drafted. Level 2 attempts not reported yet.
 Level 3 "Gaps" drafted: Assets/_Game/Levels/level03.json (Docs/LEVELS.md). Set Up Visuals generates click_120.wav and puts level03 first in the Run scene's list.
 Tested: validates, strict chart check clean (no gap-on-slope warning), scripted walk (jumps at least 4 beats apart, nothing under 2 beats, two-tap moves have 4 beats), round-trips through the chart writer. Compile check passes. Not played.
 
 ## 2026-11-11 — D17: release Web build size measured
 
-John ran Shift+Shift > Build WebGL (release, Brotli + decompression fallback): "[Build] WebGL OK in 03:54 -> Builds/WebGL, 9.6 MB on disk (plan budget: under 20 MB)". About 10 MB of headroom. Contents at the time: levels 1-2 with placeholder clicks, all scenery, no music yet. The earlier 59.4 MB was the development build, uncompressed.
+ELIA ran Shift+Shift > Build WebGL (release, Brotli + decompression fallback): "[Build] WebGL OK in 03:54 -> Builds/WebGL, 9.6 MB on disk (plan budget: under 20 MB)". About 10 MB of headroom. Contents at the time: levels 1-2 with placeholder clicks, all scenery, no music yet. The earlier 59.4 MB was the development build, uncompressed.
 Budget note for day 23: six music tracks have to fit in roughly 10 MB together (about 1.5 MB each after Unity's compression), or fewer tracks get reused (cut order item 4).
-Not yet done by John: Set Up Visuals + play for level 3 (his pull shows the level arrived; nothing to commit yet).
+Not yet done by ELIA: Set Up Visuals + play for level 3 (his pull shows the level arrived; nothing to commit yet).
 
 ## 2026-11-11 — D17: levels 2 and 3 played; ghost-layer chart types; level 4 drafted
 
-John: level 2 cleared on attempt 4, level 3 on attempt 4 (plan's limit: 5). Left as they are; tester feedback on days 25-26 decides.
+ELIA: level 2 cleared on attempt 4, level 3 on attempt 4 (plan's limit: 5). Left as they are; tester feedback on days 25-26 decides.
 
 The plan's level 4 needs "two overlapping obstacle layers"; the chart had no way to place a ghost-layer block. Added two chart types (ObstacleTypes.Cores): ghostbar (barrier + core in the event's lane) and ghostwide (barrier + cores in the other two lanes). They fill their beat in the chart like gate and wide; the spawner places the barrier and one GhostBlock per core, each judged on its own; the chart editor draws core lanes lighter. Ghost-layer blocks are now a lighter tint of the phase colour (were identical to the barrier), so cores can be seen before phasing. Set Up Visuals now also refreshes the spawner's type list.
 Level 4 "Ghost layer" drafted: Assets/_Game/Levels/level04.json (Docs/LEVELS.md), click_125 generated by the tool, level04 first in the Run scene's list.
@@ -654,14 +654,14 @@ Uncertain: how a light core reads inside the 65%-solid barrier, in the night pal
 
 ## 2026-11-11 — D17: "ghost block", light pink
 
-John asked what "cores" were; chose the name "ghost block" and light pink for them.
+ELIA asked what "cores" were; chose the name "ghost block" and light pink for them.
 Done: renamed in code (ObstacleTypes.GhostBlocks, spawner field ghostBlockPrefab), comments, chart editor and Docs/LEVELS.md. Ghost blocks are light pink (#FFB5D9) on every level, not palette-driven; brighter (half-way to white) while phased; the chart editor draws their lanes in the same pink.
-Flagged to John: pink is the jump colour (hurdle, gap rims) under the "colour = what you press" rule; the ghost block is a paler pink inside a blue wall. To watch when playing.
+Flagged to ELIA: pink is the jump colour (hurdle, gap rims) under the "colour = what you press" rule; the ghost block is a paler pink inside a blue wall. To watch when playing.
 Tested: compile check, 137 Core tests. Not run in Unity. The spawner's prefab field was renamed, so Set Up Visuals must be run before level 4 plays.
 
 ## 2026-11-11 — D17: level 4 played; level 5 drafted
 
-John: level 4 cleared on attempt 3 (ghost blocks light pink). Asked for level 5.
+ELIA: level 4 cleared on attempt 3 (ghost blocks light pink). Asked for level 5.
 Level 5 "Drumline" drafted: Assets/_Game/Levels/level05.json (Docs/LEVELS.md), click_135 generated by the tool, level05 first in the Run scene's list.
 Tested: validates, strict check clean, scripted walk (3 free beats before each wall, lane unknown after a wall, gates only with a certain lane, at most two taps, lane change + phase gets 4 beats), round-trips. Compile check passes. Not played.
 Uncertain: whether four taps before every wall at 135 BPM is tiring over 92 s (21 walls); the open M1 question that charge taps move the runner sideways is now felt in a real level.
@@ -669,7 +669,7 @@ Schedule: five of six levels exist as first drafts on day 17 (plan: levels 1-4 b
 
 ## 2026-11-11 — D17: level 5 played; tempo and palette changes; level 6 drafted
 
-John: level 5 cleared on attempt 3. Asked for level 6.
+ELIA: level 5 cleared on attempt 3. Asked for level 6.
 Level 6 needs a tempo rise and a palette cycle (plan). Done:
 - Core/TempoMap.cs: beats <-> seconds with tempo changes; LevelData gets optional `tempo` and `paletteChanges` lists (validated). With no changes the maths is the old beat x 60 / bpm.
 - Conductor converts through the tempo map (BeatAt, SongTimeAtBeat, new BpmAtBeat); the count-in uses the starting tempo. Spawner and TrackBuilder place gaps and hurdles using the tempo at their own beat.
@@ -679,12 +679,12 @@ Level 6 needs a tempo rise and a palette cycle (plan). Done:
 - Level 6 "Full shift": Assets/_Game/Levels/level06.json (Docs/LEVELS.md); first in the Run scene's list.
 
 Tested: 145 Core tests (8 new: tempo map continuity and round trip, click length, chart save, validation). Level validates, strict check clean, scripted walk with all earlier rules, round-trips; length 89.1 s. Compile check passes. Not played.
-Uncertain (all need John's eyes and ears): that the click and the obstacles stay together across the tempo rise at beat 96 in the editor and in WebGL; the feel of the speed-up (the runner goes from 10.8 to 12.5 m/s); hard palette cuts on the beat; a gap's hole position right after the rise.
+Uncertain (all need ELIA's eyes and ears): that the click and the obstacles stay together across the tempo rise at beat 96 in the editor and in WebGL; the feel of the speed-up (the runner goes from 10.8 to 12.5 m/s); hard palette cuts on the beat; a gap's hole position right after the rise.
 Schedule: all six levels exist as first drafts on day 17, on placeholder clicks.
 
 ## 2026-11-12 — D18: menu, level select, results choices, pause
 
-John: level 6 cleared on attempt 3 (so the tempo rise and palette cuts work in the editor). Asked for the menu.
+ELIA: level 6 cleared on attempt 3 (so the tempo rise and palette cuts work in the editor). Asked for the menu.
 Done (Docs/MENU.md):
 - Core/ShiftMenuKeys: Left / Right / Both from the two Shift keys, engine-free, 5 tests.
 - MainMenu (Menu scene): levels 1-6 with length and best score, Calibrate timing, Credits; Sticky Keys tip. Left/Right choose, Both opens.
@@ -699,15 +699,23 @@ Still placeholder: all UI is IMGUI text; no UI sounds until the audio pass.
 
 ## 2026-11-13 — D19: commit attribution removed
 
-John asked for Claude to be removed as a contributor and for it not to recur.
-Done: the 73 "Co-Authored-By: Claude ..." lines were stripped from the commit messages on main (history rewritten; every commit has a new hash). Trees, authors, committers, dates and the rest of each message are unchanged, checked commit by commit; the 73 commits that carried a signature were re-signed with the session key for now, the other 36 stay unsigned as before. .claude/settings.json added with attribution.commit and attribution.pr set to "" so Claude Code adds no attribution to commits or pull requests. Commits made in these sessions from here on carry no co-author line.
-Also removed, at John's request: the "Claude-Session:" link line the same 73 commit messages ended with; .claude/settings.json sets attribution.sessionUrl to false so it is not added again. Signing: John will re-sign the commits on his own machine with his own key, so GitHub shows them as verified under his account. Not changed: mentions of Claude inside files (CLAUDE.md, Docs, the in-game credits text) are content, not git attribution.
-After the forced push, John's clone must be reset to the new history (not pulled), or the old commits come back as a merge.
+ELIA asked for the co-author attribution to be removed from the commit history and for it not to recur.
+Done: the 73 "Co-Authored-By" lines were stripped from the commit messages on main (history rewritten; every commit has a new hash). Trees, authors, committers, dates and the rest of each message are unchanged, checked commit by commit. The project settings file now sets attribution.commit and attribution.pr to "", so no attribution is added to commits or pull requests.
+Also removed, at ELIA's request: the session link line the same 73 commit messages ended with; the settings file sets attribution.sessionUrl to false so it is not added again. Signing: ELIA re-signs the commits on their own machine with their own key, so GitHub shows them as verified under their account.
+After the forced push, ELIA's clone must be reset to the new history (not pulled), or the old commits come back as a merge.
 
 ## 2026-11-13 — D19: licences
 
-John re-signed the whole history with his own SSH signing key and force-pushed (110 commits, all signed; this session's copy reset to it).
-Dual licensing at John's request: LICENSE (MIT, source code only, note added at the top), new LICENSE-ASSETS (All Rights Reserved for all original non-code content), README "License" section, and the click-track row in Docs/CREDITS.md changed from "MIT, as code" to All Rights Reserved so it does not contradict the new notice.
-Decided by John: the copyright holder in both files is "ELIA" (git config user.name returns "John"); level designs, scenes, prefabs, materials and palettes are assets (All Rights Reserved); the Docs/ folder is also under LICENSE-ASSETS.
-Signing: commits made from the cloud session are unsigned from here on (repo-local commit.gpgsign false there), so GitHub shows no badge on them. John batch-signs everything on his PC with his own SSH key right before the final Game Off submission (added to the submission checklist in Docs/PLAN.md).
+ELIA re-signed the whole history with their own SSH signing key and force-pushed (110 commits, all signed; this session's copy reset to it).
+Dual licensing at ELIA's request: LICENSE (MIT, source code only, note added at the top), new LICENSE-ASSETS (All Rights Reserved for all original non-code content), README "License" section, and the click-track row in Docs/CREDITS.md changed from "MIT, as code" to All Rights Reserved so it does not contradict the new notice.
+Decided by ELIA: the copyright holder in both files is "ELIA" (git config user.name returns "ELIA"); level designs, scenes, prefabs, materials and palettes are assets (All Rights Reserved); the Docs/ folder is also under LICENSE-ASSETS.
+Signing: commits made from the cloud session are unsigned from here on (repo-local commit.gpgsign false there), so GitHub shows no badge on them. ELIA batch-signs everything on their PC with their own SSH key right before the final Game Off submission (added to the submission checklist in Docs/PLAN.md).
 How to batch-sign (tested on 13 Nov; it never touches the working files): close Unity, `git fetch origin`, `git reset --hard origin/main`, then `git filter-branch -f --commit-filter 'git commit-tree -S $@' -- main`, check `git cat-file commit HEAD | Select-String gpgsig`, then `git push --force-with-lease origin main`. Do not use `git rebase -S --root` for this: it stops at the commit that moved the PNGs into LFS.
+
+## 2026-11-13 — D19: names in credits and docs; README charge row
+
+ELIA's instructions: the credits name is ELIA, and no other personal or tool name is to appear anywhere in the project's files.
+Done: the earlier first name replaced by ELIA in 32 files (docs, code comments, test comments: 166 places); the tool name removed from the plan, credits, log and code comments (references to the rules file now read "project rules"). In-game credits: "Design, code, levels and testing: ELIA". Docs/CREDITS.md tools list: "Design, code and levels by ELIA". README controls: charge is "Alternate L, R, L, R quickly" (no beat needed since day 13).
+Tested: compile check, 150 Core tests (only comments, docs and one credits string changed).
+Left as they are, for ELIA to decide: the names of the rules file and the settings folder at the repository root (the tool only finds them under those names; cloud sessions clone the repository fresh, so they must stay in it to work); the author name and three commit subjects in the existing commit history (changing them means another history rewrite, which can be folded into the final batch-signing).
+Note: the Menu scene already in the repository has no credits text yet; it is filled in when Set Up Visuals first creates the Menu object.

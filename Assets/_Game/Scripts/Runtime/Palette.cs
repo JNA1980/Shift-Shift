@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ShiftShift
 {
     /// <summary>
-    /// One level's colours (playbook 2.2; chosen with John, day 16, Docs/PALETTES.md): sky, road, lines, accent and
+    /// One level's colours (playbook 2.2; chosen with ELIA, day 16, Docs/PALETTES.md): sky, road, lines, accent and
     /// "colour = what you press" action colours. Picked by the level JSON's "palette" field (asset name).
     /// </summary>
     [CreateAssetMenu(menuName = "Shift+Shift/Palette", fileName = "Palette")]

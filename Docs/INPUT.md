@@ -23,13 +23,13 @@ All times are **song time** in seconds from `ShiftInput.Clock` (`IClock`). Until
 ## How each gesture is decided
 
 - **Tap** is decided on key-up (it might still become a hold), timed at key-down.
-  Lane changes therefore show one press-length late (~60–107 ms measured). John, day 10: feels fine, keep.
+  Lane changes therefore show one press-length late (~60–107 ms measured). ELIA, day 10: feels fine, keep.
 - **Hold** fires when the threshold passes while still held, timed at key-down.
 - **Both** is decided as soon as the second key goes down. First key-up before the threshold = BothTap;
   otherwise BothHold until the first key-up.
 - **Lockout after a both-gesture:** the key still held, and any re-press, are ignored until both keys are up.
   Otherwise letting go of one key at the end of a phase would become a sprint or slide.
-- **Alternate (changed day 13, John: option A):** quick alternating taps, **no beat needed**. A tap continues the
+- **Alternate (changed day 13, ELIA: option A):** quick alternating taps, **no beat needed**. A tap continues the
   streak when it is on the *other* side and its key-down is within 400 ms of the previous tap's. A same-side tap or
   a longer gap restarts at 1; a hold or both-gesture resets to 0; the streak expires 400 ms after the last tap.
   Charge = streak 4 (Charge Taps). Every Alternate tap is also a TapLeft/TapRight (see open question 1).
@@ -49,7 +49,7 @@ All times are **song time** in seconds from `ShiftInput.Clock` (`IClock`). Until
 
 ## Web builds: two Shift keys in the browser (day 17)
 
-Measured on John's machine (Chrome, Windows) with `tools/shift-key-test.html`:
+Measured on ELIA's machine (Chrome, Windows) with `tools/shift-key-test.html`:
 - The second Shift's key-down is flagged "repeat" even on its first press.
 - Only the last Shift released produces a key-up. The first release is silent.
 

@@ -27,7 +27,7 @@ namespace ShiftShift.Core
     }
 
     /// <summary>
-    /// Score for one run (John, day 17): every obstacle passed scores, more for passing it on the beat:
+    /// Score for one run (ELIA, day 17): every obstacle passed scores, more for passing it on the beat:
     /// Perfect 50, Good 20, OK 5, each times the streak multiplier (x2 at 10, x3 at 25, x4 at 50).
     /// The streak counts on-beat answers (Perfect, Good) in a row; an OK neither adds to it nor breaks it.
     /// </summary>
