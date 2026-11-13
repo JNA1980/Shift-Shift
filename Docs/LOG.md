@@ -719,3 +719,15 @@ Done: the earlier first name replaced by ELIA in 32 files (docs, code comments, 
 Tested: compile check, 150 Core tests (only comments, docs and one credits string changed).
 Left as they are, for ELIA to decide: the names of the rules file and the settings folder at the repository root (the tool only finds them under those names; cloud sessions clone the repository fresh, so they must stay in it to work); the author name and three commit subjects in the existing commit history (changing them means another history rewrite, which can be folded into the final batch-signing).
 Note: the Menu scene already in the repository has no credits text yet; it is filled in when Set Up Visuals first creates the Menu object.
+
+## 2026-11-13 — D19: final history step prepared
+
+ELIA's decisions: the name on commits is ELIA (git name set on the PC and in the cloud session); the rules file and the settings folder at the repository root stay, so cloud sessions keep working.
+Added tools/sign-history.sh for the last step before submission. It sets the author and committer name of every commit to the current git name, rewords the three old commit subjects that contain a name, and signs every commit with the owner's key. It rewrites commit records only and never touches the working files (the earlier `git rebase -S --root` attempt stopped at the commit that moved the PNGs into LFS).
+Rehearsed here on a throwaway branch: 112 commits, 112 signed, one name, files, emails and dates identical, three subjects changed, no name left in any message.
+Final step, on the PC, with Unity closed (this replaces the filter-branch line in the earlier entry):
+1. `git fetch origin` then `git reset --hard origin/main` (or `git pull --no-edit` if nothing was rewritten since the last pull)
+2. `git -c alias.signhistory='!sh tools/sign-history.sh' signhistory`
+3. Check the printed totals, then `git push --force-with-lease origin main`
+4. Tell the cloud session, so its copy is reset before any further commit.
+Until then: commits already on GitHub keep the old name and their Verified badges; new commits carry the name ELIA and, when made from the cloud session, no signature.

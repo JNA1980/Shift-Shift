@@ -414,9 +414,10 @@ close.
 - [x] LICENSE chosen: MIT for code (LICENSE), All Rights Reserved for assets
   and Docs/ (LICENSE-ASSETS), copyright ELIA. Third-party assets keep their
   own licences.
-- [ ] Right before the final submission: on ELIA's PC, batch-sign all commits
-  with their own SSH key (commits made from the cloud session are unsigned),
-  then force-push. Command and steps: Docs/LOG.md, 2026-11-13.
+- [ ] Right before the final submission: on ELIA's PC, run the final history
+  step (tools/sign-history.sh): one name on every commit, three old subjects
+  reworded, every commit signed with ELIA's own SSH key (commits made from the
+  cloud session are unsigned). Then force-push. Steps: Docs/LOG.md, 2026-11-13.
 
 - [ ] Tag v1.0-jam on the submitted commit
 
