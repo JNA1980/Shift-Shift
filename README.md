@@ -36,6 +36,16 @@ Gesture logic is engine-free and covered by edit-mode tests:
 
 [Design & build plan](Docs/PLAN.md) · [Scope lock](Docs/SCOPE.md) · [Credits](Docs/CREDITS.md) · [Input rules](Docs/INPUT.md)
 
-## Licence
+## License
 
-Code: MIT (see [LICENSE](LICENSE)). Assets: see [Docs/CREDITS.md](Docs/CREDITS.md).
+This project is dual-licensed. Copyright (c) 2026 ELIA.
+
+- **Source code: MIT.** The C# scripts, editor tools, tests and build scripts are open source under the
+  MIT License. See [LICENSE](LICENSE).
+- **Game assets: All Rights Reserved.** All original game art, audio, music, sprites, textures, 3D models,
+  fonts, level designs and other media assets are not open source. They may not be copied, modified,
+  distributed or reused without explicit written permission. See [LICENSE-ASSETS](LICENSE-ASSETS).
+- **Documentation: All Rights Reserved.** Everything in the `Docs/` folder (plan, scope, logs, guides) is
+  covered by the same notice, [LICENSE-ASSETS](LICENSE-ASSETS).
+
+Third-party material keeps its own licence; it is listed in [Docs/CREDITS.md](Docs/CREDITS.md).

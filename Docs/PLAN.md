@@ -411,8 +411,12 @@ close.
 
 - [ ] SCOPE.md: scope lock and post-jam list
 
-- [ ] LICENSE chosen (MIT for code is the common jam choice; assets keep
-  their own licences)
+- [x] LICENSE chosen: MIT for code (LICENSE), All Rights Reserved for assets
+  and Docs/ (LICENSE-ASSETS), copyright ELIA. Third-party assets keep their
+  own licences.
+- [ ] Right before the final submission: on John's PC, batch-sign all commits
+  with his own SSH key (commits made from the cloud session are unsigned),
+  then force-push. Command and steps: Docs/LOG.md, 2026-11-13.
 
 - [ ] Tag v1.0-jam on the submitted commit
 

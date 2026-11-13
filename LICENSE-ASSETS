@@ -1,0 +1,28 @@
+Shift+Shift: game assets and documentation
+
+Copyright (c) 2026 ELIA. All Rights Reserved.
+
+This notice covers every original asset and media file in this repository
+that is not source code, including but not limited to: visual art, audio,
+music, sound effects, sprites, textures, materials, 3D models, fonts, level
+designs, scenes, prefabs, palettes, screenshots, video and other media.
+
+It also covers the documentation in the Docs/ folder (the design and build
+plan, scope, logs, guides and any media stored there).
+
+No permission is granted to copy, modify, distribute, sublicense, sell or
+otherwise reuse any visual art, audio, music, sprites, textures, 3D models,
+other media assets or Docs/ documentation in this repository, in whole or in
+part, without the
+explicit prior written permission of the copyright holder.
+
+The assets and documentation are published in this repository only so that
+the project can be viewed, built and played as submitted to GitHub Game Off
+2026. That does not grant any licence to use them in another project or
+product.
+
+What this notice does not cover:
+- The project's source code, which is licensed under the MIT License (see
+  LICENSE).
+- Third-party assets, which remain under their own licences (see
+  Docs/CREDITS.md).
